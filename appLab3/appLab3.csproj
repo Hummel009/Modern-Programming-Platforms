@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>appLab02</RootNamespace>
+    <RootNamespace>appLab3</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
    <AllowUnsafeBlocks>true</AllowUnsafeBlocks> 
