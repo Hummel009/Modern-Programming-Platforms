@@ -23,9 +23,11 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore --project ./app${{matrix.version}}
+      working-directory: ./app${{matrix.version}}
+      run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal --project ./app${{matrix.version}}
+      working-directory: ./app${{matrix.version}}
+      run: dotnet test --no-build --verbosity normal
     - name: Upload artifact
       uses: actions/upload-artifact@v3.1.3
       with:
