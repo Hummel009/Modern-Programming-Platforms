@@ -1,0 +1,50 @@
+# Visual Studio temporary files
+.vscode/
+.vs/
+bin/
+obj/
+
+# User-specific files
+*.suo
+*.user
+*.userprefs
+*.sln.docstates
+
+# .NET Scaffolding
+ScaffoldingReadMe.txt
+
+# User-specific files
+*.suo
+*.user
+*.userprefs
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Visual Studio Code directories
+.vscode/
+
+# Rider
+.idea/
+
+# User-specific files
+*.suo
+*.user
+*.userprefs
+*.sln.docstates
+
+# User-specific files
+*.suo
+*.user
+*.userprefs
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# User-specific files
+*.suo
+*.user
+*.userprefs
+
+# Rider
+.idea/
