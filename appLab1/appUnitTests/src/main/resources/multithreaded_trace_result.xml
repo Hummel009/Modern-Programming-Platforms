@@ -1,0 +1,14 @@
+<root>
+    <thread id="1" time="60ms">
+        <method name="FirstMethod" time="10ms" class="FirstClass"/>
+        <method name="ThirdMethod" time="30ms" class="ThirdClass">
+            <method name="SecondMethod" time="20ms" class="SecondClass"/>
+        </method>
+    </thread>
+    <thread id="2" time="150ms">
+        <method name="SixthMethod" time="60ms" class="SixthClass">
+            <method name="FifthMethod" time="50ms" class="FifthClass"/>
+        </method>
+        <method name="FourthMethod" time="40ms" class="FourthClass"/>
+    </thread>
+</root>

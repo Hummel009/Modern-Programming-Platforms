@@ -1,0 +1,54 @@
+{
+    "threads": [
+        {
+            "id": "1",
+            "time": "60ms",
+            "methods": [
+                {
+                    "name": "FirstMethod",
+                    "class": "FirstClass",
+                    "time": "10ms",
+                    "methods": [ ]
+                },
+                {
+                    "name": "ThirdMethod",
+                    "class": "ThirdClass",
+                    "time": "30ms",
+                    "methods": [
+                        {
+                            "name": "SecondMethod",
+                            "class": "SecondClass",
+                            "time": "20ms",
+                            "methods": [ ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "2",
+            "time": "150ms",
+            "methods": [
+                {
+                    "name": "SixthMethod",
+                    "class": "SixthClass",
+                    "time": "60ms",
+                    "methods": [
+                        {
+                            "name": "FifthMethod",
+                            "class": "FifthClass",
+                            "time": "50ms",
+                            "methods": [ ]
+                        }
+                    ]
+                },
+                {
+                    "name": "FourthMethod",
+                    "class": "FourthClass",
+                    "time": "40ms",
+                    "methods": [ ]
+                }
+            ]
+        }
+    ]
+}
