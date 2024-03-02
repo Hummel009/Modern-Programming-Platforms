@@ -1,7 +1,6 @@
-﻿namespace com.github.hummel.mpp.lab2
+﻿namespace com.github.hummel.mpp.lab2;
+
+public interface IFaker
 {
-    public interface IFaker
-    {
-        T create<T>();
-    }
+    T create<T>();
 }

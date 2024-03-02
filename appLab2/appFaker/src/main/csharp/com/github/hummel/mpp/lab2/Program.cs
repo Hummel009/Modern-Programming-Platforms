@@ -1,8 +1,15 @@
-﻿
-using com.github.hummel.mpp.lab2;
+﻿namespace com.github.hummel.mpp.lab2;
 
-var f = new FakerImpl();
-var s = f.create<TestClass>();
+#pragma warning disable CS8618
+
+public class Program
+{
+    public static void Main()
+    {
+        var f = new FakerImpl();
+        f.create<TestClass>();
+    }
+}
 
 public class Gen : ICustomGenerator<int>
 {
