@@ -11,7 +11,7 @@ public class FakerConfigTest
     [TestMethod]
     public void classMemberExceptionTest()
     {
-        Action action = () =>
+        var action = () =>
         {
             FakerConfigImpl fakerConfig = new FakerConfigImpl();
             TestClass1 t = new TestClass1();
@@ -23,7 +23,7 @@ public class FakerConfigTest
     [TestMethod]
     public void notPropertyOrFieldExceptionTest()
     {
-        Action action = () =>
+        var action = () =>
         {
             FakerConfigImpl fakerConfig = new FakerConfigImpl();
             fakerConfig.add<TestClass, int, GenInt>(test => test.proc());
@@ -34,7 +34,7 @@ public class FakerConfigTest
     [TestMethod]
     public void notGeneratorExceptionTest()
     {
-        Action action = () =>
+        var action = () =>
         {
             FakerConfigImpl fakerConfig = new FakerConfigImpl();
             fakerConfig.add<TestClass, int, TestClass1>(test => test.f1);
@@ -45,7 +45,7 @@ public class FakerConfigTest
     [TestMethod]
     public void generatorTypeExceptionTest()
     {
-        Action action = () =>
+        var action = () =>
         {
             FakerConfigImpl fakerConfig = new FakerConfigImpl();
             fakerConfig.add<TestClass, int, GenString>(test => test.f1);

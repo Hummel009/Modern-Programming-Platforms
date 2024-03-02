@@ -17,11 +17,13 @@ public class Cycled
 public class ConstructorClass
 {
     private float f1 = float.NaN;
+    
     public float f2 = float.NaN;
     public float f3 = float.NaN;
     public float f4 = float.NaN;
 
     private float p1 { get; set; } = float.NaN;
+
     public float p2 { get; set; } = float.NaN;
     public float p3 { get; set; } = float.NaN;
     public float p4 { get; } = float.NaN;

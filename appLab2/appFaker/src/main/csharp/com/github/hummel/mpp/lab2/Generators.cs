@@ -52,22 +52,32 @@ public static class Generators
     public static object generateDto(Type type, Dictionary<MemberInfo, Type>? config = null)
     {
         HashSet<Type> usedTypes = [];
-        if (config == null) config = new Dictionary<MemberInfo, Type>();
+        if (config == null)
+        {
+            config = new Dictionary<MemberInfo, Type>();
+        }
         object InnerGenerator(Type type, bool considerType = true)
         {
-            if (considerType && !usedTypes.Add(type)) throw new Exception("Cyclic dependence");
+            if (considerType && !usedTypes.Add(type))
+            {
+                throw new Exception("Cyclic dependence");
+            }
             ConstructorInfo? constructor = null;
             var asdasd = type.GetMembers();
             var privateFields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where(field => !field.Name.Contains(">k__BackingField")).ToList();
             var privateProperties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance).Concat(type.GetProperties().Where(prop => prop.SetMethod == null || prop.SetMethod != null && !prop.SetMethod.IsPublic).ToList()).ToList();
             var privateMembers = privateFields.Select(member => member.Name.ToLower()).ToList().Union(privateProperties.Select(member => member.Name.ToLower()).ToList()).ToList();
             int privateMembersMaxAmount = -1;
+
             foreach (var constr in type.GetConstructors())
             {
                 int privateMembersAmount = 0;
                 foreach (var param in constr.GetParameters())
                 {
-                    if (privateMembers.Contains(param.Name!.ToLower())) privateMembersAmount++;
+                    if (privateMembers.Contains(param.Name!.ToLower()))
+                    {
+                        privateMembersAmount++;
+                    }
                 }
                 if (constr.IsPublic && privateMembersAmount > privateMembersMaxAmount)
                 {
@@ -75,7 +85,10 @@ public static class Generators
                     constructor = constr;
                 }
             }
-            if (constructor == null) throw new Exception("No public constructor");
+            if (constructor == null)
+            {
+                throw new Exception("No public constructor");
+            }
             List<object> parameters = [];
             foreach (var parameter in constructor.GetParameters())
             {
@@ -91,7 +104,9 @@ public static class Generators
                         parameters.Add(generateTypedMethod.Invoke(gen, null)!);
                     }
                     else
+                    {
                         parameters.Add(generate(parameter.ParameterType));
+                    }
                 }
                 catch (KeyNotFoundException)
                 {
@@ -114,14 +129,19 @@ public static class Generators
                     {
                         var m = mList[0];
                         var gen = Activator.CreateInstance(config[m]);
-                        Type typeOfT = m.MemberType == MemberTypes.Field ? (m as FieldInfo)!.FieldType : (m as PropertyInfo)!.PropertyType;
-                        MethodInfo generateTypedMethod = config[m].GetMethod("Generate")!;
+                        var typeOfT = m.MemberType == MemberTypes.Field ? (m as FieldInfo)!.FieldType : (m as PropertyInfo)!.PropertyType;
+                        var generateTypedMethod = config[m].GetMethod("Generate")!;
+
                         try
                         {
                             if (member.MemberType == MemberTypes.Field)
+                            {
                                 (member as FieldInfo).SetValue(newDTO, generateTypedMethod.Invoke(gen, null));
+                            }
                             else
+                            {
                                 (member as PropertyInfo).SetValue(newDTO, generateTypedMethod.Invoke(gen, null));
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -131,9 +151,13 @@ public static class Generators
                     else
                     {
                         if (member.MemberType == MemberTypes.Field)
+                        {
                             (member as FieldInfo).SetValue(newDTO, generate((member as FieldInfo).FieldType));
+                        }
                         else
+                        {
                             (member as PropertyInfo).SetValue(newDTO, generate((member as PropertyInfo).PropertyType));
+                        }
                     }
                 }
                 catch (KeyNotFoundException)
@@ -144,11 +168,11 @@ public static class Generators
 
             foreach (var member in errors)
             {
-                Type typeOfMember = member.MemberType == MemberTypes.Field ? (member as FieldInfo)!.FieldType : (member as PropertyInfo)!.PropertyType;
-                Type intf = typeOfMember.GetInterface("IList`1");
+                var typeOfMember = member.MemberType == MemberTypes.Field ? (member as FieldInfo)!.FieldType : (member as PropertyInfo)!.PropertyType;
+                var intf = typeOfMember.GetInterface("IList`1");
                 if (intf != null)
                 {
-                    Type genericType = intf.GenericTypeArguments[0];
+                    var genericType = intf.GenericTypeArguments[0];
                     while ((intf = intf.GenericTypeArguments[0].GetInterface("IList`1")) != null) { genericType = intf.GenericTypeArguments[0]; }
                     usedTypes.Add(genericType);
                     object ListGenerator(Type type)
@@ -173,16 +197,24 @@ public static class Generators
                         return res;
                     }
                     if (member.MemberType == MemberTypes.Field)
+                    {
                         (member as FieldInfo).SetValue(newDTO, ListGenerator((member as FieldInfo).FieldType));
+                    }
                     else
+                    {
                         (member as PropertyInfo).SetValue(newDTO, ListGenerator((member as PropertyInfo).PropertyType));
+                    }
                 }
                 else
                 {
                     if (member.MemberType == MemberTypes.Field)
+                    {
                         (member as FieldInfo).SetValue(newDTO, InnerGenerator((member as FieldInfo).FieldType));
+                    }
                     else
+                    {
                         (member as PropertyInfo).SetValue(newDTO, InnerGenerator((member as PropertyInfo).PropertyType));
+                    }
                 }
             }
             return newDTO;
@@ -237,15 +269,6 @@ public static class Generators
                                                         second: random.Next(0, 61)
                                                         );
 
-    private static object generateURL(Type type)
-    {
-        string start = "http://herecanbeyouradd.com/";
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789/";
-        int length = random.Next(10, 20);
-        var str = new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
-        return start + str;
-    }
-
     private static object generateList(Type type)
     {
         object? obj = null;
@@ -262,7 +285,9 @@ public static class Generators
             {
                 var temp = type.GetInterfaces().Where(interf => interf.Name.Contains("ILisy`")).ToList();
                 if (type.GenericTypeArguments[0].FullName!.Contains("System.") && temp.Count == 1)
+                {
                     throw new NotImplementedException($"Generator for type {type} has not been implemented yet");
+                }
                 throw new KeyNotFoundException();
             }
             Convert.ChangeType(obj, type.GenericTypeArguments[0]);

@@ -11,7 +11,7 @@ public class FakerTest
     {
         Action action = () =>
         {
-            FakerImpl f = new FakerImpl();
+            var f = new FakerImpl();
             f.create<CycleTestClass>();
         };
         action.Should().Throw<Exception>();
@@ -20,17 +20,16 @@ public class FakerTest
     [TestMethod]
     public void constructorSelectionTest()
     {
-        FakerImpl f = new FakerImpl();
-        ConstructorClass obj = f.create<ConstructorClass>();
+        var f = new FakerImpl();
+        var obj = f.create<ConstructorClass>();
         obj.check();
     }
 
     [TestMethod]
     public void commonClassTest()
     {
-        FakerImpl f = new FakerImpl();
-        CommonClass obj = f.create<CommonClass>();
-        Type type = typeof(CommonClass);
+        var f = new FakerImpl();
+        var obj = f.create<CommonClass>();
         obj.f1.Should().NotBe(float.NaN);
         obj.p1.Should().NotBe(float.NaN);
         foreach (var list in obj.list)
