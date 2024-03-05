@@ -36,49 +36,49 @@
                     <HierarchicalDataTemplate DataType="{x:Type vm:AssemblyNode}" ItemsSource="{Binding items}">
                         <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
                             <Image Source="Images\Assembly.png"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="3 0 0 0" />
+                            <TextBlock Text="{Binding name}" VerticalAlignment="Center" Margin="3 0 0 0" />
                         </StackPanel>
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type vm:NamespaceNode}" ItemsSource="{Binding items}">
                         <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
                             <Image Source="Images\Namespace.png"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="3 0 0 0" />
+                            <TextBlock Text="{Binding name}" VerticalAlignment="Center" Margin="3 0 0 0" />
                         </StackPanel>
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type vm:ClassNode}" ItemsSource="{Binding items}">
                         <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
                             <Image Source="{Binding imagePath}"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="3 0 0 0" />
+                            <TextBlock Text="{Binding name}" VerticalAlignment="Center" Margin="3 0 0 0" />
                         </StackPanel>
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type vm:PropertyNode}">
                         <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
                             <Image Source="Images\Property.png"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="3 0 0 0" />
+                            <TextBlock Text="{Binding name}" VerticalAlignment="Center" Margin="3 0 0 0" />
                         </StackPanel>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type vm:FieldNode}">
                         <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
                             <Image Source="{Binding imagePath}"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="3 0 0 0" />
+                            <TextBlock Text="{Binding name}" VerticalAlignment="Center" Margin="3 0 0 0" />
                         </StackPanel>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type vm:ConstructorNode}">
                         <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
                             <Image Source="Images\Constructor.png"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="3 0 0 0" />
+                            <TextBlock Text="{Binding name}" VerticalAlignment="Center" Margin="3 0 0 0" />
                         </StackPanel>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type vm:MethodNode}">
                         <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
                             <Image Source="{Binding imagePath}"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="3 0 0 0" />
+                            <TextBlock Text="{Binding name}" VerticalAlignment="Center" Margin="3 0 0 0" />
                         </StackPanel>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type vm:EventNode}">
                         <StackPanel Orientation="Horizontal" Margin="0 0 0 3">
                             <Image Source="Images\Event.png"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" Margin="3 0 0 0" />
+                            <TextBlock Text="{Binding name}" VerticalAlignment="Center" Margin="3 0 0 0" />
                         </StackPanel>
                     </DataTemplate>
                 </TreeView.Resources>

@@ -3,8 +3,6 @@
 #pragma warning disable CS7022
 #pragma warning disable CS0169
 
-Console.WriteLine("Impostor among us!");
-
 public class TestClass
 {
     public delegate void AccountHandler(string message);

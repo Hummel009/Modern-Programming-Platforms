@@ -65,7 +65,7 @@ public class DecompilerViewModel : INotifyPropertyChanged
                       return;
                   }
                   AssemblyNode assembly = new AssemblyNode(new AssemblyModel(a));
-                  if (this.assemblies.Where(asm => asm.Name == assembly.Name).ToList().Count == 0)
+                  if (this.assemblies.Where(asm => asm.name == assembly.name).ToList().Count == 0)
                   {
                       this.assemblies.Add(assembly);
                   }
@@ -146,7 +146,7 @@ public class DecompilerViewModel : INotifyPropertyChanged
 
 public interface INode : INotifyPropertyChanged
 {
-    public string Name
+    public string name
     {
         get;
     }
@@ -156,7 +156,7 @@ public class AssemblyNode : INode
 {
     public AssemblyNode(AssemblyModel assemly)
     {
-        this.Name = assemly.name;
+        this.name = assemly.name;
         this.path = assemly.assembly.Location;
         this.items = new List<INode>();
 
@@ -166,7 +166,7 @@ public class AssemblyNode : INode
         }
     }
     internal string path;
-    public string Name
+    public string name
     {
         get;
         set;
@@ -188,14 +188,14 @@ public class NamespaceNode : INode
 {
     public NamespaceNode(NamespaceModel namespaceModel)
     {
-        this.Name = namespaceModel.name;
+        this.name = namespaceModel.name;
         this.items = new List<INode>();
         foreach (var item in namespaceModel.classes)
         {
             items.Add(new ClassNode(item));
         }
     }
-    public string Name
+    public string name
     {
         get;
         set;
@@ -217,7 +217,7 @@ public class ClassNode : INode
 {
     public ClassNode(ClassModel cls)
     {
-        this.Name = cls.name;
+        this.name = cls.name;
         this.items = new List<INode>();
 
         if (cls.@class.IsEnum)
@@ -271,7 +271,7 @@ public class ClassNode : INode
         get;
         set;
     }
-    public string Name
+    public string name
     {
         get;
         set;
@@ -293,10 +293,10 @@ public class EventNode : INode
 {
     public EventNode(EventModel eventModel)
     {
-        this.Name = eventModel.ToString();
+        this.name = eventModel.ToString();
     }
 
-    public string Name
+    public string name
     {
         get;
         set;
@@ -313,7 +313,7 @@ public class MethodNode : INode
 {
     public MethodNode(MethodModel method)
     {
-        this.Name = method.ToString();
+        this.name = method.ToString();
         if (method.extension)
         {
             imagePath = "Images\\ExtensionMethod.png";
@@ -323,7 +323,7 @@ public class MethodNode : INode
             imagePath = "Images\\Method.png";
         }
     }
-    public string Name
+    public string name
     {
         get;
         set;
@@ -345,7 +345,7 @@ public class FieldNode : INode
 {
     public FieldNode(FieldModel field)
     {
-        this.Name = field.ToString();
+        this.name = field.ToString();
         if (field.field.DeclaringType!.IsEnum && !field.field.Name.Contains("value__"))
         {
             imagePath = "Images\\EnumValue.png";
@@ -356,7 +356,7 @@ public class FieldNode : INode
         }
     }
 
-    public string Name
+    public string name
     {
         get;
         set;
@@ -378,10 +378,10 @@ public class ConstructorNode : INode
 {
     public ConstructorNode(ConstructorModel constructor)
     {
-        this.Name = constructor.ToString();
+        this.name = constructor.ToString();
     }
 
-    public string Name
+    public string name
     {
         get;
         set;
@@ -398,10 +398,10 @@ public class PropertyNode : INode
 {
     public PropertyNode(PropertyModel property)
     {
-        this.Name = property.ToString();
+        this.name = property.ToString();
     }
     
-    public string Name
+    public string name
     {
         get;
         set;
