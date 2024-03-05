@@ -7,7 +7,7 @@
         xmlns:models="clr-namespace:com.github.hummel.mpp.lab3"
         xmlns:vm="clr-namespace:com.github.hummel.mpp.lab3"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="600">
+        Title="C# Decompiler" Height="720" Width="1200">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.1*"/>
