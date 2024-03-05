@@ -1,0 +1,9 @@
+﻿<Application x:Class="com.github.hummel.mpp.lab3.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:com.github.hummel.mpp.lab3"
+             StartupUri="src/main/resources/MainWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>

@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="src\main\resources\images\Assembly.png" />
+    <None Remove="src\main\resources\images\Class.png" />
+    <None Remove="src\main\resources\images\Constructor.png" />
+    <None Remove="src\main\resources\images\Delegate.png" />
+    <None Remove="src\main\resources\images\Enum.png" />
+    <None Remove="src\main\resources\images\EnumValue.png" />
+    <None Remove="src\main\resources\images\Event.png" />
+    <None Remove="src\main\resources\images\ExtensionMethod.png" />
+    <None Remove="src\main\resources\images\Field.png" />
+    <None Remove="src\main\resources\images\Interface.png" />
+    <None Remove="src\main\resources\images\Method.png" />
+    <None Remove="src\main\resources\images\Namespace.png" />
+    <None Remove="src\main\resources\images\Property.png" />
+    <None Remove="src\main\resources\images\Struct.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\appAssembly\appAssembly.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="src\main\resources\images\Assembly.png" />
+    <Resource Include="src\main\resources\images\Class.png" />
+    <Resource Include="src\main\resources\images\Constructor.png" />
+    <Resource Include="src\main\resources\images\Delegate.png" />
+    <Resource Include="src\main\resources\images\Enum.png" />
+    <Resource Include="src\main\resources\images\EnumValue.png" />
+    <Resource Include="src\main\resources\images\Event.png" />
+    <Resource Include="src\main\resources\images\ExtensionMethod.png" />
+    <Resource Include="src\main\resources\images\Field.png" />
+    <Resource Include="src\main\resources\images\Interface.png" />
+    <Resource Include="src\main\resources\images\Method.png" />
+    <Resource Include="src\main\resources\images\Namespace.png" />
+    <Resource Include="src\main\resources\images\Property.png" />
+    <Resource Include="src\main\resources\images\Struct.png" />
+  </ItemGroup>
+
+</Project>
