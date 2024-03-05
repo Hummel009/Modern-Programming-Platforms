@@ -29,18 +29,18 @@ public class DecompilerViewModel : INotifyPropertyChanged
         }
     }
 
-    private AssemblyNode selectedAssm;
-    public AssemblyNode SelectedAssm
+    private AssemblyNode selectedAsm;
+    public AssemblyNode SelectedAsm
     {
         get
         {
-            return selectedAssm;
+            return selectedAsm;
         }
         set
         {
-            if (selectedAssm != value)
+            if (selectedAsm != value)
             {
-                selectedAssm = value;
+                selectedAsm = value;
             }
         }
     }
@@ -81,12 +81,12 @@ public class DecompilerViewModel : INotifyPropertyChanged
         {
             return removeCommand ??= new RelayCommand(obj =>
               {
-                  if (selectedAssm != null)
+                  if (selectedAsm != null)
                   {
-                      this.Assemblies.Remove(selectedAssm);
+                      this.Assemblies.Remove(selectedAsm);
                       OnPropertyChanged(nameof(Assemblies));
                   }
-                  selectedAssm = null;
+                  selectedAsm = null;
               });
         }
     }
@@ -98,16 +98,16 @@ public class DecompilerViewModel : INotifyPropertyChanged
             return removeCommand ??
               (removeCommand = new RelayCommand(obj =>
               {
-                  if (selectedAssm != null)
+                  if (selectedAsm != null)
                   {
-                      string path = selectedAssm.path;
-                      this.Assemblies.Remove(selectedAssm);
+                      string path = selectedAsm.path;
+                      this.Assemblies.Remove(selectedAsm);
                       Assembly a = Assembly.LoadFrom(path);
                       AssemblyNode assembly = new AssemblyNode(new AssemblyModel(a));
                       this.assemblies.Add(assembly);
                       OnPropertyChanged(nameof(Assemblies));
                   }
-                  selectedAssm = null;
+                  selectedAsm = null;
               }));
         }
     }

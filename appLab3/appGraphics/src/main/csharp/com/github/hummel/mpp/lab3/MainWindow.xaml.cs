@@ -16,7 +16,7 @@ public partial class MainWindow : Window
     {
         if (@event.NewValue is AssemblyNode)
         {
-            decompilerViewModel.SelectedAssm = (AssemblyNode)@event.NewValue;
+            decompilerViewModel.SelectedAsm = (AssemblyNode)@event.NewValue;
         }
     }
 }

@@ -24,7 +24,7 @@
                          Name="FilePath" FontSize="20" TextAlignment="Center"/>
             </Grid>
             <Grid Grid.Column="1">
-                <Button Margin="10" Content="Add Assm" FontSize="20"
+                <Button Margin="10" Content="Add Asm" FontSize="20"
                         Command="{Binding AddCommand}" 
                         CommandParameter="{Binding SourceString}"/>
             </Grid>
@@ -90,14 +90,14 @@
                 <ColumnDefinition Width="0.5*"/>
             </Grid.ColumnDefinitions>
             <Grid>
-                <Button Margin="50 10" Content="Refresh Assm" IsEnabled="False"
+                <Button Margin="50 10" Content="Refresh Asm" IsEnabled="False"
                         Command="{Binding RemoveCommand}" FontSize="20"
-                        CommandParameter="{Binding SelectedAssm}"/>
+                        CommandParameter="{Binding SelectedAsm}"/>
             </Grid>
             <Grid Grid.Column="1">
-                <Button Margin="50 10" Content="Delete Assm" 
+                <Button Margin="50 10" Content="Delete Asm" 
                         Command="{Binding RemoveCommand}" FontSize="20"
-                        CommandParameter="{Binding SelectedAssm}"/>
+                        CommandParameter="{Binding SelectedAsm}"/>
             </Grid>
         </Grid>
     </Grid>
