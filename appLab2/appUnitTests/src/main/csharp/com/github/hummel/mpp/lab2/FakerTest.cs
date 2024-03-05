@@ -9,10 +9,10 @@ public class FakerTest
     [TestMethod]
     public void cycleDetectionTest()
     {
-        Action action = () =>
+        var action = () =>
         {
-            var f = new FakerImpl();
-            f.create<CycleTestClass>();
+            var faker = new FakerImpl();
+            faker.create<CycleTestClass>();
         };
         action.Should().Throw<Exception>();
     }
@@ -20,16 +20,16 @@ public class FakerTest
     [TestMethod]
     public void constructorSelectionTest()
     {
-        var f = new FakerImpl();
-        var obj = f.create<ConstructorClass>();
+        var faker = new FakerImpl();
+        var obj = faker.create<ConstructorClass>();
         obj.check();
     }
 
     [TestMethod]
     public void commonClassTest()
     {
-        var f = new FakerImpl();
-        var obj = f.create<CommonClass>();
+        var faker = new FakerImpl();
+        var obj = faker.create<CommonClass>();
         obj.f1.Should().NotBe(float.NaN);
         obj.p1.Should().NotBe(float.NaN);
         foreach (var list in obj.list)
