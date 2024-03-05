@@ -14,13 +14,13 @@ public class Tests
     [TestInitialize]
     public void testInitialize()
     {
-        string basePath = AppDomain.CurrentDomain.BaseDirectory;
+        var basePath = AppDomain.CurrentDomain.BaseDirectory;
         basePath = Directory.GetParent(basePath)!.FullName;
         basePath = Directory.GetParent(basePath)!.FullName;
         basePath = Directory.GetParent(basePath)!.FullName;
         basePath = Directory.GetParent(basePath)!.FullName;
         basePath = Path.Combine(basePath, "src", "main", "resources");
-        string filePath = Path.Combine(basePath, "Example.dll");
+        var filePath = Path.Combine(basePath, "Example.dll");
         model = new AssemblyModel(Assembly.LoadFrom(filePath));
     }
 
