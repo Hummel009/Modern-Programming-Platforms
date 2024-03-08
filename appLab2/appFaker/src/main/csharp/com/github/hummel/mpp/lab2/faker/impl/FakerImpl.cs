@@ -2,17 +2,17 @@
 
 public class FakerImpl : IFaker
 {
-    private readonly FakerConfigImpl? config;
+    private readonly FakerConfigImpl? globalConfig;
 
-    public FakerImpl() => config = null;
+    public FakerImpl() => globalConfig = null;
 
-    public FakerImpl(FakerConfigImpl config) => this.config = config;
+    public FakerImpl(FakerConfigImpl globalConfig) => this.globalConfig = globalConfig;
 
     public T create<T>()
     {
         var type = typeof(T);
-        var conf = config == null ? null : config.getClassConfig(type);
-        var obj = Generators.generateDto(type, conf);
+        var localConfig = globalConfig == null ? null : globalConfig.getConfigForType(type);
+        var obj = Generators.generateDto(type, localConfig);
         return (T)obj;
     }
 }

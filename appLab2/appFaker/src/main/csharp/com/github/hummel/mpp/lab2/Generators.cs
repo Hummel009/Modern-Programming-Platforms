@@ -13,7 +13,7 @@ public static class Generators
 
     private delegate object Generator(Type type);
 
-    private static readonly Dictionary<Type, Generator> typeGenMap = new Dictionary<Type, Generator>()
+    private static readonly Dictionary<Type, Generator> typeToGenerator = new Dictionary<Type, Generator>()
         {
             { typeof(int), generateInt},
             { typeof(float), generateFloat},
@@ -38,23 +38,23 @@ public static class Generators
         if (type.GetInterfaces().Contains(typeof(IList)))
         {
             var ifaces = type.GetInterfaces();
-            foreach (var temp in ifaces)
+            foreach (var iface in ifaces)
             {
-                if (temp.Name.Contains("IList`1") && temp.GenericTypeArguments.Length > 0)
+                if (iface.Name.Contains("IList`1") && iface.GenericTypeArguments.Length > 0)
                 {
-                    return typeGenMap[typeof(IList)](temp);
+                    return typeToGenerator[typeof(IList)](iface);
                 }
             }
         }
-        return typeGenMap[type](type);
+        return typeToGenerator[type](type);
     }
 
-    public static object generateDto(Type type, Dictionary<MemberInfo, Type>? config = null)
+    public static object generateDto(Type type, Dictionary<MemberInfo, Type>? localConfig = null)
     {
         HashSet<Type> usedTypes = [];
-        if (config == null)
+        if (localConfig == null)
         {
-            config = new Dictionary<MemberInfo, Type>();
+            localConfig = new Dictionary<MemberInfo, Type>();
         }
         object InnerGenerator(Type type, bool considerType = true)
         {
@@ -94,13 +94,13 @@ public static class Generators
             {
                 try
                 {
-                    var mList = config!.Keys.Where(member => member.Name == parameter.Name).ToList();
+                    var mList = localConfig!.Keys.Where(member => member.Name == parameter.Name).ToList();
                     if (mList.Count == 1)
                     {
                         var m = mList[0];
-                        var gen = Activator.CreateInstance(config[m]);
+                        var gen = Activator.CreateInstance(localConfig[m]);
                         Type typeOfT = m.MemberType == MemberTypes.Field ? (m as FieldInfo)!.FieldType : (m as PropertyInfo)!.PropertyType;
-                        MethodInfo generateTypedMethod = config[m].GetMethod("Generate")!;
+                        MethodInfo generateTypedMethod = localConfig[m].GetMethod("Generate")!;
                         parameters.Add(generateTypedMethod.Invoke(gen, null)!);
                     }
                     else
@@ -123,14 +123,14 @@ public static class Generators
             {
                 try
                 {
-                    var mList = config!.Keys.Where(_member => _member.Name == member.Name).ToList();
+                    var mList = localConfig!.Keys.Where(_member => _member.Name == member.Name).ToList();
                     object value;
                     if (mList.Count == 1)
                     {
                         var m = mList[0];
-                        var gen = Activator.CreateInstance(config[m]);
+                        var gen = Activator.CreateInstance(localConfig[m]);
                         var typeOfT = m.MemberType == MemberTypes.Field ? (m as FieldInfo)!.FieldType : (m as PropertyInfo)!.PropertyType;
-                        var generateTypedMethod = config[m].GetMethod("Generate")!;
+                        var generateTypedMethod = localConfig[m].GetMethod("Generate")!;
 
                         try
                         {

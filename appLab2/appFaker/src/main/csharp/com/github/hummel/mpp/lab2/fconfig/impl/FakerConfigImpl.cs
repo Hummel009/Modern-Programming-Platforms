@@ -5,11 +5,11 @@ using System.Reflection;
 
 public class FakerConfigImpl
 {
-    private Dictionary<Type, Dictionary<MemberInfo, Type>> classesConfigs;
+    private Dictionary<Type, Dictionary<MemberInfo, Type>> globalConfig;
 
-    public FakerConfigImpl() => classesConfigs = new Dictionary<Type, Dictionary<MemberInfo, Type>>();
+    public FakerConfigImpl() => globalConfig = new Dictionary<Type, Dictionary<MemberInfo, Type>>();
 
-    public Dictionary<MemberInfo, Type> getClassConfig(Type type) => this.classesConfigs[type];
+    public Dictionary<MemberInfo, Type> getConfigForType(Type type) => this.globalConfig[type];
 
     public void add<TClass, TField, TGenerator>(Expression<Func<TClass, TField>> fieldSelector)
     {
@@ -39,18 +39,19 @@ public class FakerConfigImpl
             throw new Exception("Generator type");
         }
 
-        if (!classesConfigs.ContainsKey(classType))
+        if (!globalConfig.ContainsKey(classType))
         {
-            classesConfigs.Add(classType, new Dictionary<MemberInfo, Type>());
+            globalConfig.Add(classType, new Dictionary<MemberInfo, Type>());
         }
-        Dictionary<MemberInfo, Type> classConfig = classesConfigs[classType];
-        if (!classConfig.ContainsKey(member))
+        
+        var localConfig = globalConfig[classType];
+        if (!localConfig.ContainsKey(member))
         {
-            classConfig.Add(member, generatorType);
+            localConfig.Add(member, generatorType);
         }
         else
         {
-            classConfig[member] = generatorType;
+            localConfig[member] = generatorType;
         }
     }
 }
