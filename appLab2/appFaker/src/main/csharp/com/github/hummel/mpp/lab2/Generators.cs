@@ -53,7 +53,8 @@ public static class Generators
     {
         HashSet<Type> usedTypes = [];
         localConfig ??= new Dictionary<MemberInfo, Type>();
-        object InnerGenerator(Type type, bool considerType = true)
+        
+        object generateViaConfig(Type type, bool considerType = true)
         {
             if (considerType && !usedTypes.Add(type))
             {
@@ -107,7 +108,7 @@ public static class Generators
                 }
                 catch (KeyNotFoundException)
                 {
-                    parameters.Add(InnerGenerator(parameter.ParameterType));
+                    parameters.Add(generateViaConfig(parameter.ParameterType));
                 }
             }
             var newDTO = constructor.Invoke(parameters.ToArray());
@@ -186,7 +187,7 @@ public static class Generators
                             }
                             else
                             {
-                                obj = InnerGenerator(type.GenericTypeArguments[0], false);
+                                obj = generateViaConfig(type.GenericTypeArguments[0], false);
                             }
                             Convert.ChangeType(obj, type.GenericTypeArguments[0]);
                             res.Add(obj);
@@ -206,23 +207,24 @@ public static class Generators
                 {
                     if (member.MemberType == MemberTypes.Field)
                     {
-                        (member as FieldInfo).SetValue(newDTO, InnerGenerator((member as FieldInfo).FieldType));
+                        (member as FieldInfo).SetValue(newDTO, generateViaConfig((member as FieldInfo).FieldType));
                     }
                     else
                     {
-                        (member as PropertyInfo).SetValue(newDTO, InnerGenerator((member as PropertyInfo).PropertyType));
+                        (member as PropertyInfo).SetValue(newDTO, generateViaConfig((member as PropertyInfo).PropertyType));
                     }
                 }
             }
             return newDTO;
         }
+        
         if (type.Assembly.FullName!.Contains("System."))
         {
             return generate(type);
         }
         else
         {
-            return InnerGenerator(type);
+            return generateViaConfig(type);
         }
     }
 
