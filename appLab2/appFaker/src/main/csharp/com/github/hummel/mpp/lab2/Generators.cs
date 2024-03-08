@@ -54,7 +54,7 @@ public static class Generators
         HashSet<Type> usedTypes = [];
         localConfig ??= new Dictionary<MemberInfo, Type>();
         
-        object generateViaConfig(Type type, bool considerType)
+        object generateDto(Type type, bool considerType)
         {
             if (considerType && !usedTypes.Add(type))
             {
@@ -108,10 +108,10 @@ public static class Generators
                 }
                 catch (KeyNotFoundException)
                 {
-                    parameters.Add(generateViaConfig(parameter.ParameterType, true));
+                    parameters.Add(generateDto(parameter.ParameterType, true));
                 }
             }
-            var newDTO = constructor.Invoke(parameters.ToArray());
+            var dto = constructor.Invoke(parameters.ToArray());
             List<MemberInfo> errors = new List<MemberInfo>();
             var publicMembers = type.GetMembers().Where(_member =>
             (_member.MemberType == MemberTypes.Field && (_member as FieldInfo).IsPublic) ||
@@ -134,11 +134,11 @@ public static class Generators
                         {
                             if (member.MemberType == MemberTypes.Field)
                             {
-                                (member as FieldInfo).SetValue(newDTO, generateTypedMethod.Invoke(gen, null));
+                                (member as FieldInfo).SetValue(dto, generateTypedMethod.Invoke(gen, null));
                             }
                             else
                             {
-                                (member as PropertyInfo).SetValue(newDTO, generateTypedMethod.Invoke(gen, null));
+                                (member as PropertyInfo).SetValue(dto, generateTypedMethod.Invoke(gen, null));
                             }
                         }
                         catch (Exception ex)
@@ -150,11 +150,11 @@ public static class Generators
                     {
                         if (member.MemberType == MemberTypes.Field)
                         {
-                            (member as FieldInfo).SetValue(newDTO, generate((member as FieldInfo).FieldType));
+                            (member as FieldInfo).SetValue(dto, generate((member as FieldInfo).FieldType));
                         }
                         else
                         {
-                            (member as PropertyInfo).SetValue(newDTO, generate((member as PropertyInfo).PropertyType));
+                            (member as PropertyInfo).SetValue(dto, generate((member as PropertyInfo).PropertyType));
                         }
                     }
                 }
@@ -187,7 +187,7 @@ public static class Generators
                             }
                             else
                             {
-                                obj = generateViaConfig(type.GenericTypeArguments[0], false);
+                                obj = generateDto(type.GenericTypeArguments[0], false);
                             }
                             Convert.ChangeType(obj, type.GenericTypeArguments[0]);
                             res.Add(obj);
@@ -196,26 +196,26 @@ public static class Generators
                     }
                     if (member.MemberType == MemberTypes.Field)
                     {
-                        (member as FieldInfo).SetValue(newDTO, ListGenerator((member as FieldInfo).FieldType));
+                        (member as FieldInfo).SetValue(dto, ListGenerator((member as FieldInfo).FieldType));
                     }
                     else
                     {
-                        (member as PropertyInfo).SetValue(newDTO, ListGenerator((member as PropertyInfo).PropertyType));
+                        (member as PropertyInfo).SetValue(dto, ListGenerator((member as PropertyInfo).PropertyType));
                     }
                 }
                 else
                 {
                     if (member.MemberType == MemberTypes.Field)
                     {
-                        (member as FieldInfo).SetValue(newDTO, generateViaConfig((member as FieldInfo).FieldType, true));
+                        (member as FieldInfo).SetValue(dto, generateDto((member as FieldInfo).FieldType, true));
                     }
                     else
                     {
-                        (member as PropertyInfo).SetValue(newDTO, generateViaConfig((member as PropertyInfo).PropertyType, true));
+                        (member as PropertyInfo).SetValue(dto, generateDto((member as PropertyInfo).PropertyType, true));
                     }
                 }
             }
-            return newDTO;
+            return dto;
         }
         
         if (type.Assembly.FullName!.Contains("System."))
@@ -224,7 +224,7 @@ public static class Generators
         }
         else
         {
-            return generateViaConfig(type, true);
+            return generateDto(type, true);
         }
     }
 
