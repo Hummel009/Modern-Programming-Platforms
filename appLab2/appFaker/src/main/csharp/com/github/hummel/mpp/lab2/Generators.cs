@@ -54,7 +54,7 @@ public static class Generators
         HashSet<Type> usedTypes = [];
         localConfig ??= new Dictionary<MemberInfo, Type>();
         
-        object generateViaConfig(Type type, bool considerType = true)
+        object generateViaConfig(Type type, bool considerType)
         {
             if (considerType && !usedTypes.Add(type))
             {
@@ -108,7 +108,7 @@ public static class Generators
                 }
                 catch (KeyNotFoundException)
                 {
-                    parameters.Add(generateViaConfig(parameter.ParameterType));
+                    parameters.Add(generateViaConfig(parameter.ParameterType, true));
                 }
             }
             var newDTO = constructor.Invoke(parameters.ToArray());
@@ -207,11 +207,11 @@ public static class Generators
                 {
                     if (member.MemberType == MemberTypes.Field)
                     {
-                        (member as FieldInfo).SetValue(newDTO, generateViaConfig((member as FieldInfo).FieldType));
+                        (member as FieldInfo).SetValue(newDTO, generateViaConfig((member as FieldInfo).FieldType, true));
                     }
                     else
                     {
-                        (member as PropertyInfo).SetValue(newDTO, generateViaConfig((member as PropertyInfo).PropertyType));
+                        (member as PropertyInfo).SetValue(newDTO, generateViaConfig((member as PropertyInfo).PropertyType, true));
                     }
                 }
             }
@@ -224,7 +224,7 @@ public static class Generators
         }
         else
         {
-            return generateViaConfig(type);
+            return generateViaConfig(type, true);
         }
     }
 
