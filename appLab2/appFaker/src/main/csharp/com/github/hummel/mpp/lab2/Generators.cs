@@ -52,10 +52,7 @@ public static class Generators
     public static object generateDto(Type type, Dictionary<MemberInfo, Type>? localConfig = null)
     {
         HashSet<Type> usedTypes = [];
-        if (localConfig == null)
-        {
-            localConfig = new Dictionary<MemberInfo, Type>();
-        }
+        localConfig ??= new Dictionary<MemberInfo, Type>();
         object InnerGenerator(Type type, bool considerType = true)
         {
             if (considerType && !usedTypes.Add(type))
@@ -63,7 +60,7 @@ public static class Generators
                 throw new Exception("Cyclic dependence");
             }
             ConstructorInfo? constructor = null;
-            var asdasd = type.GetMembers();
+            var members = type.GetMembers();
             var privateFields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where(field => !field.Name.Contains(">k__BackingField")).ToList();
             var privateProperties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance).Concat(type.GetProperties().Where(prop => prop.SetMethod == null || prop.SetMethod != null && !prop.SetMethod.IsPublic).ToList()).ToList();
             var privateMembers = privateFields.Select(member => member.Name.ToLower()).ToList().Union(privateProperties.Select(member => member.Name.ToLower()).ToList()).ToList();
@@ -260,39 +257,28 @@ public static class Generators
         return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
-    private static object generateDateTime(Type type) => new DateTime(
-                                                        year: random.Next(0, DateTime.Now.Year + 1),
-                                                        month: random.Next(0, 13),
-                                                        day: random.Next(0, 28),
-                                                        hour: random.Next(0, 25),
-                                                        minute: random.Next(0, 61),
-                                                        second: random.Next(0, 61)
-                                                        );
+    private static object generateDateTime(Type type) {
+        return new DateTime(
+            year: random.Next(0, DateTime.Now.Year + 1),
+            month: random.Next(0, 13),
+            day: random.Next(0, 28),
+            hour: random.Next(0, 25),
+            minute: random.Next(0, 61),
+            second: random.Next(0, 61)
+        );
+    }
 
     private static object generateList(Type type)
     {
-        object? obj = null;
-        int length = random.Next(3, 6);
-        Type listType = typeof(List<>).MakeGenericType(type.GenericTypeArguments[0]);
-        var res = (IList)Convert.ChangeType(Activator.CreateInstance(listType), listType)!;
-        for (int i = 0; i < length; i++)
+        var length = random.Next(3, 6);
+        var listType = typeof(List<>).MakeGenericType(type.GenericTypeArguments[0]);
+        var list = (IList)Convert.ChangeType(Activator.CreateInstance(listType), listType)!;
+        for (var i = 0; i < length; i++)
         {
-            try
-            {
-                obj = generate(type.GenericTypeArguments[0]);
-            }
-            catch (KeyNotFoundException)
-            {
-                var temp = type.GetInterfaces().Where(interf => interf.Name.Contains("ILisy`")).ToList();
-                if (type.GenericTypeArguments[0].FullName!.Contains("System.") && temp.Count == 1)
-                {
-                    throw new NotImplementedException($"Generator for type {type} has not been implemented yet");
-                }
-                throw new KeyNotFoundException();
-            }
+            object? obj = generate(type.GenericTypeArguments[0]);
             Convert.ChangeType(obj, type.GenericTypeArguments[0]);
-            res.Add(obj);
+            list.Add(obj);
         }
-        return res;
+        return list;
     }
 }
