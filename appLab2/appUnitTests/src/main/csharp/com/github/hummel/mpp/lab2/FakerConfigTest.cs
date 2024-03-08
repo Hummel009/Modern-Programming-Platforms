@@ -29,7 +29,7 @@ public class FakerConfigTest
     }
 
     [TestMethod]
-    public void classMemberExceptionTest()
+    public void foreignMemberExceptionTest()
     {
         var action = () =>
         {
@@ -41,7 +41,7 @@ public class FakerConfigTest
     }
 
     [TestMethod]
-    public void notPropertyOrFieldExceptionTest()
+    public void wrongMemberExceptionTest()
     {
         var action = () =>
         {
