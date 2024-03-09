@@ -5,7 +5,6 @@ using System.Reflection;
 
 #pragma warning disable CS8602
 #pragma warning disable CS0168
-#pragma warning disable CS8600
 
 public static class Generators
 {
@@ -35,15 +34,13 @@ public static class Generators
 
     private static object generate(Type type)
     {
-        if (type.GetInterfaces().Contains(typeof(IList)))
+        var ifaces = type.GetInterfaces();
+        foreach (var iface in ifaces)
         {
-            var ifaces = type.GetInterfaces();
-            foreach (var iface in ifaces)
+            //'1 - это аргумент типа
+            if (iface.Name.Contains("IList`1"))
             {
-                if (iface.Name.Contains("IList`1") && iface.GenericTypeArguments.Length > 0)
-                {
-                    return typeToGenerator[typeof(IList)](iface);
-                }
+                return typeToGenerator[typeof(IList)](iface);
             }
         }
         return typeToGenerator[type](type);
@@ -53,7 +50,7 @@ public static class Generators
     {
         HashSet<Type> usedTypes = [];
         localConfig ??= new Dictionary<MemberInfo, Type>();
-        
+
         object generateDto(Type type, bool considerType)
         {
             if (considerType && !usedTypes.Add(type))
@@ -217,7 +214,7 @@ public static class Generators
             }
             return dto;
         }
-        
+
         if (type.Assembly.FullName!.Contains("System."))
         {
             return generate(type);
@@ -259,7 +256,8 @@ public static class Generators
         return new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
-    private static object generateDateTime(Type type) {
+    private static object generateDateTime(Type type)
+    {
         return new DateTime(
             year: random.Next(0, DateTime.Now.Year + 1),
             month: random.Next(0, 13),
