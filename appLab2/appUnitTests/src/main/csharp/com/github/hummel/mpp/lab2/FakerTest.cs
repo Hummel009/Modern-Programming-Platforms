@@ -1,8 +1,5 @@
 namespace com.github.hummel.mpp.lab2;
 
-using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 [TestClass]
 public class FakerTest
 {
