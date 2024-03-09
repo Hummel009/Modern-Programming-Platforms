@@ -37,8 +37,7 @@ public static class Generators
         var ifaces = type.GetInterfaces();
         foreach (var iface in ifaces)
         {
-            //'1 - это аргумент типа
-            if (iface.Name.Contains("IList`1"))
+            if (iface.Name.Contains("IList"))
             {
                 return typeToGenerator[typeof(IList)](iface);
             }
