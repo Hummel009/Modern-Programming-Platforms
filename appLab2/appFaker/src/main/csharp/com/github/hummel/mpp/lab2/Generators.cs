@@ -50,52 +50,54 @@ public static class Generators
         HashSet<Type> usedTypes = [];
         localConfig ??= new Dictionary<MemberInfo, Type>();
 
-        object generateDto(Type type, bool considerType)
+        object generateRecursive(Type type, bool considerType)
         {
             if (considerType && !usedTypes.Add(type))
             {
                 throw new Exception("Cyclic dependence");
             }
-            ConstructorInfo? constructor = null;
+
             var members = type.GetMembers();
             var privateFields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where(field => !field.Name.Contains(">k__BackingField")).ToList();
             var privateProperties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance).Concat(type.GetProperties().Where(prop => prop.SetMethod == null || prop.SetMethod != null && !prop.SetMethod.IsPublic).ToList()).ToList();
             var privateMembers = privateFields.Select(member => member.Name.ToLower()).ToList().Union(privateProperties.Select(member => member.Name.ToLower()).ToList()).ToList();
             int privateMembersMaxAmount = -1;
 
-            foreach (var constr in type.GetConstructors())
+            ConstructorInfo? savedConstructor = null;
+            foreach (var constructor in type.GetConstructors())
             {
                 int privateMembersAmount = 0;
-                foreach (var param in constr.GetParameters())
+                foreach (var parameter in constructor.GetParameters())
                 {
-                    if (privateMembers.Contains(param.Name!.ToLower()))
+                    if (privateMembers.Contains(parameter.Name!.ToLower()))
                     {
                         privateMembersAmount++;
                     }
                 }
-                if (constr.IsPublic && privateMembersAmount > privateMembersMaxAmount)
+                if (constructor.IsPublic && privateMembersAmount > privateMembersMaxAmount)
                 {
                     privateMembersMaxAmount = privateMembersAmount;
-                    constructor = constr;
+                    savedConstructor = constructor;
                 }
             }
-            if (constructor == null)
+            if (savedConstructor == null)
             {
                 throw new Exception("No public constructor");
             }
+
             List<object> parameters = [];
-            foreach (var parameter in constructor.GetParameters())
+            foreach (var parameter in savedConstructor.GetParameters())
             {
                 try
                 {
-                    var mList = localConfig!.Keys.Where(member => member.Name == parameter.Name).ToList();
-                    if (mList.Count == 1)
+                    var configMembers = localConfig!.Keys.Where(member => member.Name == parameter.Name).ToList();
+                    if (configMembers.Count == 1)
                     {
-                        var m = mList[0];
-                        var gen = Activator.CreateInstance(localConfig[m]);
-                        var typeOfT = m.MemberType == MemberTypes.Field ? (m as FieldInfo)!.FieldType : (m as PropertyInfo)!.PropertyType;
-                        var generateTypedMethod = localConfig[m].GetMethod("Generate")!;
-                        parameters.Add(generateTypedMethod.Invoke(gen, null)!);
+                        var configMember = configMembers[0];
+                        var generatorType = localConfig[configMember];
+                        var generatorInstance = Activator.CreateInstance(generatorType);
+                        var generatorMethod = generatorType.GetMethod("generate")!;
+                        parameters.Add(generatorMethod.Invoke(generatorInstance, null)!);
                     }
                     else
                     {
@@ -104,10 +106,11 @@ public static class Generators
                 }
                 catch (KeyNotFoundException)
                 {
-                    parameters.Add(generateDto(parameter.ParameterType, true));
+                    parameters.Add(generateRecursive(parameter.ParameterType, true));
                 }
             }
-            var dto = constructor.Invoke(parameters.ToArray());
+            
+            var dto = savedConstructor.Invoke(parameters.ToArray());
             var errors = new List<MemberInfo>();
             var publicMembers = type.GetMembers().Where(_member =>
             (_member.MemberType == MemberTypes.Field && (_member as FieldInfo).IsPublic) ||
@@ -183,7 +186,7 @@ public static class Generators
                             }
                             else
                             {
-                                obj = generateDto(type.GenericTypeArguments[0], false);
+                                obj = generateRecursive(type.GenericTypeArguments[0], false);
                             }
                             Convert.ChangeType(obj, type.GenericTypeArguments[0]);
                             res.Add(obj);
@@ -203,11 +206,11 @@ public static class Generators
                 {
                     if (member.MemberType == MemberTypes.Field)
                     {
-                        (member as FieldInfo).SetValue(dto, generateDto((member as FieldInfo).FieldType, true));
+                        (member as FieldInfo).SetValue(dto, generateRecursive((member as FieldInfo).FieldType, true));
                     }
                     else
                     {
-                        (member as PropertyInfo).SetValue(dto, generateDto((member as PropertyInfo).PropertyType, true));
+                        (member as PropertyInfo).SetValue(dto, generateRecursive((member as PropertyInfo).PropertyType, true));
                     }
                 }
             }
@@ -220,7 +223,7 @@ public static class Generators
         }
         else
         {
-            return generateDto(type, true);
+            return generateRecursive(type, true);
         }
     }
 
