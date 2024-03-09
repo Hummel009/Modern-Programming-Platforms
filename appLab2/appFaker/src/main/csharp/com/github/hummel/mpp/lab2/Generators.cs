@@ -116,7 +116,7 @@ public static class Generators
             (publicMember.MemberType == MemberTypes.Field && (publicMember as FieldInfo).IsPublic) ||
             (publicMember.MemberType == MemberTypes.Property && (publicMember as PropertyInfo).SetMethod != null && (publicMember as PropertyInfo).SetMethod.IsPublic)).ToList();
 
-            var errors = new List<MemberInfo>();
+            var erroredItems = new List<MemberInfo>();
             foreach (var publicMember in publicMembers)
             {
                 try
@@ -163,58 +163,81 @@ public static class Generators
                 }
                 catch (KeyNotFoundException)
                 {
-                    errors.Add(publicMember);
+                    erroredItems.Add(publicMember);
                 }
             }
 
-            foreach (var member in errors)
+            foreach (var erroredItem in erroredItems)
             {
-                var typeOfMember = member.MemberType == MemberTypes.Field ? (member as FieldInfo)!.FieldType : (member as PropertyInfo)!.PropertyType;
-                var intf = typeOfMember.GetInterface("IList`1");
-                if (intf != null)
+                var potentialListType = erroredItem.MemberType == MemberTypes.Field ? (erroredItem as FieldInfo)!.FieldType : (erroredItem as PropertyInfo)!.PropertyType;
+                var implementsList = potentialListType.GetInterface("IList`1") != null;
+
+                if (implementsList)
                 {
-                    var genericType = intf.GenericTypeArguments[0];
-                    while ((intf = intf.GenericTypeArguments[0].GetInterface("IList`1")) != null) { genericType = intf.GenericTypeArguments[0]; }
+                    var listType = potentialListType.GetInterface("IList`1");
+                    var genericType = listType.GenericTypeArguments[0];
+                   
+                    while (true)
+                    {
+                        var genericListType = genericType.GetInterface("IList`1");
+                        
+                        if (genericListType != null) {
+                            break;
+                        }
+
+                        genericType = genericListType.GenericTypeArguments[0];
+                    }
+
                     usedTypes.Add(genericType);
-                    object ListGenerator(Type type)
+
+                    object generateRecursiveList(Type type)
                     {
                         object? obj = null;
-                        int length = random.Next(3, 6);
-                        Type listType = typeof(List<>).MakeGenericType(type.GenericTypeArguments[0]);
-                        var res = (IList)Convert.ChangeType(Activator.CreateInstance(listType), listType)!;
-                        for (int i = 0; i < length; i++)
+                        
+                        var listType = typeof(List<>).MakeGenericType(type.GenericTypeArguments[0]);
+                        var listInstance = Activator.CreateInstance(listType);
+                        var listContents = (IList)Convert.ChangeType(listInstance, listType)!;
+
+                        for (int i = 0; i < 4; i++)
                         {
                             if (type.GenericTypeArguments[0].GetInterface("IList`1") != null)
                             {
-                                obj = ListGenerator(type.GenericTypeArguments[0]);
+                                obj = generateRecursiveList(type.GenericTypeArguments[0]);
                             }
                             else
                             {
                                 obj = generateRecursive(type.GenericTypeArguments[0], false);
                             }
+                            
                             Convert.ChangeType(obj, type.GenericTypeArguments[0]);
-                            res.Add(obj);
+
+                            listContents.Add(obj);
                         }
-                        return res;
+                        return listContents;
                     }
-                    if (member.MemberType == MemberTypes.Field)
+                    
+                    if (erroredItem.MemberType == MemberTypes.Field)
                     {
-                        (member as FieldInfo).SetValue(filledDto, ListGenerator((member as FieldInfo).FieldType));
+                        var fieldInfo = erroredItem as FieldInfo;
+                        fieldInfo.SetValue(filledDto, generateRecursiveList(fieldInfo.FieldType));
                     }
                     else
                     {
-                        (member as PropertyInfo).SetValue(filledDto, ListGenerator((member as PropertyInfo).PropertyType));
+                        var propertyInfo = erroredItem as PropertyInfo;
+                        propertyInfo.SetValue(filledDto, generateRecursiveList(propertyInfo.PropertyType));
                     }
                 }
                 else
                 {
-                    if (member.MemberType == MemberTypes.Field)
+                    if (erroredItem.MemberType == MemberTypes.Field)
                     {
-                        (member as FieldInfo).SetValue(filledDto, generateRecursive((member as FieldInfo).FieldType, true));
+                        var fieldInfo = erroredItem as FieldInfo;
+                        fieldInfo.SetValue(filledDto, generateRecursive(fieldInfo.FieldType, true));
                     }
                     else
                     {
-                        (member as PropertyInfo).SetValue(filledDto, generateRecursive((member as PropertyInfo).PropertyType, true));
+                        var propertyInfo = erroredItem as PropertyInfo;
+                        propertyInfo.SetValue(filledDto, generateRecursive(propertyInfo.PropertyType, true));
                     }
                 }
             }
