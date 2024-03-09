@@ -93,8 +93,8 @@ public static class Generators
                     {
                         var m = mList[0];
                         var gen = Activator.CreateInstance(localConfig[m]);
-                        Type typeOfT = m.MemberType == MemberTypes.Field ? (m as FieldInfo)!.FieldType : (m as PropertyInfo)!.PropertyType;
-                        MethodInfo generateTypedMethod = localConfig[m].GetMethod("Generate")!;
+                        var typeOfT = m.MemberType == MemberTypes.Field ? (m as FieldInfo)!.FieldType : (m as PropertyInfo)!.PropertyType;
+                        var generateTypedMethod = localConfig[m].GetMethod("Generate")!;
                         parameters.Add(generateTypedMethod.Invoke(gen, null)!);
                     }
                     else
@@ -108,7 +108,7 @@ public static class Generators
                 }
             }
             var dto = constructor.Invoke(parameters.ToArray());
-            List<MemberInfo> errors = new List<MemberInfo>();
+            var errors = new List<MemberInfo>();
             var publicMembers = type.GetMembers().Where(_member =>
             (_member.MemberType == MemberTypes.Field && (_member as FieldInfo).IsPublic) ||
             (_member.MemberType == MemberTypes.Property && (_member as PropertyInfo).SetMethod != null && (_member as PropertyInfo).SetMethod.IsPublic))
