@@ -9,7 +9,7 @@ public class Program
     }
 }
 
-class FillableClass(int i)
+class FillableClass(int i = 0)
 {
     public int getI() {
         return i;
