@@ -109,57 +109,61 @@ public static class Generators
                     parameters.Add(generateRecursive(parameter.ParameterType, true));
                 }
             }
-            
-            var dto = savedConstructor.Invoke(parameters.ToArray());
+
+            var filledDto = savedConstructor.Invoke([.. parameters]);
+
+            var publicMembers = type.GetMembers().Where(publicMember =>
+            (publicMember.MemberType == MemberTypes.Field && (publicMember as FieldInfo).IsPublic) ||
+            (publicMember.MemberType == MemberTypes.Property && (publicMember as PropertyInfo).SetMethod != null && (publicMember as PropertyInfo).SetMethod.IsPublic)).ToList();
+
             var errors = new List<MemberInfo>();
-            var publicMembers = type.GetMembers().Where(_member =>
-            (_member.MemberType == MemberTypes.Field && (_member as FieldInfo).IsPublic) ||
-            (_member.MemberType == MemberTypes.Property && (_member as PropertyInfo).SetMethod != null && (_member as PropertyInfo).SetMethod.IsPublic))
-                .ToList();
-            foreach (var member in publicMembers)
+            foreach (var publicMember in publicMembers)
             {
                 try
                 {
-                    var mList = localConfig!.Keys.Where(_member => _member.Name == member.Name).ToList();
-                    object value;
-                    if (mList.Count == 1)
+                    var configMembers = localConfig!.Keys.Where(_member => _member.Name == publicMember.Name).ToList();
+                    if (configMembers.Count == 1)
                     {
-                        var m = mList[0];
-                        var gen = Activator.CreateInstance(localConfig[m]);
-                        var typeOfT = m.MemberType == MemberTypes.Field ? (m as FieldInfo)!.FieldType : (m as PropertyInfo)!.PropertyType;
-                        var generateTypedMethod = localConfig[m].GetMethod("Generate")!;
+                        var configMember = configMembers[0];
+                        var generatorType = localConfig[configMember];
+                        var generatorInstance = Activator.CreateInstance(generatorType);
+                        var generatorMethod = generatorType.GetMethod("generate")!;
 
                         try
                         {
-                            if (member.MemberType == MemberTypes.Field)
+                            if (publicMember.MemberType == MemberTypes.Field)
                             {
-                                (member as FieldInfo).SetValue(dto, generateTypedMethod.Invoke(gen, null));
+                                var fieldInfo = publicMember as FieldInfo;
+                                fieldInfo.SetValue(filledDto, generatorMethod.Invoke(generatorInstance, null));
                             }
                             else
                             {
-                                (member as PropertyInfo).SetValue(dto, generateTypedMethod.Invoke(gen, null));
+                                var propertyInfo = publicMember as PropertyInfo;
+                                propertyInfo.SetValue(filledDto, generatorMethod.Invoke(generatorInstance, null));
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception e)
                         {
                             throw new Exception("Custom generator");
                         }
                     }
                     else
                     {
-                        if (member.MemberType == MemberTypes.Field)
+                        if (publicMember.MemberType == MemberTypes.Field)
                         {
-                            (member as FieldInfo).SetValue(dto, generate((member as FieldInfo).FieldType));
+                            var fieldInfo = publicMember as FieldInfo;
+                            fieldInfo.SetValue(filledDto, generate(fieldInfo.FieldType));
                         }
                         else
                         {
-                            (member as PropertyInfo).SetValue(dto, generate((member as PropertyInfo).PropertyType));
+                            var propertyInfo = publicMember as PropertyInfo;
+                            propertyInfo.SetValue(filledDto, generate(propertyInfo.PropertyType));
                         }
                     }
                 }
                 catch (KeyNotFoundException)
                 {
-                    errors.Add(member);
+                    errors.Add(publicMember);
                 }
             }
 
@@ -195,26 +199,27 @@ public static class Generators
                     }
                     if (member.MemberType == MemberTypes.Field)
                     {
-                        (member as FieldInfo).SetValue(dto, ListGenerator((member as FieldInfo).FieldType));
+                        (member as FieldInfo).SetValue(filledDto, ListGenerator((member as FieldInfo).FieldType));
                     }
                     else
                     {
-                        (member as PropertyInfo).SetValue(dto, ListGenerator((member as PropertyInfo).PropertyType));
+                        (member as PropertyInfo).SetValue(filledDto, ListGenerator((member as PropertyInfo).PropertyType));
                     }
                 }
                 else
                 {
                     if (member.MemberType == MemberTypes.Field)
                     {
-                        (member as FieldInfo).SetValue(dto, generateRecursive((member as FieldInfo).FieldType, true));
+                        (member as FieldInfo).SetValue(filledDto, generateRecursive((member as FieldInfo).FieldType, true));
                     }
                     else
                     {
-                        (member as PropertyInfo).SetValue(dto, generateRecursive((member as PropertyInfo).PropertyType, true));
+                        (member as PropertyInfo).SetValue(filledDto, generateRecursive((member as PropertyInfo).PropertyType, true));
                     }
                 }
             }
-            return dto;
+
+            return filledDto;
         }
 
         if (type.Assembly.FullName!.Contains("System."))
