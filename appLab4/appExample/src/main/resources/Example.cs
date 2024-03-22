@@ -3,6 +3,8 @@ namespace com.github.hummel.mpp.lab4;
 using System.Data;
 using System.Runtime.Serialization;
 
+#pragma warning disable SYSLIB0050
+
 public class Class1
 {
     public Class1(IDataReader a, ISerializable m, IObjectReference o, string c)
