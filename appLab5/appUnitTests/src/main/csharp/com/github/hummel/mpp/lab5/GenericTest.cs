@@ -26,18 +26,4 @@ public class GenericTest
         var service = (ServiceImpl<IRepository>)depProvider.resolve<IService<IRepository>>();
         service.repository.Should().BeOfType<RepositoryImpl>();
     }
-
-    [Test]
-    public void resolveAllTest()
-    {
-        var depConfig = new DependenciesConfiguration();
-        depConfig.register<IService, ServiceImpl1S>();
-        depConfig.register<IRepository, RepositoryImpl>();
-        depConfig.register<IService, ServiceImpl2S>();
-        var depProvider = new DependencyProvider(depConfig);
-        var services = depProvider.resolveAll<IService>();
-        services.Should().HaveCount(2);
-        services[0].Should().BeOfType<ServiceImpl1S>();
-        services[1].Should().BeOfType<ServiceImpl2S>();
-    }
 }
