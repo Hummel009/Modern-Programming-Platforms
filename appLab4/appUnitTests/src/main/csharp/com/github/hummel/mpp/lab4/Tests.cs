@@ -20,7 +20,7 @@ public class Tests
         basePath = Directory.GetParent(basePath)!.FullName;
         basePath = Directory.GetParent(basePath)!.FullName;
         basePath = Path.Combine(basePath, "src", "main", "resources");
-        var filePath = Path.Combine(basePath, "HelperClass.cs");
+        var filePath = Path.Combine(basePath, "Example.cs");
         var generator = new Generator();
         var temp = generator.generateTestClasses(File.ReadAllText(filePath));
         testClassView = temp.Result.Values.ElementAt(0);
