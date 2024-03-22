@@ -34,7 +34,7 @@ public class DependencyProvider
 
     public List<TDependency> resolveAll<TDependency>()
     {
-        var temp = new List<TDependency>();
+        var dependencies = new List<TDependency>();
         foreach (var dep in findByTypeAll(typeof(TDependency)))
         {
             object res;
@@ -55,9 +55,9 @@ public class DependencyProvider
                 res = createDependency(dep);
                 depMap[dep] = res;
             }
-            temp.Add((TDependency)res);
+            dependencies.Add((TDependency)res);
         }
-        return temp;
+        return dependencies;
     }
 
     public IEnumerable<CustomDependency> findByTypeAll(Type t)
@@ -73,10 +73,10 @@ public class DependencyProvider
 
     public TDependency resolve<TDependency>(string? name = null)
     {
-        object res = null;
+        object res;
         bool replace = false;
-        Type TDep = null;
-        Type TImpl = null;
+        Type savedDepType = null;
+        Type savedImplType = null;
         CustomDependency dep;
         if (name != null)
         {
@@ -96,9 +96,9 @@ public class DependencyProvider
             }
 
             _ = findByType(typeof(TDependency).GenericTypeArguments[0]) ?? throw new Exception("Dependency not found.");
-            var tImpl = dep.implType.MakeGenericType(typeof(TDependency).GenericTypeArguments[0]);
+            var implType = dep.implType.MakeGenericType(typeof(TDependency).GenericTypeArguments[0]);
             dep.depType = typeof(TDependency);
-            dep.implType = tImpl;
+            dep.implType = implType;
         }
         if (dep.kind == Kind.SINGLETON)
         {
@@ -119,8 +119,8 @@ public class DependencyProvider
         }
         if (replace)
         {
-            dep.depType = TDep;
-            dep.implType = TImpl;
+            dep.depType = savedDepType;
+            dep.implType = savedImplType;
         }
         res.GetType();
         return (TDependency)res;
@@ -138,11 +138,11 @@ public class DependencyProvider
         return null;
     }
 
-    private CustomDependency? findByDepName(Type t)
+    private CustomDependency? findByDepName(Type type)
     {
         foreach (var dep in depMap.Keys)
         {
-            if (dep.depType.Name == t.Name)
+            if (dep.depType.Name == type.Name)
             {
                 return dep;
             }
@@ -150,11 +150,11 @@ public class DependencyProvider
         return null;
     }
 
-    private CustomDependency? findByType(Type t)
+    private CustomDependency? findByType(Type type)
     {
         foreach (var dep in depMap.Keys)
         {
-            if (dep.depType == t)
+            if (dep.depType == type)
             {
                 return dep;
             }
@@ -173,25 +173,25 @@ public class DependencyProvider
                 throw new Exception("Cyclic dependence.");
             }
             object res = null;
-            var constrs = type.GetConstructors().Where(c => c.GetCustomAttributes<ConstructorAnnotation>().Any()).ToArray();
-            if (constrs.Length == 0)
+            var constructors = type.GetConstructors().Where(constructorInfo => constructorInfo.GetCustomAttributes<ConstructorAnnotation>().Any()).ToArray();
+            if (constructors.Length == 0)
             {
                 throw new Exception("Constructor not found.");
             }
-            var constructor = constrs[0];
-            var parms = constructor.GetParameters();
+            var constructor = constructors[0];
+            var parameters = constructor.GetParameters();
             var args = new List<object>();
-            foreach (var param in parms)
+            foreach (var parameter in parameters)
             {
-                var paramType = param.ParameterType;
-                if (paramType.IsInterface || paramType.IsAbstract || paramType.IsGenericType)
+                var parameterType = parameter.ParameterType;
+                if (parameterType.IsInterface || parameterType.IsAbstract || parameterType.IsGenericType)
                 {
-                    if (paramType.IsGenericType)
+                    if (parameterType.IsGenericType)
                     {
-                        var paramGenType = paramType.GenericTypeArguments[0];
-                        if (paramType.FullName.Contains("System"))
+                        var parameterGenericType = parameterType.GenericTypeArguments[0];
+                        if (parameterType.FullName.Contains("System"))
                         {
-                            var listType = typeof(List<>).MakeGenericType(paramGenType);
+                            var listType = typeof(List<>).MakeGenericType(parameterGenericType);
                             try
                             {
                                 args.Add(faker.createLab5(listType));
@@ -199,31 +199,31 @@ public class DependencyProvider
                             catch (KeyNotFoundException)
                             {
                                 var genericMethod = typeof(DependencyProvider).GetMethod("ResolveAll");
-                                var closedMethod = genericMethod.MakeGenericMethod(paramGenType);
-                                var t = closedMethod.Invoke(this, null);
-                                args.Add(t);
+                                var closedMethod = genericMethod.MakeGenericMethod(parameterGenericType);
+                                var arg = closedMethod.Invoke(this, null);
+                                args.Add(arg);
                             }
                         }
                         else
                         {
                             var genericMethod = typeof(DependencyProvider).GetMethod("Resolve");
-                            var closedMethod = genericMethod.MakeGenericMethod(paramType);
-                            var t = closedMethod.Invoke(this, new object[] { null });
-                            args.Add(t);
+                            var closedMethod = genericMethod.MakeGenericMethod(parameterType);
+                            var arg = closedMethod.Invoke(this, [null]);
+                            args.Add(arg);
                         }
                     }
                     else
                     {
-                        var temp = param.GetCustomAttribute<ParameterAnnotation>();
+                        var annotation = parameter.GetCustomAttribute<ParameterAnnotation>();
                         CustomDependency? dep;
-                        if (temp != null)
+                        if (annotation != null)
                         {
-                            var name = temp.Param;
+                            var name = annotation.parameterName;
                             dep = findByName(name);
                         }
                         else
                         {
-                            dep = findByType(paramType);
+                            dep = findByType(parameterType);
                         }
                         if (dep == null)
                         {
@@ -234,14 +234,14 @@ public class DependencyProvider
                 }
                 else
                 {
-                    var temp = dependency.depParams.Where(p => p.parameterName == param.Name).ToList();
+                    var temp = dependency.depParameters.Where(depParam => depParam.parameterName == parameter.Name).ToList();
                     if (temp.Count > 0)
                     {
                         args.Add(temp[0].parameterValue);
                     }
                     else
                     {
-                        args.Add(faker.createLab5(paramType));
+                        args.Add(faker.createLab5(parameterType));
                     }
                 }
             }
