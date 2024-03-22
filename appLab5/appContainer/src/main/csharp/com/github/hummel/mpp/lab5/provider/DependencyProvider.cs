@@ -21,9 +21,9 @@ public class DependencyProvider
         depMap = [];
         foreach (var dep in deps)
         {
-            if (!dep.tImpl.IsAssignableTo(dep.tDep) || dep.tImpl.IsInterface || dep.tImpl.IsAbstract)
+            if (!dep.implType.IsAssignableTo(dep.depType) || dep.implType.IsInterface || dep.implType.IsAbstract)
             {
-                if (!dep.tImpl.GetInterfaces().Where(i => i.Name == dep.tDep.Name).Any())
+                if (!dep.implType.GetInterfaces().Where(i => i.Name == dep.depType.Name).Any())
                 {
                     throw new Exception("Implementation class.");
                 }
@@ -38,7 +38,7 @@ public class DependencyProvider
         foreach (var dep in findByTypeAll(typeof(TDependency)))
         {
             object res;
-            if (dep.lifeCycle == Kind.SINGLETON)
+            if (dep.kind == Kind.SINGLETON)
             {
                 if (depMap[dep] == null)
                 {
@@ -64,7 +64,7 @@ public class DependencyProvider
     {
         foreach (var dep in depMap.Keys)
         {
-            if (dep.tDep == t)
+            if (dep.depType == t)
             {
                 yield return dep;
             }
@@ -96,11 +96,11 @@ public class DependencyProvider
             }
 
             _ = findByType(typeof(TDependency).GenericTypeArguments[0]) ?? throw new Exception("Dependency not found.");
-            var tImpl = dep.tImpl.MakeGenericType(typeof(TDependency).GenericTypeArguments[0]);
-            dep.tDep = typeof(TDependency);
-            dep.tImpl = tImpl;
+            var tImpl = dep.implType.MakeGenericType(typeof(TDependency).GenericTypeArguments[0]);
+            dep.depType = typeof(TDependency);
+            dep.implType = tImpl;
         }
-        if (dep.lifeCycle == Kind.SINGLETON)
+        if (dep.kind == Kind.SINGLETON)
         {
             if (depMap[dep] == null)
             {
@@ -119,8 +119,8 @@ public class DependencyProvider
         }
         if (replace)
         {
-            dep.tDep = TDep;
-            dep.tImpl = TImpl;
+            dep.depType = TDep;
+            dep.implType = TImpl;
         }
         res.GetType();
         return (TDependency)res;
@@ -142,7 +142,7 @@ public class DependencyProvider
     {
         foreach (var dep in depMap.Keys)
         {
-            if (dep.tDep.Name == t.Name)
+            if (dep.depType.Name == t.Name)
             {
                 return dep;
             }
@@ -154,7 +154,7 @@ public class DependencyProvider
     {
         foreach (var dep in depMap.Keys)
         {
-            if (dep.tDep == t)
+            if (dep.depType == t)
             {
                 return dep;
             }
@@ -167,7 +167,7 @@ public class DependencyProvider
         var usedTypes = new HashSet<Type>();
         object createRecursive(CustomDependency dependency)
         {
-            var type = dependency.tImpl;
+            var type = dependency.implType;
             if (!usedTypes.Add(type))
             {
                 throw new Exception("Cyclic dependence.");
@@ -234,7 +234,7 @@ public class DependencyProvider
                 }
                 else
                 {
-                    var temp = dependency.parameters.Where(p => p.parameterName == param.Name).ToList();
+                    var temp = dependency.depParams.Where(p => p.parameterName == param.Name).ToList();
                     if (temp.Count > 0)
                     {
                         args.Add(temp[0].parameterValue);

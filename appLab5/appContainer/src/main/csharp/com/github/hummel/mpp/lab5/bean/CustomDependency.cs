@@ -1,10 +1,10 @@
 ﻿namespace com.github.hummel.mpp.lab5;
 
-public class CustomDependency(Type tDep, Type tImpl, Kind lifeCycle, string? name, List<DependencyParameter> parameters)
+public class CustomDependency(Type depType, Type implType, Kind kind, string? name, List<DependencyParameter> depParams)
 {
-    public Type tDep = tDep;
-    public Type tImpl = tImpl;
-    public Kind lifeCycle = lifeCycle;
+    public Type depType = depType;
+    public Type implType = implType;
+    public Kind kind = kind;
     public string? name = name;
-    public List<DependencyParameter> parameters = parameters;
+    public List<DependencyParameter> depParams = depParams;
 }
