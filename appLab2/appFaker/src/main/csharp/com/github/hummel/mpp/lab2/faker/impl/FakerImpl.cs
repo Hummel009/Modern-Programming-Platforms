@@ -15,4 +15,11 @@ public class FakerImpl : IFaker
         var obj = Generators.generateDto(type, localConfig);
         return (T)obj;
     }
+
+    public object createLab5(Type type)
+    {
+        var localConfig = globalConfig == null ? null : globalConfig.getConfigForType(type);
+        var obj = Generators.generateDto(type, localConfig);
+        return obj;
+    }
 }
