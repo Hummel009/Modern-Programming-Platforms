@@ -22,7 +22,7 @@ public class Tests
         basePath = Path.Combine(basePath, "src", "main", "resources");
         var filePath = Path.Combine(basePath, "Example.cs");
         var generator = new Generator();
-        var temp = generator.generateTestClasses(File.ReadAllText(filePath));
+        var temp = generator.getNamesAndContents(File.ReadAllText(filePath));
         testClassView = temp.Result.Values.ElementAt(0);
     }
 

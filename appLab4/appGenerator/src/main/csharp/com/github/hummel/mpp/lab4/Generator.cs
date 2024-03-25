@@ -12,26 +12,26 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 public class Generator
 {
-    public async Task<ConcurrentDictionary<string, string>> generateTestClasses(string text)
+    public async Task<ConcurrentDictionary<string, string>> getNamesAndContents(string text)
     {
-        return await parseFileForClasses(text);
+        return await getNamesAndContentsAsync(text);
     }
 
-    private async Task<ConcurrentDictionary<string, string>> parseFileForClasses(string text)
+    private async Task<ConcurrentDictionary<string, string>> getNamesAndContentsAsync(string text)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(text);
         var root = syntaxTree.GetRoot();
         var compilation = CSharpCompilation.Create("MyCompilation").AddSyntaxTrees(syntaxTree);
         var semanticModel = compilation.GetSemanticModel(syntaxTree);
         var classes = root.DescendantNodes().OfType<ClassDeclarationSyntax>();
-        var map = new ConcurrentDictionary<string, string>();
+        var namesAndContents = new ConcurrentDictionary<string, string>();
         Parallel.ForEach(classes, clazz =>
         {
             var unit = generateUnit(clazz, semanticModel);
             var unitView = getUnitView(unit);
-            map.TryAdd(clazz.Identifier.ValueText, unitView);
+            namesAndContents.TryAdd(clazz.Identifier.ValueText, unitView);
         });
-        return map;
+        return namesAndContents;
     }
 
     private string getUnitView(CompilationUnitSyntax compilationUnitSyn)

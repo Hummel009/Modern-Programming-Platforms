@@ -36,7 +36,7 @@ class Program
         {
             MaxDegreeOfParallelism = parallel2,
         };
-        var generatorBlock = new TransformBlock<string, ConcurrentDictionary<string, string>>(generator.generateTestClasses, generatorOptions);
+        var generatorBlock = new TransformBlock<string, ConcurrentDictionary<string, string>>(generator.getNamesAndContents, generatorOptions);
 
         //макс степень параллелизма для блока записи
         var writerOptions = new ExecutionDataflowBlockOptions
