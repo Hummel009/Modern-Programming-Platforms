@@ -75,22 +75,29 @@ class Program
 
     static async Task write(ConcurrentDictionary<string, string> map)
     {
-        var folder = Directory.CreateDirectory("tests");
+        var basePath = AppDomain.CurrentDomain.BaseDirectory;
+        basePath = Directory.GetParent(basePath)!.FullName;
+        basePath = Directory.GetParent(basePath)!.FullName;
+        basePath = Directory.GetParent(basePath)!.FullName;
+        basePath = Directory.GetParent(basePath)!.FullName;
+        basePath = Path.Combine(basePath, "src", "main", "resources");
+        
         foreach (var entry in map)
         {
-            if (folder.EnumerateFiles().Where(f => f.Name == entry.Key).ToList().Count == 1)
-            {
-                throw new Exception();
-            }
+            var fileName = entry.Key;
+            var fileContent = entry.Value;
+            
             var copyNumber = 1;
-            var fileName = $"tests\\{entry.Key}.cs";
-            while (File.Exists(fileName))
+            
+            var filePath = Path.Combine(basePath, $"{fileName}.cs");
+
+            while (File.Exists(filePath))
             {
-                fileName = $"tests\\{entry.Key}({copyNumber++}).cs";
+                filePath = Path.Combine(basePath, $"{fileName} [{copyNumber++}].cs");
             }
-            var file = File.Create(fileName);
+            var file = File.Create(filePath);
             var stream = new StreamWriter(file);
-            await stream.WriteLineAsync(entry.Value);
+            await stream.WriteLineAsync(fileContent);
             await stream.FlushAsync();
             stream.Close();
         }

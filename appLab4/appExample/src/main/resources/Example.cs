@@ -5,13 +5,13 @@ using System.Runtime.Serialization;
 
 #pragma warning disable SYSLIB0050
 
-public class Class1
+public class Example
 {
-    public Class1(IDataReader a, ISerializable m, IObjectReference o, string c)
+    public Example(IDataReader a, ISerializable m, IObjectReference o, string c)
     {
 
     }
-    public Class1()
+    public Example()
     {
 
     }
