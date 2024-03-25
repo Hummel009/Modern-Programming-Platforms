@@ -27,13 +27,14 @@ public class Generator
         var map = new ConcurrentDictionary<string, string>();
         Parallel.ForEach(classes, clazz =>
         {
-            var resultUnit = generate(clazz, semanticModel);
-            map.TryAdd(clazz.Identifier.ValueText, viewOf(resultUnit));
+            var unit = generateUnit(clazz, semanticModel);
+            var unitView = getUnitView(unit);
+            map.TryAdd(clazz.Identifier.ValueText, unitView);
         });
         return map;
     }
 
-    private string viewOf(CompilationUnitSyntax compilationUnitSyn)
+    private string getUnitView(CompilationUnitSyntax compilationUnitSyn)
     {
         var workspace = new AdhocWorkspace();
         var options = workspace.Options;
@@ -50,7 +51,7 @@ public class Generator
         return stringBuilder.ToString();
     }
 
-    public CompilationUnitSyntax generate(ClassDeclarationSyntax Class, SemanticModel semanticModel)
+    public CompilationUnitSyntax generateUnit(ClassDeclarationSyntax Class, SemanticModel semanticModel)
     {
         var compilationUnit = CompilationUnit()
         .AddUsings(UsingDirective(IdentifierName("System")))
