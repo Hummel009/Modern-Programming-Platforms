@@ -50,11 +50,13 @@ public class Generator
     {
         var compilationUnit = CompilationUnit()
         .AddUsings(UsingDirective(IdentifierName("System")))
-        .AddUsings(UsingDirective(IdentifierName("System.Generic")))
+        .AddUsings(UsingDirective(IdentifierName("System.Data")))
         .AddUsings(UsingDirective(IdentifierName("System.Collections.Generic")))
         .AddUsings(UsingDirective(IdentifierName("System.Linq")))
         .AddUsings(UsingDirective(IdentifierName("System.Text")))
-        .AddUsings(UsingDirective(IdentifierName("System.Moq")))
+        .AddUsings(UsingDirective(IdentifierName("System.Runtime.Serialization")))
+        .AddUsings(UsingDirective(IdentifierName("com.github.hummel.mpp.lab4")))
+        .AddUsings(UsingDirective(IdentifierName("Moq")))
         .AddUsings(UsingDirective(IdentifierName("NUnit.Framework")));
 
         var constructorSyns = Class.DescendantNodes().OfType<ConstructorDeclarationSyntax>();
