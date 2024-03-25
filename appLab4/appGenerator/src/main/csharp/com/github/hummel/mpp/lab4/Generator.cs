@@ -34,6 +34,8 @@ public class Generator
         return namesAndContents;
     }
 
+    // TO STRING
+
     private string getUnitView(CompilationUnitSyntax compilationUnitSyn)
     {
         var workspace = new AdhocWorkspace();
@@ -45,6 +47,8 @@ public class Generator
         formattedNode.WriteTo(stringWriter);
         return stringWriter.ToString();
     }
+
+    // WRAPPER GENERATOR
 
     public CompilationUnitSyntax generateUnit(ClassDeclarationSyntax Class, SemanticModel semanticModel)
     {
@@ -119,6 +123,28 @@ public class Generator
         return compilationUnit;
     }
 
+    // CLASS GENERATOR
+
+    private ClassDeclarationSyntax generateTestClass(string name)
+    {
+        var classSyn = ClassDeclaration(name + "Tests")
+            .AddModifiers(Token(SyntaxKind.PublicKeyword))
+            .WithAttributeLists(
+            SingletonList(
+                AttributeList(
+                    SingletonSeparatedList(
+                        Attribute(
+                            IdentifierName("TestFixture")
+                        )
+                    )
+                )
+            )
+        );
+        return classSyn;
+    }
+
+    // PRIMARY GENERATORS
+
     private FieldDeclarationSyntax generateField(string type, string name)
     {
         var variableSyn = VariableDeclaration(IdentifierName(type))
@@ -126,6 +152,57 @@ public class Generator
         var fieldSyn = FieldDeclaration(variableSyn)
             .AddModifiers(Token(SyntaxKind.PrivateKeyword));
         return fieldSyn;
+    }
+
+    private MethodDeclarationSyntax generateSetUpMethod(ConstructorDeclarationSyntax constructorSyn, SemanticModel semanticModel, ClassDeclarationSyntax classSyn)
+    {
+        var statementSyns = new List<StatementSyntax>();
+        var argumentSyns = new List<ArgumentSyntax>();
+        int ifaceQuantity = 1;
+        int paramQuantity = 1;
+        var parameterSyns = constructorSyn.ParameterList.Parameters;
+        foreach (var parameterSyn in parameterSyns)
+        {
+            var parameterSymbol = semanticModel.GetDeclaredSymbol(parameterSyn);
+            if ((parameterSymbol!.Type.TypeKind == TypeKind.Interface) ||
+                (parameterSymbol.Type.Name.Length > 2 && parameterSymbol.Type.Name[0] == 'I' && char.IsUpper(parameterSymbol.Type.Name[1])))
+            {
+                var statementSyn = generateMoqType(parameterSyn.Type!, $"_dependency{ifaceQuantity}");
+                var argumentSyn = Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName($"_dependency{ifaceQuantity}"),
+                                IdentifierName("Object")));
+                argumentSyns.Add(argumentSyn);
+                statementSyns.Add(statementSyn);
+                ifaceQuantity++;
+            }
+            else
+            {
+                var variableSyn = generatePrimitiveType(parameterSyn.Type!, $"param{paramQuantity}");
+                var argumentSyn = Argument(IdentifierName($"param{paramQuantity}"));
+                argumentSyns.Add(argumentSyn);
+                paramQuantity++;
+                statementSyns.Add(LocalDeclarationStatement(variableSyn));
+            }
+        }
+        var argumentList = ArgumentList(SeparatedList(argumentSyns));
+
+        var expressionStatementSyn = ExpressionStatement(
+            AssignmentExpression(
+                SyntaxKind.SimpleAssignmentExpression,
+                IdentifierName("_myClassUnderTest"),
+                ObjectCreationExpression(
+                    IdentifierName(classSyn.Identifier.ValueText))
+                .WithArgumentList(argumentList)));
+        statementSyns.Add(expressionStatementSyn);
+        var methodSynResult = MethodDeclaration(
+            PredefinedType(Token(SyntaxKind.VoidKeyword)),
+            Identifier("SetUp"))
+            .AddModifiers(Token(SyntaxKind.PublicKeyword))
+            .AddAttributeLists(
+                AttributeList(SingletonSeparatedList(
+                Attribute(IdentifierName("SetUp")))))
+            .WithBody(Block(statementSyns));
+        return methodSynResult;
     }
 
     private MethodDeclarationSyntax generateTestMethod(MethodDeclarationSyntax methodSyn, SemanticModel semanticModel)
@@ -251,74 +328,7 @@ public class Generator
         return methodSynResult;
     }
 
-    private ClassDeclarationSyntax generateTestClass(string name)
-    {
-        var classSyn = ClassDeclaration(name + "Tests")
-            .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .WithAttributeLists(
-            SingletonList(
-                AttributeList(
-                    SingletonSeparatedList(
-                        Attribute(
-                            IdentifierName("TestFixture")
-                        )
-                    )
-                )
-            )
-        );
-        return classSyn;
-    }
-
-    private MethodDeclarationSyntax generateSetUpMethod(ConstructorDeclarationSyntax constructorSyn, SemanticModel semanticModel, ClassDeclarationSyntax classSyn)
-    {
-        var statementSyns = new List<StatementSyntax>();
-        var argumentSyns = new List<ArgumentSyntax>();
-        int ifaceQuantity = 1;
-        int paramQuantity = 1;
-        var parameterSyns = constructorSyn.ParameterList.Parameters;
-        foreach (var parameterSyn in parameterSyns)
-        {
-            var parameterSymbol = semanticModel.GetDeclaredSymbol(parameterSyn);
-            if ((parameterSymbol!.Type.TypeKind == TypeKind.Interface) ||
-                (parameterSymbol.Type.Name.Length > 2 && parameterSymbol.Type.Name[0] == 'I' && char.IsUpper(parameterSymbol.Type.Name[1])))
-            {
-                var statementSyn = generateMoqType(parameterSyn.Type!, $"_dependency{ifaceQuantity}");
-                var argumentSyn = Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                IdentifierName($"_dependency{ifaceQuantity}"),
-                                IdentifierName("Object")));
-                argumentSyns.Add(argumentSyn);
-                statementSyns.Add(statementSyn);
-                ifaceQuantity++;
-            }
-            else
-            {
-                var variableSyn = generatePrimitiveType(parameterSyn.Type!, $"param{paramQuantity}");
-                var argumentSyn = Argument(IdentifierName($"param{paramQuantity}"));
-                argumentSyns.Add(argumentSyn);
-                paramQuantity++;
-                statementSyns.Add(LocalDeclarationStatement(variableSyn));
-            }
-        }
-        var argumentList = ArgumentList(SeparatedList(argumentSyns));
-
-        var expressionStatementSyn = ExpressionStatement(
-            AssignmentExpression(
-                SyntaxKind.SimpleAssignmentExpression,
-                IdentifierName("_myClassUnderTest"),
-                ObjectCreationExpression(
-                    IdentifierName(classSyn.Identifier.ValueText))
-                .WithArgumentList(argumentList)));
-        statementSyns.Add(expressionStatementSyn);
-        var methodSynResult = MethodDeclaration(
-            PredefinedType(Token(SyntaxKind.VoidKeyword)),
-            Identifier("SetUp"))
-            .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .AddAttributeLists(
-                AttributeList(SingletonSeparatedList(
-                Attribute(IdentifierName("SetUp")))))
-            .WithBody(Block(statementSyns));
-        return methodSynResult;
-    }
+    // SECONDARY GENERATORS
 
     private VariableDeclarationSyntax generatePrimitiveType(TypeSyntax typeSyn, string name)
     {
