@@ -76,7 +76,6 @@ class Program
     static async Task write(ConcurrentDictionary<string, string> map)
     {
         var folder = Directory.CreateDirectory("tests");
-        Console.WriteLine(folder);
         foreach (var entry in map)
         {
             if (folder.EnumerateFiles().Where(f => f.Name == entry.Key).ToList().Count == 1)
