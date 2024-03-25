@@ -21,18 +21,16 @@ public class Example
         return 5;
     }
 
-    public void test(IDataReader a, int b)
-    {
-
-    }
     public void test1()
     {
 
     }
+
     public void test2()
     {
 
     }
+    
     private void test3()
     {
 
