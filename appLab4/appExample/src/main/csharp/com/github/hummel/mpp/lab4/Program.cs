@@ -43,7 +43,7 @@ class Program
         {
             MaxDegreeOfParallelism = parallel3,
         };
-        var writer = new ActionBlock<ConcurrentDictionary<string, string>>(write, generatorOptions);
+        var writer = new ActionBlock<ConcurrentDictionary<string, string>>(write, writerOptions);
 
         //попадание данных в новый блок по выходу из старого - цепочка данных
         bufferBlock.LinkTo(readerBlock);
