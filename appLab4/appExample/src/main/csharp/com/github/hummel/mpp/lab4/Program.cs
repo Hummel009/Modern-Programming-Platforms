@@ -8,8 +8,6 @@ class Program
 {
     public static void Main()
     {
-        var maxDegreesOfParallelism = new int[] { 4, 4, 4 };
-        
         var basePath = AppDomain.CurrentDomain.BaseDirectory;
         basePath = Directory.GetParent(basePath)!.FullName;
         basePath = Directory.GetParent(basePath)!.FullName;
@@ -18,10 +16,10 @@ class Program
         basePath = Path.Combine(basePath, "src", "main", "resources");
         var filePath = Path.Combine(basePath, "Example.cs");
         var pathes = new string[] { filePath };
-        generateTestClasses(pathes, maxDegreesOfParallelism);
+        generateTestClasses(pathes, 4, 4, 4);
     }
 
-    static void generateTestClasses(string[] pathes, int[] maxDegreesOfParallelism)
+    static void generateTestClasses(string[] pathes, int parallel1, int parallel2, int parallel3)
     {
         var generator = new Generator();
         var buffer = new BufferBlock<string>();
@@ -29,21 +27,21 @@ class Program
         //макс степень параллелизма для блока чтения
         var readerOptions = new ExecutionDataflowBlockOptions
         {
-            MaxDegreeOfParallelism = maxDegreesOfParallelism[0],
+            MaxDegreeOfParallelism = parallel1,
         };
         var reader = new TransformBlock<string, string>(read, readerOptions);
 
         //макс степень параллелизма для блока генерации
         var generatorOptions = new ExecutionDataflowBlockOptions
         {
-            MaxDegreeOfParallelism = maxDegreesOfParallelism[1],
+            MaxDegreeOfParallelism = parallel2,
         };
         var transformer = new TransformBlock<string, ConcurrentDictionary<string, string>>(generator.generateTestClasses, generatorOptions);
 
         //макс степень параллелизма для блока записи
         var writerOptions = new ExecutionDataflowBlockOptions
         {
-            MaxDegreeOfParallelism = maxDegreesOfParallelism[2],
+            MaxDegreeOfParallelism = parallel3,
         };
         var writer = new ActionBlock<ConcurrentDictionary<string, string>>(write, generatorOptions);
 
@@ -78,6 +76,7 @@ class Program
     static async Task write(ConcurrentDictionary<string, string> map)
     {
         var folder = Directory.CreateDirectory("tests");
+        Console.WriteLine(folder);
         foreach (var entry in map)
         {
             if (folder.EnumerateFiles().Where(f => f.Name == entry.Key).ToList().Count == 1)
@@ -96,6 +95,5 @@ class Program
             await stream.FlushAsync();
             stream.Close();
         }
-
     }
 }
