@@ -27,7 +27,8 @@ public class Generator
         var map = new ConcurrentDictionary<string, string>();
         Parallel.ForEach(classes, clazz =>
         {
-            map.TryAdd(clazz.Identifier.ValueText, viewOf(generate(clazz, semanticModel)));
+            var resultUnit = generate(clazz, semanticModel);
+            map.TryAdd(clazz.Identifier.ValueText, viewOf(resultUnit));
         });
         return map;
     }
