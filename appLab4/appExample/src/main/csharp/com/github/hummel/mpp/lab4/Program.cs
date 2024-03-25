@@ -21,35 +21,6 @@ class Program
         generateTestClasses(pathes, maxDegreesOfParallelism);
     }
 
-    static async Task<string> read(string path)
-    {
-        return await File.ReadAllTextAsync(path);
-    }
-
-    static async Task write(ConcurrentDictionary<string, string> map)
-    {
-        var folder = Directory.CreateDirectory("tests");
-        foreach (var entry in map)
-        {
-            if (folder.EnumerateFiles().Where(f => f.Name == entry.Key).ToList().Count == 1)
-            {
-                throw new Exception();
-            }
-            var copyNumber = 1;
-            var fileName = $"tests\\{entry.Key}.cs";
-            while (File.Exists(fileName))
-            {
-                fileName = $"tests\\{entry.Key}({copyNumber++}).cs";
-            }
-            var file = File.Create(fileName);
-            var stream = new StreamWriter(file);
-            await stream.WriteLineAsync(entry.Value);
-            await stream.FlushAsync();
-            stream.Close();
-        }
-
-    }
-
     static void generateTestClasses(string[] pathes, int[] maxDegreesOfParallelism)
     {
         var g = new Generator();
@@ -89,5 +60,34 @@ class Program
         buffer.Complete();
 
         writer.Completion.Wait();
+    }
+
+    static async Task<string> read(string path)
+    {
+        return await File.ReadAllTextAsync(path);
+    }
+
+    static async Task write(ConcurrentDictionary<string, string> map)
+    {
+        var folder = Directory.CreateDirectory("tests");
+        foreach (var entry in map)
+        {
+            if (folder.EnumerateFiles().Where(f => f.Name == entry.Key).ToList().Count == 1)
+            {
+                throw new Exception();
+            }
+            var copyNumber = 1;
+            var fileName = $"tests\\{entry.Key}.cs";
+            while (File.Exists(fileName))
+            {
+                fileName = $"tests\\{entry.Key}({copyNumber++}).cs";
+            }
+            var file = File.Create(fileName);
+            var stream = new StreamWriter(file);
+            await stream.WriteLineAsync(entry.Value);
+            await stream.FlushAsync();
+            stream.Close();
+        }
+
     }
 }
