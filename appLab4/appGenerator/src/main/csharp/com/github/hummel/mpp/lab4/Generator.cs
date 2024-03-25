@@ -27,9 +27,26 @@ public class Generator
         var map = new ConcurrentDictionary<string, string>();
         Parallel.ForEach(classes, clazz =>
         {
-            map.TryAdd(clazz.Identifier.ValueText, print(generate(clazz, semanticModel)));
+            map.TryAdd(clazz.Identifier.ValueText, viewOf(generate(clazz, semanticModel)));
         });
         return map;
+    }
+
+    private string viewOf(CompilationUnitSyntax compilationUnitSyn)
+    {
+        var workspace = new AdhocWorkspace();
+        var options = workspace.Options;
+        options = options.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInMethods, false);
+        options = options.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInTypes, false);
+        var formattedNode = Formatter.Format(compilationUnitSyn, workspace, options);
+        var stringBuilder = new StringBuilder();
+        using (var stringWriter = new StringWriter(stringBuilder))
+        {
+            formattedNode.WriteTo(stringWriter);
+        }
+
+        //Console.WriteLine(stringBuilder.ToString());
+        return stringBuilder.ToString();
     }
 
     public CompilationUnitSyntax generate(ClassDeclarationSyntax Class, SemanticModel semanticModel)
@@ -335,22 +352,5 @@ public class Generator
                                 typeSyn))))
                 .WithArgumentList(
                     ArgumentList())));
-    }
-
-    private string print(CompilationUnitSyntax compilationUnitSyn)
-    {
-        var workspace = new AdhocWorkspace();
-        var options = workspace.Options;
-        options = options.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInMethods, false);
-        options = options.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInTypes, false);
-        var formattedNode = Formatter.Format(compilationUnitSyn, workspace, options);
-        var stringBuilder = new StringBuilder();
-        using (var stringWriter = new StringWriter(stringBuilder))
-        {
-            formattedNode.WriteTo(stringWriter);
-        }
-
-        Console.WriteLine(stringBuilder.ToString());
-        return stringBuilder.ToString();
     }
 }
