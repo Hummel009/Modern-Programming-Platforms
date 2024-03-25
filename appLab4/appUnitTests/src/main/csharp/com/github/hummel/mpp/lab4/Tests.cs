@@ -47,6 +47,6 @@ public class Tests
         var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
         var type = typeof(Class1);
         var quantity = type.GetMethods(BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Length;
-        quantity.Should().Be(methods.Count() - 1);
+        quantity.Should().Be(methods.Count() - 1); //отсечь конструктор
     }
 }
