@@ -23,21 +23,24 @@ class Program
 
     static void generateTestClasses(string[] pathes, int[] maxDegreesOfParallelism)
     {
-        var g = new Generator();
+        var generator = new Generator();
         var buffer = new BufferBlock<string>();
 
+        //макс степень параллелизма для блока чтения
         var readerOptions = new ExecutionDataflowBlockOptions
         {
             MaxDegreeOfParallelism = maxDegreesOfParallelism[0],
         };
         var reader = new TransformBlock<string, string>(read, readerOptions);
 
+        //макс степень параллелизма для блока генерации
         var generatorOptions = new ExecutionDataflowBlockOptions
         {
             MaxDegreeOfParallelism = maxDegreesOfParallelism[1],
         };
-        var generator = new TransformBlock<string, ConcurrentDictionary<string, string>>(g.generateTestClasses, generatorOptions);
+        var transformer = new TransformBlock<string, ConcurrentDictionary<string, string>>(generator.generateTestClasses, generatorOptions);
 
+        //макс степень параллелизма для блока записи
         var writerOptions = new ExecutionDataflowBlockOptions
         {
             MaxDegreeOfParallelism = maxDegreesOfParallelism[2],
@@ -45,12 +48,12 @@ class Program
         var writer = new ActionBlock<ConcurrentDictionary<string, string>>(write, generatorOptions);
 
         buffer.LinkTo(reader);
-        reader.LinkTo(generator);
-        generator.LinkTo(writer);
+        reader.LinkTo(transformer);
+        transformer.LinkTo(writer);
 
         buffer.Completion.ContinueWith(task => reader.Complete());
-        reader.Completion.ContinueWith(task => generator.Complete());
-        generator.Completion.ContinueWith(task => writer.Complete());
+        reader.Completion.ContinueWith(task => transformer.Complete());
+        transformer.Completion.ContinueWith(task => writer.Complete());
 
         foreach (var path in pathes)
         {
