@@ -47,21 +47,26 @@ class Program
         };
         var writer = new ActionBlock<ConcurrentDictionary<string, string>>(write, generatorOptions);
 
+        //попадание данных в новый блок по выходу из старого - цепочка данных
         buffer.LinkTo(reader);
         reader.LinkTo(transformer);
         transformer.LinkTo(writer);
 
+        //начало выполнения нового блока по завершении старого - цепочка действий
         buffer.Completion.ContinueWith(task => reader.Complete());
         reader.Completion.ContinueWith(task => transformer.Complete());
         transformer.Completion.ContinueWith(task => writer.Complete());
 
+        //все пути к классам положить в стартовый блок данных
         foreach (var path in pathes)
         {
             buffer.Post(path);
         }
 
+        //больше данных не будет
         buffer.Complete();
 
+        //подождать завершения последнего блока - цепочка действий
         writer.Completion.Wait();
     }
 
