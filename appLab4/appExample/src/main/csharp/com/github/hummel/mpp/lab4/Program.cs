@@ -22,21 +22,21 @@ class Program
     static void generateTestClasses(string[] pathes, int parallel1, int parallel2, int parallel3)
     {
         var generator = new Generator();
-        var buffer = new BufferBlock<string>();
+        var bufferBlock = new BufferBlock<string>();
 
         //макс степень параллелизма для блока чтения
         var readerOptions = new ExecutionDataflowBlockOptions
         {
             MaxDegreeOfParallelism = parallel1,
         };
-        var reader = new TransformBlock<string, string>(read, readerOptions);
+        var readerBlock = new TransformBlock<string, string>(read, readerOptions);
 
         //макс степень параллелизма для блока генерации
         var generatorOptions = new ExecutionDataflowBlockOptions
         {
             MaxDegreeOfParallelism = parallel2,
         };
-        var transformer = new TransformBlock<string, ConcurrentDictionary<string, string>>(generator.generateTestClasses, generatorOptions);
+        var generatorBlock = new TransformBlock<string, ConcurrentDictionary<string, string>>(generator.generateTestClasses, generatorOptions);
 
         //макс степень параллелизма для блока записи
         var writerOptions = new ExecutionDataflowBlockOptions
@@ -46,23 +46,23 @@ class Program
         var writer = new ActionBlock<ConcurrentDictionary<string, string>>(write, generatorOptions);
 
         //попадание данных в новый блок по выходу из старого - цепочка данных
-        buffer.LinkTo(reader);
-        reader.LinkTo(transformer);
-        transformer.LinkTo(writer);
+        bufferBlock.LinkTo(readerBlock);
+        readerBlock.LinkTo(generatorBlock);
+        generatorBlock.LinkTo(writer);
 
         //начало выполнения нового блока по завершении старого - цепочка действий
-        buffer.Completion.ContinueWith(task => reader.Complete());
-        reader.Completion.ContinueWith(task => transformer.Complete());
-        transformer.Completion.ContinueWith(task => writer.Complete());
+        bufferBlock.Completion.ContinueWith(task => readerBlock.Complete());
+        readerBlock.Completion.ContinueWith(task => generatorBlock.Complete());
+        generatorBlock.Completion.ContinueWith(task => writer.Complete());
 
         //все пути к классам положить в стартовый блок данных
         foreach (var path in pathes)
         {
-            buffer.Post(path);
+            bufferBlock.Post(path);
         }
 
         //больше данных не будет
-        buffer.Complete();
+        bufferBlock.Complete();
 
         //подождать завершения последнего блока - цепочка действий
         writer.Completion.Wait();
