@@ -41,14 +41,9 @@ public class Generator
         options = options.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInMethods, false);
         options = options.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInTypes, false);
         var formattedNode = Formatter.Format(compilationUnitSyn, workspace, options);
-        var stringBuilder = new StringBuilder();
-        using (var stringWriter = new StringWriter(stringBuilder))
-        {
-            formattedNode.WriteTo(stringWriter);
-        }
-
-        //Console.WriteLine(stringBuilder.ToString());
-        return stringBuilder.ToString();
+        using var stringWriter = new StringWriter();
+        formattedNode.WriteTo(stringWriter);
+        return stringWriter.ToString();
     }
 
     public CompilationUnitSyntax generateUnit(ClassDeclarationSyntax Class, SemanticModel semanticModel)
