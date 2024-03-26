@@ -15,12 +15,13 @@ public class DepProvider
     private readonly Dictionary<DepLinker, object> depMap;
     private readonly FakerImpl faker = new();
 
-    public DepProvider(DepConfig dependencies)
+    public DepProvider(DepConfig config)
     {
-        var deps = dependencies.getDependencies();
+        var deps = config.getDependencies();
         depMap = [];
         foreach (var dep in deps)
         {
+            //тип dep.implType может быть присвоен переменной, имеющей тип dep.depType или его подтипу
             if (!dep.implType.IsAssignableTo(dep.depType) || dep.implType.IsInterface || dep.implType.IsAbstract)
             {
                 if (!dep.implType.GetInterfaces().Where(i => i.Name == dep.depType.Name).Any())
@@ -32,10 +33,10 @@ public class DepProvider
         }
     }
 
-    public List<TDependency> resolveAll<TDependency>()
+    public List<DepType> resolveAll<DepType>()
     {
-        var dependencies = new List<TDependency>();
-        foreach (var dep in findByTypeAll(typeof(TDependency)))
+        var dependencies = new List<DepType>();
+        foreach (var dep in findByTypeAll(typeof(DepType)))
         {
             object res;
             if (dep.kind == Mode.SINGLETON)
@@ -55,7 +56,7 @@ public class DepProvider
                 res = createDependency(dep);
                 depMap[dep] = res;
             }
-            dependencies.Add((TDependency)res);
+            dependencies.Add((DepType)res);
         }
         return dependencies;
     }
@@ -71,7 +72,7 @@ public class DepProvider
         }
     }
 
-    public TDependency resolve<TDependency>(string? name = null)
+    public DepType resolve<DepType>(string? name = null)
     {
         object res;
         bool replace = false;
@@ -84,20 +85,20 @@ public class DepProvider
         }
         else
         {
-            dep = findByType(typeof(TDependency));
+            dep = findByType(typeof(DepType));
         }
         if (dep == null)
         {
             replace = true;
-            dep = findByDepName(typeof(TDependency));
+            dep = findByDepName(typeof(DepType));
             if (dep == null)
             {
                 throw new Exception("Dependency not found.");
             }
 
-            _ = findByType(typeof(TDependency).GenericTypeArguments[0]) ?? throw new Exception("Dependency not found.");
-            var implType = dep.implType.MakeGenericType(typeof(TDependency).GenericTypeArguments[0]);
-            dep.depType = typeof(TDependency);
+            _ = findByType(typeof(DepType).GenericTypeArguments[0]) ?? throw new Exception("Dependency not found.");
+            var implType = dep.implType.MakeGenericType(typeof(DepType).GenericTypeArguments[0]);
+            dep.depType = typeof(DepType);
             dep.implType = implType;
         }
         if (dep.kind == Mode.SINGLETON)
@@ -123,7 +124,7 @@ public class DepProvider
             dep.implType = savedImplType;
         }
         res.GetType();
-        return (TDependency)res;
+        return (DepType)res;
     }
 
     private DepLinker? findByName(string name)
