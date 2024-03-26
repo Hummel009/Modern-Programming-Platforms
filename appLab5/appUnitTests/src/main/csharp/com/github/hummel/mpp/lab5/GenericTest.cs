@@ -8,7 +8,7 @@ public class GenericTest
     [Test]
     public void genericFirstTest()
     {
-        var depConfig = new DependenciesConfiguration();
+        var depConfig = new DepConfig();
         depConfig.register(typeof(IService<>), typeof(ServiceImpl<>));
         depConfig.register<IRepository, RepositoryImpl>();
         var depProvider = new DependencyProvider(depConfig);
@@ -19,7 +19,7 @@ public class GenericTest
     [Test]
     public void genericSecondTest()
     {
-        var depConfig = new DependenciesConfiguration();
+        var depConfig = new DepConfig();
         depConfig.register<IService<IRepository>, ServiceImpl<IRepository>>();
         depConfig.register<IRepository, RepositoryImpl>();
         var depProvider = new DependencyProvider(depConfig);

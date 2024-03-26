@@ -10,7 +10,7 @@ public class ExceptionTest
     {
         var action = () =>
         {
-            var depConfig = new DependenciesConfiguration();
+            var depConfig = new DepConfig();
             depConfig.register<IConstructor, Constructor>();
             var depProvider = new DependencyProvider(depConfig);
             depProvider.resolve<IConstructor>();
@@ -23,7 +23,7 @@ public class ExceptionTest
     {
         var action = () =>
         {
-            var depConfig = new DependenciesConfiguration();
+            var depConfig = new DepConfig();
             var depProvider = new DependencyProvider(depConfig);
             depProvider.resolve<IConstructor>();
         };
@@ -35,7 +35,7 @@ public class ExceptionTest
     {
         var action = () =>
         {
-            var depConfig = new DependenciesConfiguration();
+            var depConfig = new DepConfig();
             depConfig.register<IConstructor, ConstructorNoIface>();
             var depProvider = new DependencyProvider(depConfig);
             depProvider.resolve<IConstructor>();

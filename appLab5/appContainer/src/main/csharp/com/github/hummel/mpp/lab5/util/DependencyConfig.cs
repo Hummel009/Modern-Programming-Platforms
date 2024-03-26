@@ -1,6 +1,6 @@
 ﻿namespace com.github.hummel.mpp.lab5;
 
-public class DependenciesConfiguration
+public class DepConfig
 {
     private readonly List<CustomDependency> dependencies = [];
 

@@ -15,7 +15,7 @@ public class DependencyProvider
     private readonly Dictionary<CustomDependency, object> depMap;
     private readonly FakerImpl faker = new();
 
-    public DependencyProvider(DependenciesConfiguration dependencies)
+    public DependencyProvider(DepConfig dependencies)
     {
         var deps = dependencies.getDependencies();
         depMap = [];

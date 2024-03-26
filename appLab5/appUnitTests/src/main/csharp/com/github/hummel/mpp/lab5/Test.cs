@@ -5,20 +5,20 @@ using NUnit.Framework;
 
 public class CommonCreatingTest
 {
-    HelperClassForCommon instance;
+    Impl instance;
 
     [OneTimeSetUp]
     public void initialize()
     {
-        var depConfig = new DependenciesConfiguration();
-        depConfig.register<ITestInterface, HelperClassForCommon>(
-            parameters: new DependencyParameter("parameter", "Tested")
-        );
-        depConfig.register<INestedInterface, Impl1>();
-        depConfig.register<INestedInterface, Impl2>(name: "Impl2");
-        depConfig.register<IDoubleNestedInterface, Impl3>();
+        var depConfig = new DepConfig();
+        depConfig.register<IInterface, Impl>();
+
+        depConfig.register<INestedInterface, NestedImpl1>(name: "Impl1");
+        depConfig.register<INestedInterface, NestedImpl2>(name: "Impl2");
+        
         var provider = new DependencyProvider(depConfig);
-        instance = (HelperClassForCommon)provider.resolve<ITestInterface>();
+
+        instance = (Impl) provider.resolve<IInterface>();
     }
 
     [Test]
@@ -32,6 +32,6 @@ public class CommonCreatingTest
     [Test]
     public void dependencyNestedTest()
     {
-        instance.nested.Should().BeOfType<Impl2>();
+        instance.nested.Should().BeOfType<NestedImpl2>();
     }
 }
