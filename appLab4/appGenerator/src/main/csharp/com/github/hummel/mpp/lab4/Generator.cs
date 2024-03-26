@@ -24,8 +24,7 @@ public class Generator
         var compilation = CSharpCompilation.Create("MyCompilation").AddSyntaxTrees(syntaxTree);
         var semanticModel = compilation.GetSemanticModel(syntaxTree);
         var classes = root.DescendantNodes().OfType<ClassDeclarationSyntax>();
-        var namesAndContents = new ConcurrentDictionary<string,
-            string>();
+        var namesAndContents = new ConcurrentDictionary<string, string>();
         Parallel.ForEach(classes, clazz =>
         {
             var unit = generateUnit(clazz, semanticModel);
@@ -213,7 +212,7 @@ public class Generator
     {
         return VariableDeclaration(typeSyn, SingletonSeparatedList(VariableDeclarator(Identifier(name)).WithInitializer(EqualsValueClause(DefaultExpression(typeSyn)))));
     }
-    
+
     private ExpressionStatementSyntax generateMoqType(TypeSyntax typeSyn, string name)
     {
         return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, IdentifierName(name), ObjectCreationExpression(GenericName(Identifier("Mock")).WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList(typeSyn)))).WithArgumentList(ArgumentList())));
