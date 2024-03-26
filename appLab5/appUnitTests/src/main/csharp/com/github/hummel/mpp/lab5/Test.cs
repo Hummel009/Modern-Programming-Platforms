@@ -31,6 +31,6 @@ public class CommonCreatingTest
     [Test]
     public void dependencyNestedTest()
     {
-        instance.nested.Should().BeOfType<NestedImpl2>();
+        instance.nested.Should().BeOfType<NestedImpl1>();
     }
 }

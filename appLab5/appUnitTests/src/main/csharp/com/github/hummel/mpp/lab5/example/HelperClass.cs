@@ -15,7 +15,7 @@ public class Impl : IInterface
 
     [ConstructorAnnotation]
     public Impl(
-        [ParameterAnnotation("Impl2")] INestedInterface nested,
+        INestedInterface nested,
         string shouldNotBeEmpty
     )
     {

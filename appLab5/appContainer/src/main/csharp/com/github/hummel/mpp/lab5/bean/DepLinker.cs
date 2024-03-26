@@ -1,10 +1,10 @@
 ﻿namespace com.github.hummel.mpp.lab5;
 
-public class DepLinker(Type depType, Type implType, Mode kind, string? name, List<DepParameter> depParameters)
+public class DepLinker(Type depType, Type implType, Mode mode, string? name)
 {
     public Type depType = depType;
     public Type implType = implType;
-    public Mode kind = kind;
+    public Mode mode = mode;
     public string? name = name;
-    public List<DepParameter> depParameters = depParameters;
+    public List<DepParameter> depParameters = [];
 }

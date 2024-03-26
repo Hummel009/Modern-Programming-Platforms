@@ -12,158 +12,95 @@ using System.Reflection;
 
 public class DepProvider
 {
-    private readonly Dictionary<DepLinker, object> depMap;
+    private readonly Dictionary<DepLinker, object> linkerObjMap;
     private readonly FakerImpl faker = new();
 
     public DepProvider(DepConfig config)
     {
-        var deps = config.getDependencies();
-        depMap = [];
-        foreach (var dep in deps)
+        var linkers = config.getLinkers();
+        linkerObjMap = [];
+        foreach (var linker in linkers)
         {
-            //тип dep.implType может быть присвоен переменной, имеющей тип dep.depType или его подтипу
-            if (!dep.implType.IsAssignableTo(dep.depType) || dep.implType.IsInterface || dep.implType.IsAbstract)
+            //если имплемент не похож на имплемент по 3 критериям
+            if (!linker.implType.IsAssignableTo(linker.depType) || linker.implType.IsInterface || linker.implType.IsAbstract)
             {
-                if (!dep.implType.GetInterfaces().Where(i => i.Name == dep.depType.Name).Any())
+                //если интерфейс не подходит
+                if (!linker.implType.GetInterfaces().Where(iface => iface.Name == linker.depType.Name).Any())
                 {
                     throw new Exception("Implementation class.");
                 }
             }
-            depMap.Add(dep, null);
+            linkerObjMap.Add(linker, null);
         }
     }
 
-    public List<DepType> resolveAll<DepType>()
+    public DepType resolve<DepType>()
     {
-        var dependencies = new List<DepType>();
-        foreach (var dep in findByTypeAll(typeof(DepType)))
+        DepLinker linker = findLinkerByType(typeof(DepType));
+        
+        if (linker == null)
         {
-            object res;
-            if (dep.kind == Mode.SINGLETON)
+            linker = findLinkerByName(typeof(DepType));
+
+            if (linker == null)
             {
-                if (depMap[dep] == null)
-                {
-                    res = createDependency(dep);
-                    depMap[dep] = res;
-                }
-                else
-                {
-                    res = depMap[dep];
-                }
+                throw new Exception("Linker not found.");
+            }
+
+            var implType = linker.implType.MakeGenericType(typeof(DepType).GenericTypeArguments[0]);
+
+            linker.depType = typeof(DepType);
+            linker.implType = implType;
+        }
+        
+        object obj; //single or not
+
+        if (linker.mode == Mode.SINGLETON)
+        {
+            if (linkerObjMap[linker] == null)
+            {
+                obj = fabricateObj(linker);
+                linkerObjMap[linker] = obj;
             }
             else
             {
-                res = createDependency(dep);
-                depMap[dep] = res;
-            }
-            dependencies.Add((DepType)res);
-        }
-        return dependencies;
-    }
-
-    public IEnumerable<DepLinker> findByTypeAll(Type t)
-    {
-        foreach (var dep in depMap.Keys)
-        {
-            if (dep.depType == t)
-            {
-                yield return dep;
-            }
-        }
-    }
-
-    public DepType resolve<DepType>(string? name = null)
-    {
-        object res;
-        bool replace = false;
-        Type savedDepType = null;
-        Type savedImplType = null;
-        DepLinker dep;
-        if (name != null)
-        {
-            dep = findByName(name);
-        }
-        else
-        {
-            dep = findByType(typeof(DepType));
-        }
-        if (dep == null)
-        {
-            replace = true;
-            dep = findByDepName(typeof(DepType));
-            if (dep == null)
-            {
-                throw new Exception("Dependency not found.");
-            }
-
-            _ = findByType(typeof(DepType).GenericTypeArguments[0]) ?? throw new Exception("Dependency not found.");
-            var implType = dep.implType.MakeGenericType(typeof(DepType).GenericTypeArguments[0]);
-            dep.depType = typeof(DepType);
-            dep.implType = implType;
-        }
-        if (dep.kind == Mode.SINGLETON)
-        {
-            if (depMap[dep] == null)
-            {
-                res = createDependency(dep);
-                depMap[dep] = res;
-            }
-            else
-            {
-                res = depMap[dep];
+                obj = linkerObjMap[linker];
             }
         }
         else
         {
-            res = createDependency(dep);
-            depMap[dep] = res;
+            obj = fabricateObj(linker);
+            linkerObjMap[linker] = obj;
         }
-        if (replace)
-        {
-            dep.depType = savedDepType;
-            dep.implType = savedImplType;
-        }
-        res.GetType();
-        return (DepType)res;
+
+        return (DepType) obj;
     }
 
-    private DepLinker? findByName(string name)
+    private DepLinker? findLinkerByType(Type type)
     {
-        foreach (var dep in depMap.Keys)
+        foreach (var linker in linkerObjMap.Keys)
         {
-            if (name != null && dep.name == name)
+            if (linker.depType == type)
             {
-                return dep;
+                return linker;
             }
         }
         return null;
     }
 
-    private DepLinker? findByDepName(Type type)
+    private DepLinker? findLinkerByName(Type type)
     {
-        foreach (var dep in depMap.Keys)
+        foreach (var linker in linkerObjMap.Keys)
         {
-            if (dep.depType.Name == type.Name)
+            if (linker.depType.Name == type.Name)
             {
-                return dep;
+                return linker;
             }
         }
         return null;
     }
 
-    private DepLinker? findByType(Type type)
-    {
-        foreach (var dep in depMap.Keys)
-        {
-            if (dep.depType == type)
-            {
-                return dep;
-            }
-        }
-        return null;
-    }
-
-    private object createDependency(DepLinker dependency)
+    private object fabricateObj(DepLinker dependency)
     {
         var usedTypes = new HashSet<Type>();
         object createRecursive(DepLinker dependency)
@@ -215,21 +152,7 @@ public class DepProvider
                     }
                     else
                     {
-                        var annotation = parameter.GetCustomAttribute<ParameterAnnotation>();
-                        DepLinker? dep;
-                        if (annotation != null)
-                        {
-                            var name = annotation.parameterName;
-                            dep = findByName(name);
-                        }
-                        else
-                        {
-                            dep = findByType(parameterType);
-                        }
-                        if (dep == null)
-                        {
-                            throw new Exception("Dependency not found.");
-                        }
+                        DepLinker? dep = findLinkerByType(parameterType) ?? throw new Exception("Dependency not found.");
                         args.Add(createRecursive(dep));
                     }
                 }
