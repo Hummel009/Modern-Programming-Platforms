@@ -6,7 +6,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Formatting;
 using Formatter = Microsoft.CodeAnalysis.Formatting.Formatter;
 using System.Collections.Concurrent;
-
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 #pragma warning disable CS1998
@@ -25,7 +24,8 @@ public class Generator
         var compilation = CSharpCompilation.Create("MyCompilation").AddSyntaxTrees(syntaxTree);
         var semanticModel = compilation.GetSemanticModel(syntaxTree);
         var classes = root.DescendantNodes().OfType<ClassDeclarationSyntax>();
-        var namesAndContents = new ConcurrentDictionary<string, string>();
+        var namesAndContents = new ConcurrentDictionary<string,
+            string>();
         Parallel.ForEach(classes, clazz =>
         {
             var unit = generateUnit(clazz, semanticModel);
@@ -36,7 +36,6 @@ public class Generator
     }
 
     // TO STRING
-
     private string getUnitView(CompilationUnitSyntax compilationUnitSyn)
     {
         var workspace = new AdhocWorkspace();
@@ -44,26 +43,16 @@ public class Generator
         options = options.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInMethods, false);
         options = options.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInTypes, false);
         var formattedNode = Formatter.Format(compilationUnitSyn, workspace, options);
-        using var stringWriter = new StringWriter();
+        using
+        var stringWriter = new StringWriter();
         formattedNode.WriteTo(stringWriter);
         return stringWriter.ToString();
     }
 
     // WRAPPER GENERATOR
-
     public CompilationUnitSyntax generateUnit(ClassDeclarationSyntax Class, SemanticModel semanticModel)
     {
-        var compilationUnit = CompilationUnit()
-        .AddUsings(UsingDirective(IdentifierName("System")))
-        .AddUsings(UsingDirective(IdentifierName("System.Data")))
-        .AddUsings(UsingDirective(IdentifierName("System.Collections.Generic")))
-        .AddUsings(UsingDirective(IdentifierName("System.Linq")))
-        .AddUsings(UsingDirective(IdentifierName("System.Text")))
-        .AddUsings(UsingDirective(IdentifierName("System.Runtime.Serialization")))
-        .AddUsings(UsingDirective(IdentifierName("com.github.hummel.mpp.lab4")))
-        .AddUsings(UsingDirective(IdentifierName("Moq")))
-        .AddUsings(UsingDirective(IdentifierName("NUnit.Framework")));
-
+        var compilationUnit = CompilationUnit().AddUsings(UsingDirective(IdentifierName("System"))).AddUsings(UsingDirective(IdentifierName("System.Data"))).AddUsings(UsingDirective(IdentifierName("System.Collections.Generic"))).AddUsings(UsingDirective(IdentifierName("System.Linq"))).AddUsings(UsingDirective(IdentifierName("System.Text"))).AddUsings(UsingDirective(IdentifierName("System.Runtime.Serialization"))).AddUsings(UsingDirective(IdentifierName("com.github.hummel.mpp.lab4"))).AddUsings(UsingDirective(IdentifierName("Moq"))).AddUsings(UsingDirective(IdentifierName("NUnit.Framework")));
         var constructorSyns = Class.DescendantNodes().OfType<ConstructorDeclarationSyntax>();
         ConstructorDeclarationSyntax? savedConstructorSyn = null;
         List<ParameterSyntax>? savedParameterSyns = null;
@@ -78,8 +67,7 @@ public class Generator
                 foreach (var parameterSyn in constructorSyn.ParameterList.Parameters)
                 {
                     var parameterSymbol = semanticModel.GetDeclaredSymbol(parameterSyn);
-                    if ((parameterSymbol!.Type.TypeKind == TypeKind.Interface) ||
-                        (parameterSymbol.Type.Name.Length > 2 && parameterSymbol.Type.Name[0] == 'I' && char.IsUpper(parameterSymbol.Type.Name[1])))
+                    if ((parameterSymbol!.Type.TypeKind == TypeKind.Interface) || (parameterSymbol.Type.Name.Length > 2 && parameterSymbol.Type.Name[0] == 'I' && char.IsUpper(parameterSymbol.Type.Name[1])))
                     {
                         tempParameterSyns.Add(parameterSyn);
                         interfaceMembersAmount++;
@@ -98,12 +86,9 @@ public class Generator
         }
         else
         {
-            savedConstructorSyn = ConstructorDeclaration(Identifier(Class.Identifier.ValueText))
-                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
-                .WithBody(Block());
+            savedConstructorSyn = ConstructorDeclaration(Identifier(Class.Identifier.ValueText)).WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword))).WithBody(Block());
             savedParameterSyns = new List<ParameterSyntax>();
         }
-
         var namespaceSyn = NamespaceDeclaration(IdentifierName("Tests"));
         var classSyn = generateTestClass(Class.Identifier.ValueText);
         var parameterSynQuantity = 1;
@@ -125,33 +110,17 @@ public class Generator
     }
 
     // CLASS GENERATOR
-
     private ClassDeclarationSyntax generateTestClass(string name)
     {
-        var classSyn = ClassDeclaration(name + "Tests")
-            .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .WithAttributeLists(
-            SingletonList(
-                AttributeList(
-                    SingletonSeparatedList(
-                        Attribute(
-                            IdentifierName("TestFixture")
-                        )
-                    )
-                )
-            )
-        );
+        var classSyn = ClassDeclaration(name + "Tests").AddModifiers(Token(SyntaxKind.PublicKeyword)).WithAttributeLists(SingletonList(AttributeList(SingletonSeparatedList(Attribute(IdentifierName("TestFixture"))))));
         return classSyn;
     }
 
     // PRIMARY GENERATORS
-
     private FieldDeclarationSyntax generateField(string type, string name)
     {
-        var variableSyn = VariableDeclaration(IdentifierName(type))
-            .AddVariables(VariableDeclarator(Identifier(name)));
-        var fieldSyn = FieldDeclaration(variableSyn)
-            .AddModifiers(Token(SyntaxKind.PrivateKeyword));
+        var variableSyn = VariableDeclaration(IdentifierName(type)).AddVariables(VariableDeclarator(Identifier(name)));
+        var fieldSyn = FieldDeclaration(variableSyn).AddModifiers(Token(SyntaxKind.PrivateKeyword));
         return fieldSyn;
     }
 
@@ -165,13 +134,10 @@ public class Generator
         foreach (var parameterSyn in parameterSyns)
         {
             var parameterSymbol = semanticModel.GetDeclaredSymbol(parameterSyn);
-            if ((parameterSymbol!.Type.TypeKind == TypeKind.Interface) ||
-                (parameterSymbol.Type.Name.Length > 2 && parameterSymbol.Type.Name[0] == 'I' && char.IsUpper(parameterSymbol.Type.Name[1])))
+            if ((parameterSymbol!.Type.TypeKind == TypeKind.Interface) || (parameterSymbol.Type.Name.Length > 2 && parameterSymbol.Type.Name[0] == 'I' && char.IsUpper(parameterSymbol.Type.Name[1])))
             {
                 var statementSyn = generateMoqType(parameterSyn.Type!, $"_dependency{ifaceQuantity}");
-                var argumentSyn = Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                IdentifierName($"_dependency{ifaceQuantity}"),
-                                IdentifierName("Object")));
+                var argumentSyn = Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName($"_dependency{ifaceQuantity}"), IdentifierName("Object")));
                 argumentSyns.Add(argumentSyn);
                 statementSyns.Add(statementSyn);
                 ifaceQuantity++;
@@ -186,23 +152,9 @@ public class Generator
             }
         }
         var argumentList = ArgumentList(SeparatedList(argumentSyns));
-
-        var expressionStatementSyn = ExpressionStatement(
-            AssignmentExpression(
-                SyntaxKind.SimpleAssignmentExpression,
-                IdentifierName("_myClassUnderTest"),
-                ObjectCreationExpression(
-                    IdentifierName(classSyn.Identifier.ValueText))
-                .WithArgumentList(argumentList)));
+        var expressionStatementSyn = ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, IdentifierName("_myClassUnderTest"), ObjectCreationExpression(IdentifierName(classSyn.Identifier.ValueText)).WithArgumentList(argumentList)));
         statementSyns.Add(expressionStatementSyn);
-        var methodSynResult = MethodDeclaration(
-            PredefinedType(Token(SyntaxKind.VoidKeyword)),
-            Identifier("SetUp"))
-            .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .AddAttributeLists(
-                AttributeList(SingletonSeparatedList(
-                Attribute(IdentifierName("SetUp")))))
-            .WithBody(Block(statementSyns));
+        var methodSynResult = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier("SetUp")).AddModifiers(Token(SyntaxKind.PublicKeyword)).AddAttributeLists(AttributeList(SingletonSeparatedList(Attribute(IdentifierName("SetUp"))))).WithBody(Block(statementSyns));
         return methodSynResult;
     }
 
@@ -210,18 +162,14 @@ public class Generator
     {
         var statementSyns = new List<StatementSyntax>();
         var argumentSyns = new List<ArgumentSyntax>();
-
         var parameterSyns = methodSyn.ParameterList.Parameters;
-
         foreach (var parameterSyn in parameterSyns)
         {
             var parameterSymbol = semanticModel.GetDeclaredSymbol(parameterSyn);
             if ((parameterSymbol!.Type.TypeKind == TypeKind.Interface) || (parameterSymbol.Type.Name.Length > 2 && parameterSymbol.Type.Name[0] == 'I' && char.IsUpper(parameterSymbol.Type.Name[1])))
             {
                 var statementSyn = generateMoqType(parameterSyn.Type!, parameterSyn.Identifier.ValueText);
-                var argumentSyn = Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                IdentifierName(parameterSyn.Identifier.ValueText),
-                                IdentifierName("Object")));
+                var argumentSyn = Argument(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(parameterSyn.Identifier.ValueText), IdentifierName("Object")));
                 argumentSyns.Add(argumentSyn);
                 statementSyns.Add(statementSyn);
             }
@@ -236,131 +184,38 @@ public class Generator
         var argumentList = ArgumentList(SeparatedList(argumentSyns));
         if (methodSyn.ReturnType.ToString() == "void")
         {
-            var statementSyn = ExpressionStatement(
-            InvocationExpression(
-                MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    IdentifierName("Assert"),
-                    IdentifierName("DoesNotThrow")))
-            .WithArgumentList(
-                ArgumentList(
-                    SingletonSeparatedList(
-                        Argument(
-                            ParenthesizedLambdaExpression()
-                            .WithBlock(
-                                Block(
-                                    SingletonList<StatementSyntax>(
-                                        ExpressionStatement(
-                                            InvocationExpression(
-                                                MemberAccessExpression(
-                                                    SyntaxKind.SimpleMemberAccessExpression,
-                                                    IdentifierName("_myClassUnderTest"),
-                                                    IdentifierName(methodSyn.Identifier.ValueText)))
-                                            .WithArgumentList(argumentList))))))))));
+            var statementSyn = ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("Assert"), IdentifierName("DoesNotThrow"))).WithArgumentList(ArgumentList(SingletonSeparatedList(Argument(ParenthesizedLambdaExpression().WithBlock(Block(SingletonList<StatementSyntax>(ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("_myClassUnderTest"), IdentifierName(methodSyn.Identifier.ValueText))).WithArgumentList(argumentList))))))))));
             statementSyns.Add(statementSyn);
         }
         else
         {
             var typeSyntax = methodSyn.ReturnType;
-            var variableSyn = VariableDeclaration(
-                typeSyntax,
-                SingletonSeparatedList(
-                VariableDeclarator(
-                        Identifier("actual")
-                    ).WithInitializer(
-                        EqualsValueClause(
-                            InvocationExpression(
-                                MemberAccessExpression(
-                                    SyntaxKind.SimpleMemberAccessExpression,
-                                    IdentifierName("_myClassUnderTest"),
-                                    IdentifierName(methodSyn.Identifier.ValueText)))
-                            .WithArgumentList(argumentList)))));
+            var variableSyn = VariableDeclaration(typeSyntax, SingletonSeparatedList(VariableDeclarator(Identifier("actual")).WithInitializer(EqualsValueClause(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("_myClassUnderTest"), IdentifierName(methodSyn.Identifier.ValueText))).WithArgumentList(argumentList)))));
             statementSyns.Add(LocalDeclarationStatement(variableSyn));
             var statementSyn1 = generatePrimitiveType(typeSyntax, "expected");
             statementSyns.Add(LocalDeclarationStatement(statementSyn1));
-            var statementSyn2 = ExpressionStatement(
-                InvocationExpression(
-                    MemberAccessExpression(
-                        SyntaxKind.SimpleMemberAccessExpression,
-                        IdentifierName("Assert"),
-                        IdentifierName("That")))
-                .WithArgumentList(
-                    ArgumentList(
-                        SeparatedList<ArgumentSyntax>(
-                            new SyntaxNodeOrToken[]{
-                                    Argument(
-                                        IdentifierName("actual")),
-                                    Token(SyntaxKind.CommaToken),
-                                    Argument(
-                                        InvocationExpression(
-                                            MemberAccessExpression(
-                                                SyntaxKind.SimpleMemberAccessExpression,
-                                                IdentifierName("Is"),
-                                                IdentifierName("EqualTo")))
-                                        .WithArgumentList(
-                                            ArgumentList(
-                                                SingletonSeparatedList(
-                                                    Argument(
-                                                        IdentifierName("expected"))))))}))));
+            var statementSyn2 = ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("Assert"), IdentifierName("That"))).WithArgumentList(ArgumentList(SeparatedList<ArgumentSyntax>(new SyntaxNodeOrToken[]
+            {
+                Argument(IdentifierName("actual")),
+                    Token(SyntaxKind.CommaToken),
+                    Argument(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("Is"), IdentifierName("EqualTo"))).WithArgumentList(ArgumentList(SingletonSeparatedList(Argument(IdentifierName("expected"))))))
+            }))));
             statementSyns.Add(statementSyn2);
         }
-        var expressionStatementSyn = ExpressionStatement(
-                        InvocationExpression(
-                            MemberAccessExpression(
-                                SyntaxKind.SimpleMemberAccessExpression,
-                                IdentifierName("Assert"),
-                                IdentifierName("Fail")))
-                        .WithArgumentList(
-                            ArgumentList(
-                                SingletonSeparatedList(
-                                    Argument(
-                                        LiteralExpression(
-                                            SyntaxKind.StringLiteralExpression,
-                                            Literal("autogenerated")))))));
+        var expressionStatementSyn = ExpressionStatement(InvocationExpression(MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName("Assert"), IdentifierName("Fail"))).WithArgumentList(ArgumentList(SingletonSeparatedList(Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal("autogenerated")))))));
         statementSyns.Add(expressionStatementSyn);
-        var methodSynResult = MethodDeclaration(
-            PredefinedType(Token(SyntaxKind.VoidKeyword)),
-            Identifier(methodSyn.Identifier.ValueText + "Test"))
-            .AddModifiers(Token(SyntaxKind.PublicKeyword))
-            .AddAttributeLists(
-                AttributeList(SingletonSeparatedList(
-                Attribute(IdentifierName("Test")))))
-            .WithBody(Block(statementSyns));
+        var methodSynResult = MethodDeclaration(PredefinedType(Token(SyntaxKind.VoidKeyword)), Identifier(methodSyn.Identifier.ValueText + "Test")).AddModifiers(Token(SyntaxKind.PublicKeyword)).AddAttributeLists(AttributeList(SingletonSeparatedList(Attribute(IdentifierName("Test"))))).WithBody(Block(statementSyns));
         return methodSynResult;
     }
 
     // SECONDARY GENERATORS
-
     private VariableDeclarationSyntax generatePrimitiveType(TypeSyntax typeSyn, string name)
     {
-        return VariableDeclaration(
-            typeSyn,
-            SingletonSeparatedList(
-                VariableDeclarator(
-                    Identifier(name)
-                ).WithInitializer(
-                    EqualsValueClause(
-                        DefaultExpression(typeSyn)
-                    )
-                )
-            )
-        );
+        return VariableDeclaration(typeSyn, SingletonSeparatedList(VariableDeclarator(Identifier(name)).WithInitializer(EqualsValueClause(DefaultExpression(typeSyn)))));
     }
-
+    
     private ExpressionStatementSyntax generateMoqType(TypeSyntax typeSyn, string name)
     {
-        return ExpressionStatement(
-            AssignmentExpression(
-                SyntaxKind.SimpleAssignmentExpression,
-                IdentifierName(name),
-                ObjectCreationExpression(
-                    GenericName(
-                        Identifier("Mock"))
-                    .WithTypeArgumentList(
-                        TypeArgumentList(
-                            SingletonSeparatedList(
-                                typeSyn))))
-                .WithArgumentList(
-                    ArgumentList())));
+        return ExpressionStatement(AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, IdentifierName(name), ObjectCreationExpression(GenericName(Identifier("Mock")).WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList(typeSyn)))).WithArgumentList(ArgumentList())));
     }
 }
