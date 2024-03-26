@@ -12,7 +12,7 @@ using System.Reflection;
 
 public class DependencyProvider
 {
-    private readonly Dictionary<CustomDependency, object> depMap;
+    private readonly Dictionary<Linker, object> depMap;
     private readonly FakerImpl faker = new();
 
     public DependencyProvider(DepConfig dependencies)
@@ -60,7 +60,7 @@ public class DependencyProvider
         return dependencies;
     }
 
-    public IEnumerable<CustomDependency> findByTypeAll(Type t)
+    public IEnumerable<Linker> findByTypeAll(Type t)
     {
         foreach (var dep in depMap.Keys)
         {
@@ -77,7 +77,7 @@ public class DependencyProvider
         bool replace = false;
         Type savedDepType = null;
         Type savedImplType = null;
-        CustomDependency dep;
+        Linker dep;
         if (name != null)
         {
             dep = findByName(name);
@@ -126,7 +126,7 @@ public class DependencyProvider
         return (TDependency)res;
     }
 
-    private CustomDependency? findByName(string name)
+    private Linker? findByName(string name)
     {
         foreach (var dep in depMap.Keys)
         {
@@ -138,7 +138,7 @@ public class DependencyProvider
         return null;
     }
 
-    private CustomDependency? findByDepName(Type type)
+    private Linker? findByDepName(Type type)
     {
         foreach (var dep in depMap.Keys)
         {
@@ -150,7 +150,7 @@ public class DependencyProvider
         return null;
     }
 
-    private CustomDependency? findByType(Type type)
+    private Linker? findByType(Type type)
     {
         foreach (var dep in depMap.Keys)
         {
@@ -162,10 +162,10 @@ public class DependencyProvider
         return null;
     }
 
-    private object createDependency(CustomDependency dependency)
+    private object createDependency(Linker dependency)
     {
         var usedTypes = new HashSet<Type>();
-        object createRecursive(CustomDependency dependency)
+        object createRecursive(Linker dependency)
         {
             var type = dependency.implType;
             if (!usedTypes.Add(type))
@@ -215,7 +215,7 @@ public class DependencyProvider
                     else
                     {
                         var annotation = parameter.GetCustomAttribute<ParameterAnnotation>();
-                        CustomDependency? dep;
+                        Linker? dep;
                         if (annotation != null)
                         {
                             var name = annotation.parameterName;
