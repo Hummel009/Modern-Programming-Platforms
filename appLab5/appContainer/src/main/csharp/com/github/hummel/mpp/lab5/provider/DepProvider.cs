@@ -137,7 +137,7 @@ public class DepProvider
                     }
                     else
                     {
-                        DepLinker? linker = findLinkerByType(parameterType) ?? throw new Exception("Linker not found.");
+                        var linker = findLinkerByType(parameterType) ?? throw new Exception("Linker not found.");
                         args.Add(fabricateRecursive(linker));
                     }
                 }
@@ -154,7 +154,7 @@ public class DepProvider
                     }
                 }
             }
-            
+
             return constructor.Invoke([.. args]);
         }
 
