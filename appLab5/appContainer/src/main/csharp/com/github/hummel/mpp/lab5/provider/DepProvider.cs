@@ -103,22 +103,27 @@ public class DepProvider
     private object fabricateObj(DepLinker dependency)
     {
         var usedTypes = new HashSet<Type>();
-        object createRecursive(DepLinker dependency)
+
+        object fabricateRecursive(DepLinker dependency)
         {
             var type = dependency.implType;
+
             if (!usedTypes.Add(type))
             {
-                throw new Exception("Cyclic dependence.");
+                throw new Exception("Cyclic dependence from lab 2.");
             }
+
             object res = null;
-            var constructors = type.GetConstructors().Where(constructorInfo => constructorInfo.GetCustomAttributes<ConstructorAnnotation>().Any()).ToArray();
-            if (constructors.Length == 0)
+            var neededConstructors = type.GetConstructors().Where(constructorInfo => constructorInfo.GetCustomAttributes<ConstructorAnnotation>().Any()).ToArray();
+            if (neededConstructors.Length == 0)
             {
                 throw new Exception("Constructor not found.");
             }
-            var constructor = constructors[0];
+
+            var constructor = neededConstructors[0];
             var parameters = constructor.GetParameters();
             var args = new List<object>();
+
             foreach (var parameter in parameters)
             {
                 var parameterType = parameter.ParameterType;
@@ -127,33 +132,13 @@ public class DepProvider
                     if (parameterType.IsGenericType)
                     {
                         var parameterGenericType = parameterType.GenericTypeArguments[0];
-                        if (parameterType.FullName.Contains("System"))
-                        {
-                            var listType = typeof(List<>).MakeGenericType(parameterGenericType);
-                            try
-                            {
-                                args.Add(faker.createLab5(listType));
-                            }
-                            catch (KeyNotFoundException)
-                            {
-                                var genericMethod = typeof(DepProvider).GetMethod("ResolveAll");
-                                var closedMethod = genericMethod.MakeGenericMethod(parameterGenericType);
-                                var arg = closedMethod.Invoke(this, null);
-                                args.Add(arg);
-                            }
-                        }
-                        else
-                        {
-                            var genericMethod = typeof(DepProvider).GetMethod("Resolve");
-                            var closedMethod = genericMethod.MakeGenericMethod(parameterType);
-                            var arg = closedMethod.Invoke(this, [null]);
-                            args.Add(arg);
-                        }
+                        var listType = typeof(List<>).MakeGenericType(parameterGenericType);
+                        args.Add(faker.createLab5(listType));
                     }
                     else
                     {
-                        DepLinker? dep = findLinkerByType(parameterType) ?? throw new Exception("Dependency not found.");
-                        args.Add(createRecursive(dep));
+                        DepLinker? linker = findLinkerByType(parameterType) ?? throw new Exception("Linker not found.");
+                        args.Add(fabricateRecursive(linker));
                     }
                 }
                 else
@@ -169,8 +154,10 @@ public class DepProvider
                     }
                 }
             }
+            
             return constructor.Invoke([.. args]);
         }
-        return createRecursive(dependency);
+
+        return fabricateRecursive(dependency);
     }
 }
