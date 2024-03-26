@@ -10,12 +10,12 @@ using System.Reflection;
 #pragma warning disable CS8625
 #pragma warning disable CS0219
 
-public class DependencyProvider
+public class DepProvider
 {
-    private readonly Dictionary<Linker, object> depMap;
+    private readonly Dictionary<DepLinker, object> depMap;
     private readonly FakerImpl faker = new();
 
-    public DependencyProvider(DepConfig dependencies)
+    public DepProvider(DepConfig dependencies)
     {
         var deps = dependencies.getDependencies();
         depMap = [];
@@ -38,7 +38,7 @@ public class DependencyProvider
         foreach (var dep in findByTypeAll(typeof(TDependency)))
         {
             object res;
-            if (dep.kind == Kind.SINGLETON)
+            if (dep.kind == Mode.SINGLETON)
             {
                 if (depMap[dep] == null)
                 {
@@ -60,7 +60,7 @@ public class DependencyProvider
         return dependencies;
     }
 
-    public IEnumerable<Linker> findByTypeAll(Type t)
+    public IEnumerable<DepLinker> findByTypeAll(Type t)
     {
         foreach (var dep in depMap.Keys)
         {
@@ -77,7 +77,7 @@ public class DependencyProvider
         bool replace = false;
         Type savedDepType = null;
         Type savedImplType = null;
-        Linker dep;
+        DepLinker dep;
         if (name != null)
         {
             dep = findByName(name);
@@ -100,7 +100,7 @@ public class DependencyProvider
             dep.depType = typeof(TDependency);
             dep.implType = implType;
         }
-        if (dep.kind == Kind.SINGLETON)
+        if (dep.kind == Mode.SINGLETON)
         {
             if (depMap[dep] == null)
             {
@@ -126,7 +126,7 @@ public class DependencyProvider
         return (TDependency)res;
     }
 
-    private Linker? findByName(string name)
+    private DepLinker? findByName(string name)
     {
         foreach (var dep in depMap.Keys)
         {
@@ -138,7 +138,7 @@ public class DependencyProvider
         return null;
     }
 
-    private Linker? findByDepName(Type type)
+    private DepLinker? findByDepName(Type type)
     {
         foreach (var dep in depMap.Keys)
         {
@@ -150,7 +150,7 @@ public class DependencyProvider
         return null;
     }
 
-    private Linker? findByType(Type type)
+    private DepLinker? findByType(Type type)
     {
         foreach (var dep in depMap.Keys)
         {
@@ -162,10 +162,10 @@ public class DependencyProvider
         return null;
     }
 
-    private object createDependency(Linker dependency)
+    private object createDependency(DepLinker dependency)
     {
         var usedTypes = new HashSet<Type>();
-        object createRecursive(Linker dependency)
+        object createRecursive(DepLinker dependency)
         {
             var type = dependency.implType;
             if (!usedTypes.Add(type))
@@ -198,7 +198,7 @@ public class DependencyProvider
                             }
                             catch (KeyNotFoundException)
                             {
-                                var genericMethod = typeof(DependencyProvider).GetMethod("ResolveAll");
+                                var genericMethod = typeof(DepProvider).GetMethod("ResolveAll");
                                 var closedMethod = genericMethod.MakeGenericMethod(parameterGenericType);
                                 var arg = closedMethod.Invoke(this, null);
                                 args.Add(arg);
@@ -206,7 +206,7 @@ public class DependencyProvider
                         }
                         else
                         {
-                            var genericMethod = typeof(DependencyProvider).GetMethod("Resolve");
+                            var genericMethod = typeof(DepProvider).GetMethod("Resolve");
                             var closedMethod = genericMethod.MakeGenericMethod(parameterType);
                             var arg = closedMethod.Invoke(this, [null]);
                             args.Add(arg);
@@ -215,7 +215,7 @@ public class DependencyProvider
                     else
                     {
                         var annotation = parameter.GetCustomAttribute<ParameterAnnotation>();
-                        Linker? dep;
+                        DepLinker? dep;
                         if (annotation != null)
                         {
                             var name = annotation.parameterName;

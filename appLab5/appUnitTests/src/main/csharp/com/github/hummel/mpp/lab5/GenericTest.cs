@@ -5,25 +5,32 @@ using NUnit.Framework;
 
 public class GenericTest
 {
-    [Test]
-    public void genericFirstTest()
+    Impl instance;
+
+    [OneTimeSetUp]
+    public void initialize()
     {
         var depConfig = new DepConfig();
-        depConfig.register(typeof(IService<>), typeof(ServiceImpl<>));
-        depConfig.register<IRepository, RepositoryImpl>();
-        var depProvider = new DependencyProvider(depConfig);
-        var service = (ServiceImpl<IRepository>)depProvider.resolve<IService<IRepository>>();
-        service.repository.Should().BeOfType<RepositoryImpl>();
+        depConfig.register<IInterface, Impl>();
+
+        depConfig.register(typeof(INestedInterface), typeof(NestedImpl1), name: "Impl1");
+        depConfig.register(typeof(INestedInterface), typeof(NestedImpl2), name: "Impl2");
+        
+        var provider = new DepProvider(depConfig);
+
+        instance = (Impl) provider.resolve<IInterface>();
     }
 
     [Test]
-    public void genericSecondTest()
+    public void dependencyConstructorTest()
     {
-        var depConfig = new DepConfig();
-        depConfig.register<IService<IRepository>, ServiceImpl<IRepository>>();
-        depConfig.register<IRepository, RepositoryImpl>();
-        var depProvider = new DependencyProvider(depConfig);
-        var service = (ServiceImpl<IRepository>)depProvider.resolve<IService<IRepository>>();
-        service.repository.Should().BeOfType<RepositoryImpl>();
+        instance.shouldNotBeEmpty.Should().NotBe("");
+        instance.shouldBeEmpty.Should().Be("");
+    }
+
+    [Test]
+    public void dependencyNestedTest()
+    {
+        instance.nested.Should().BeOfType<NestedImpl2>();
     }
 }

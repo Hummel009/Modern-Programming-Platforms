@@ -16,7 +16,7 @@ public class CommonCreatingTest
         depConfig.register<INestedInterface, NestedImpl1>(name: "Impl1");
         depConfig.register<INestedInterface, NestedImpl2>(name: "Impl2");
         
-        var provider = new DependencyProvider(depConfig);
+        var provider = new DepProvider(depConfig);
 
         instance = (Impl) provider.resolve<IInterface>();
     }
