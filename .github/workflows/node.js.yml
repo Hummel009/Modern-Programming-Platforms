@@ -1,30 +1,23 @@
 name: Node.js CI
-
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
-
+    branches:
+      - main
+permissions:
+  contents: read
 jobs:
   build:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        version: [ 'Lab1' ]
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js 20
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: 'npm'
-    - name: Install dependencies
-      run: |
-        cd appLab1
-        npm ci
-    - name: Build project
-      run: |
-        cd appLab1
-        npm run build --if-present
-    - name: Run tests
-      run: |
-        cd appLab1
-        npm test
+    - run: npm ci
+      working-directory: ${{matrix.version}}
+    - run: npm run build --if-present
+      working-directory: ${{matrix.version}}
+    - run: npm test
+      working-directory: ${{matrix.version}}
