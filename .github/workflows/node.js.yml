@@ -16,8 +16,8 @@ jobs:
         version: [ 'Lab1' ]
     steps:
     - run: npm ci
-      working-directory: ${{matrix.version}}
+      working-directory: ./app${{matrix.version}}
     - run: npm run build --if-present
-      working-directory: ${{matrix.version}}
+      working-directory: ./app${{matrix.version}}
     - run: npm test
-      working-directory: ${{matrix.version}}
+      working-directory: ./app${{matrix.version}}
