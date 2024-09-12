@@ -43,13 +43,18 @@ function App() {
     };
 
     const filterTasks = async (filter) => {
-    try {
-        const response = await axios.post('http://localhost:3000/filter-tasks', { filterStatus: filter });
-        setTasks(response.data);
-    } catch (error) {
-        console.error("Ошибка фильтрации задач:", error);
-    }
-};
+		const response = await axios.post('http://localhost:3000/filter-tasks', 
+			{ 
+				filterStatus: filter 
+			}, 
+			{ 
+				headers: { 
+					'Content-Type': 'application/json' 
+				} 
+			}
+		);
+		setTasks(response.data);
+	};
 
     return (
         <div>
@@ -76,7 +81,12 @@ function App() {
                 {tasks.map((task, index) => (
                     <li key={index}>
                         <strong>{task.title}</strong> - {task.status} - Дата завершения: {task.dueDate}
-                        {task.file && <br />}Прикрепленный файл: {task.file}
+                        {task.file && (
+                            <>
+                                <br />
+                                Прикрепленный файл: {task.file}
+                            </>
+                        )}
                     </li>
                 ))}
             </ul>
