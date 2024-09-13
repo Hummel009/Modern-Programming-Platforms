@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        version: [ 'Lab2' ]
+        version: [ 'Lab2', 'Lab3' ]
     steps:
       - uses: actions/checkout@main
       - name: Setup JDK 21
@@ -29,7 +29,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        version: [ 'Lab1', 'Lab2\front' ]
+        version: [ 'Lab1', 'Lab2\front', 'Lab3\front' ]
     steps:
       - uses: actions/checkout@main
       - name: Setup Node.js 20
