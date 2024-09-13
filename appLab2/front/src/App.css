@@ -46,3 +46,7 @@ body::after {
 form {
 	z-index: 0;
 }
+
+form * {
+	margin: 2px;
+}
