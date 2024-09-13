@@ -36,7 +36,7 @@ fun Application.configureRouting() {
 
 		post("/login") {
 			val user = call.receive<User>()
-			if (isValidUser(user)) {
+			if (isValidUser(user.password)) {
 				val token = JWT.create().withClaim("username", user.username)
 					.withClaim("password", UUID.randomUUID().toString())
 					.withIssuer(JWT_ISSUER).sign(Algorithm.none())
@@ -102,8 +102,5 @@ fun Application.configureRouting() {
 	}
 }
 
-fun isValidUser(user: User): Boolean {
-	val bcryptHashString = BCrypt.withDefaults().hashToString(12, "amogus134".toCharArray())
-
-	return BCrypt.verifyer().verify(user.password.toCharArray(), bcryptHashString).verified
-}
+fun isValidUser(bcryptHashString: String): Boolean =
+	BCrypt.verifyer().verify("amogus134".toCharArray(), bcryptHashString).verified

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css'
+import bcrypt from 'bcryptjs';
 
 function App() {
     const [tasks, setTasks] = useState([]);
@@ -20,15 +21,21 @@ function App() {
     };
 
     const handleLoginSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            await axios.post('http://localhost:3000/login', loginData);
-            setIsLoggedIn(true);
-            fetchTasks();
-        } catch (error) {
-            alert('Login failed. Please check your credentials.');
-        }
-    };
+    e.preventDefault();
+    try {
+        const hashedPassword = await bcrypt.hash(loginData.password, 12);
+        
+        await axios.post('http://localhost:3000/login', {
+            ...loginData,
+            password: hashedPassword
+        });
+        
+        setIsLoggedIn(true);
+        fetchTasks();
+    } catch (error) {
+        alert('Login failed. Please check your credentials.');
+    }
+};
 
     const fetchTasks = async () => {
         const response = await axios.get('http://localhost:3000/');
