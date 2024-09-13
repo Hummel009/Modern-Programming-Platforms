@@ -15,10 +15,7 @@ dependencies {
 	implementation("io.ktor:ktor-server-content-negotiation-jvm")
 
 	implementation("io.ktor:ktor-server-core-jvm")
-	implementation("io.ktor:ktor-server-freemarker-jvm")
 	implementation("io.ktor:ktor-server-netty-jvm")
-	implementation("io.ktor:ktor-server-double-receive")
-
 	implementation("io.ktor:ktor-server-cors")
 
 	implementation("io.insert-koin:koin-ktor:latest.release")
