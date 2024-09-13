@@ -29,7 +29,7 @@ java {
 }
 
 application {
-	mainClass = "com.github.hummel.mpp.lab1.ApplicationKt"
+	mainClass = "com.github.hummel.mpp.lab2.ApplicationKt"
 
 	val isDevelopment = project.ext.has("development")
 	applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")

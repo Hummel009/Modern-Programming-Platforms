@@ -1,8 +1,8 @@
-package com.github.hummel.mpp.lab1.controller
+package com.github.hummel.mpp.lab2.controller
 
-import com.github.hummel.mpp.lab1.bean.FilterRequest
-import com.github.hummel.mpp.lab1.bean.Task
-import com.github.hummel.mpp.lab1.tasks
+import com.github.hummel.mpp.lab2.bean.FilterRequest
+import com.github.hummel.mpp.lab2.bean.Task
+import com.github.hummel.mpp.lab2.tasks
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart

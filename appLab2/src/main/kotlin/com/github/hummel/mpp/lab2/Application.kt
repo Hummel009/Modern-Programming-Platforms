@@ -1,7 +1,7 @@
-package com.github.hummel.mpp.lab1
+package com.github.hummel.mpp.lab2
 
-import com.github.hummel.mpp.lab1.bean.Task
-import com.github.hummel.mpp.lab1.controller.configureRouting
+import com.github.hummel.mpp.lab2.bean.Task
+import com.github.hummel.mpp.lab2.controller.configureRouting
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.*

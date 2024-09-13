@@ -1,0 +1,44 @@
+name: Java CI with Gradle
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+permissions:
+  contents: read
+jobs:
+  build-gradle:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        version: [ 'Lab2' ]
+    steps:
+      - uses: actions/checkout@main
+      - name: Setup JDK 21
+        uses: actions/setup-java@main
+        with:
+          java-version: '21'
+          distribution: temurin
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@main
+      - name: Build with Gradle
+        run: ./gradlew :app${{matrix.version}}:build
+  build-node:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        version: [ 'Lab1', 'Lab2\front' ]
+    steps:
+      - uses: actions/checkout@main
+      - name: Setup Node.js 20
+        uses: actions/setup-node@main
+        with:
+          node-version: '20'
+      - name: Install NPM Dependencies
+      - run: npm ci
+        working-directory: app${{matrix.version}}
+      - name: Build with NPM
+      - run: npm run build --if-present
+        working-directory: app${{matrix.version}}

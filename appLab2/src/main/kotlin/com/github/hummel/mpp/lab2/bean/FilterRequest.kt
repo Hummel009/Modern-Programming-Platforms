@@ -1,4 +1,4 @@
-package com.github.hummel.mpp.lab1.bean
+package com.github.hummel.mpp.lab2.bean
 
 import kotlinx.serialization.Serializable
 

@@ -19,4 +19,4 @@ plugins {
 	id("org.gradle.toolchains.foojay-resolver-convention") version "latest.release"
 }
 
-include(":appLab1")
+include(":appLab2")
