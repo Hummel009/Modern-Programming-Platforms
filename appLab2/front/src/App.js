@@ -133,68 +133,68 @@ function App() {
 
 	return (
 		<div>
-		{errorCode ? (
-			<div>
-				<ErrorPage message={errorCode} returnBack={returnBack} />
-			</div>
-		) : (
-			<div>
+			{errorCode ? (
 				<div>
-					<h1>Список задач</h1>
-					<form onSubmit={handleSubmit}>
-						<input
-							type="text"
-							name="title"
-							placeholder="Название задачи"
-							required
-							onChange={handleChange}
-						/>
-						<select name="status" onChange={handleChange}>
+					<ErrorPage message={errorCode} returnBack={returnBack} />
+				</div>
+			) : (
+				<div>
+					<div>
+						<h1>Список задач</h1>
+						<form onSubmit={handleSubmit}>
+							<input
+								type="text"
+								name="title"
+								placeholder="Название задачи"
+								required
+								onChange={handleChange}
+							/>
+							<select name="status" onChange={handleChange}>
+								<option value="pending">В ожидании</option>
+								<option value="completed">Завершено</option>
+							</select>
+							<input
+								type="date"
+								name="dueDate"
+								required
+								onChange={handleChange}
+							/>
+							<input
+								type="file"
+								name="file"
+								onChange={handleFileChange}
+							/>
+							<button type="submit">Добавить задачу</button>
+						</form>
+
+						<h2>Фильтровать задачи</h2>
+						<select onChange={(e) => filterTasks(e.target.value)}>
+							<option value="all">Все</option>
 							<option value="pending">В ожидании</option>
 							<option value="completed">Завершено</option>
 						</select>
-						<input
-							type="date"
-							name="dueDate"
-							required
-							onChange={handleChange}
-						/>
-						<input
-							type="file"
-							name="file"
-							onChange={handleFileChange}
-						/>
-						<button type="submit">Добавить задачу</button>
-					</form>
-
-					<h2>Фильтровать задачи</h2>
-					<select onChange={(e) => filterTasks(e.target.value)}>
-						<option value="all">Все</option>
-						<option value="pending">В ожидании</option>
-						<option value="completed">Завершено</option>
-					</select>
-					<ul>
-						{Array.from(tasks).map(([id, task]) => {
-							return (
-							<li key={id}>
-								<strong>{task.title}</strong> - {task.status}
-								{task.file && (
-									<div>
-										<br />
-										Прикрепленный файл: {task.file}
-									</div>
-								)}
-								<span id="fltright"><button onClick={() => editTask(id)}>Редактировать</button></span>
-								<span id="fltright">Дата: {task.dueDate}</span>
-							</li>
-							)
-						})}
-					</ul>
+						<ul>
+							{Array.from(tasks).map(([id, task]) => {
+								return (
+								<li key={id}>
+									<strong>{task.title}</strong> - {task.status}
+									{task.file && (
+										<div>
+											<br />
+											Прикрепленный файл: {task.file}
+										</div>
+									)}
+									<span id="fltright"><button onClick={() => editTask(id)}>Редактировать</button></span>
+									<span id="fltright">Дата: {task.dueDate}</span>
+								</li>
+								)
+							})}
+						</ul>
+					</div>
+					<button onClick={clearTasks}>Очистить список задач</button>
+					<button id = "redfont" onClick={makeError}>Совершить ошибку</button>
 				</div>
-				<button onClick={clearTasks}>Очистить список задач</button>
-				<button id = "redfont" onClick={makeError}>Совершить ошибку</button>
-			</div>
-		)}
+			)}
 		</div>
 	);
 }
