@@ -50,3 +50,15 @@ form {
 form * {
 	margin: 2px;
 }
+
+#fltright {
+    float: right;
+}
+
+li {
+    height: 25px;
+}
+
+#fltright:last-of-type {
+    margin-right: 10px;
+}

@@ -6,7 +6,7 @@ import axios from 'axios';
 import './App.css'
 
 function App() {
-	const [tasks, setTasks] = useState([]);
+	const [tasks, setTasks] = useState(new Map());
 	const [formData, setFormData] = useState({
 		title: '',
 		status: 'pending',
@@ -16,7 +16,8 @@ function App() {
 
 	const fetchTasks = async () => {
 		const response = await axios.get('http://localhost:3000/');
-		setTasks(response.data);
+		const tasksMap = new Map(Object.entries(response.data));
+		setTasks(tasksMap);
 	};
 
 	useEffect(() => {
@@ -63,61 +64,87 @@ function App() {
 				'Content-Type': 'application/json'
 			}
 		});
-		setTasks(response.data);
+		const tasksMap = new Map(Object.entries(response.data));
+		setTasks(tasksMap);
+	};
+
+	const clearTasks = async () => {
+		const response = await axios.delete('http://localhost:3000/clear-tasks');
+		const tasksMap = new Map(Object.entries(response.data));
+		setTasks(tasksMap);
+	};
+
+	const editTask = async (id) => {
+		const taskToEdit = tasks.get(id);
+		const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
+
+		const response = await axios.put(`http://localhost:3000/edit-task/${id}`, {
+			title: newTitle
+		}, {
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		const tasksMap = new Map(Object.entries(response.data));
+		setTasks(tasksMap);
 	};
 
 	return (
-	    <div>
-	            <div>
-	                <h1>Список задач</h1>
-	                <form onSubmit={handleSubmit}>
-	                    <input
-	                        type="text"
-	                        name="title"
-	                        placeholder="Название задачи"
-	                        required
-	                        onChange={handleChange}
-	                    />
-	                    <select name="status" onChange={handleChange}>
-	                        <option value="pending">В ожидании</option>
-	                        <option value="completed">Завершено</option>
-	                    </select>
-	                    <input
-	                        type="date"
-	                        name="dueDate"
-	                        required
-	                        onChange={handleChange}
-	                    />
-	                    <input
-	                        type="file"
-	                        name="file"
-	                        onChange={handleFileChange}
-	                    />
-	                    <button type="submit">Добавить задачу</button>
-	                </form>
+		<div>
+			<div>
+				<h1>Список задач</h1>
+				<form onSubmit={handleSubmit}>
+					<input
+						type="text"
+						name="title"
+						placeholder="Название задачи"
+						required
+						onChange={handleChange}
+					/>
+					<select name="status" onChange={handleChange}>
+						<option value="pending">В ожидании</option>
+						<option value="completed">Завершено</option>
+					</select>
+					<input
+						type="date"
+						name="dueDate"
+						required
+						onChange={handleChange}
+					/>
+					<input
+						type="file"
+						name="file"
+						onChange={handleFileChange}
+					/>
+					<button type="submit">Добавить задачу</button>
+				</form>
 
-	                <h2>Фильтровать задачи</h2>
-	                <select onChange={(e) => filterTasks(e.target.value)}>
-	                    <option value="all">Все</option>
-	                    <option value="pending">В ожидании</option>
-	                    <option value="completed">Завершено</option>
-	                </select>
-
-	                <ul>
-	                    {tasks.map((task, index) => (
-	                        <li key={index}>
-	                            <strong>{task.title}</strong> - {task.status} - Дата завершения: {task.dueDate}
-	                            {task.file && (
-	                                <>
-	                                    <br />
-	                                    Прикрепленный файл: {task.file}
-	                                </>
-	                            )}
-	                        </li>
-	                    ))}
-	                </ul>
-	            </div>
-	    </div>
+				<h2>Фильтровать задачи</h2>
+				<select onChange={(e) => filterTasks(e.target.value)}>
+					<option value="all">Все</option>
+					<option value="pending">В ожидании</option>
+					<option value="completed">Завершено</option>
+				</select>
+				<ul>
+					{Array.from(tasks).map(([id, task]) => {
+						return (
+						<li key={id}>
+							<strong>{task.title}</strong> - {task.status}
+							{task.file && (
+								<div>
+									<br />
+									Прикрепленный файл: {task.file}
+								</div>
+							)}
+							<span id="fltright"><button onClick={() => editTask(id)}>Редактировать</button></span>
+                        	<span id="fltright">Дата: {task.dueDate}</span>
+						</li>
+						)
+					})}
+				</ul>
+			</div>
+			<button onClick={clearTasks}>Очистить список задач</button>
+		</div>
 	);
 }
 

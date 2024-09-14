@@ -1,8 +1,8 @@
 package com.github.hummel.mpp.lab2.controller
 
+import com.github.hummel.mpp.lab2.bean.EditTaskRequest
 import com.github.hummel.mpp.lab2.bean.FilterRequest
 import com.github.hummel.mpp.lab2.bean.Task
-import com.github.hummel.mpp.lab2.tasks
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
@@ -10,11 +10,15 @@ import io.ktor.server.application.Application
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import java.io.File
+
+val tasks = mutableMapOf<Int, Task>()
 
 fun Application.configureRouting() {
 	routing {
@@ -55,7 +59,7 @@ fun Application.configureRouting() {
 				part.dispose()
 			}
 
-			tasks.add(Task(title, status, dueDate, fileName))
+			tasks.put(getNextAvailableId(), Task(title, status, dueDate, fileName))
 
 			call.respond(HttpStatusCode.Created)
 		}
@@ -65,10 +69,27 @@ fun Application.configureRouting() {
 			val filterStatus = request.filterStatus
 
 			val filteredTasks = tasks.asSequence().filter {
-				it.status == filterStatus || filterStatus == "all"
-			}.toMutableList()
+				it.value.status == filterStatus || filterStatus == "all"
+			}.associate { it.key to it.value }
 
 			call.respond(filteredTasks)
 		}
+
+		delete("/clear-tasks") {
+			tasks.clear()
+
+			call.respond(tasks)
+		}
+
+		put("/edit-task/{index}") {
+			val index = call.parameters["index"]!!.toInt()
+			val request = call.receive<EditTaskRequest>()
+
+			tasks[index]!!.title = request.title
+
+			call.respond(tasks)
+		}
 	}
 }
+
+fun getNextAvailableId(): Int = if (tasks.isEmpty()) 0 else tasks.keys.max() + 1

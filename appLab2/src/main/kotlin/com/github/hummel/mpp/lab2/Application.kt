@@ -1,6 +1,5 @@
 package com.github.hummel.mpp.lab2
 
-import com.github.hummel.mpp.lab2.bean.Task
 import com.github.hummel.mpp.lab2.controller.configureRouting
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -11,8 +10,6 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.CORS
 import java.io.File
-
-val tasks = mutableListOf<Task>()
 
 fun main() {
 	val uploadsDir = File("uploads")
@@ -29,7 +26,9 @@ fun Application.module() {
 	}
 	install(CORS) {
 		anyHost()
+		allowMethod(HttpMethod.Delete)
 		allowMethod(HttpMethod.Post)
+		allowMethod(HttpMethod.Put)
 		allowMethod(HttpMethod.Get)
 		allowHeader(HttpHeaders.ContentType)
 	}
