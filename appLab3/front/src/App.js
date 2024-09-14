@@ -3,7 +3,6 @@ import React, {
 	useEffect
 } from 'react';
 import axios from 'axios';
-import bcrypt from 'bcryptjs';
 import './App.css'
 
 function App() {
@@ -35,11 +34,24 @@ function App() {
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const hashedPassword = await bcrypt.hash(loginData.password, 12);
-
 			await axios.post('http://localhost:3000/login', {
-				...loginData,
-				password: hashedPassword
+				username: loginData.username,
+				password: loginData.password
+			}, {
+				withCredentials: true
+			});
+
+			setIsLoggedIn(true);
+			fetchTasks();
+		} catch (error) {
+			alert('Login failed. Please check your credentials.');
+		}
+	};
+
+	const tryUseCookieToken = async () => {
+		try {
+			await axios.get('http://localhost:3000/token', {
+				withCredentials: true
 			});
 
 			setIsLoggedIn(true);
@@ -167,90 +179,94 @@ function App() {
 
 	return (
 		<div>
-		{!isLoggedIn ? (
-            <form onSubmit={handleLoginSubmit}>
-        	    <input
-        		    type="text"
-        			name="username"
-        			placeholder="Username"
-        			onChange={handleLoginChange}
-        			required
-        		/>
-        		<input
-        			type="password"
-        			name="password"
-        			placeholder="Password"
-        			onChange={handleLoginChange}
-        			required
-        		/>
-        		<button type="submit">Login</button>
-        	</form>
-        ) : (
-			<div>
-			{errorCode ? (
+			{!isLoggedIn ? (
 				<div>
-					<ErrorPage message={errorCode} returnBack={returnBack} />
+					<form onSubmit={handleLoginSubmit}>
+						<input
+							type="text"
+							name="username"
+							placeholder="Username"
+							onChange={handleLoginChange}
+							required
+						/>
+						<input
+							type="password"
+							name="password"
+							placeholder="Password"
+							onChange={handleLoginChange}
+							required
+						/>
+						<button type="submit">Login</button>
+					</form>
+					<br />
+					<button id="greenfont" onClick={tryUseCookieToken}>Войти через токен</button>
 				</div>
 			) : (
 				<div>
-					<div>
-						<h1>Список задач</h1>
-						<form onSubmit={handleSubmit}>
-							<input
-								type="text"
-								name="title"
-								placeholder="Название задачи"
-								required
-								onChange={handleChange}
-							/>
-							<select name="status" onChange={handleChange}>
-								<option value="pending">В ожидании</option>
-								<option value="completed">Завершено</option>
-							</select>
-							<input
-								type="date"
-								name="dueDate"
-								required
-								onChange={handleChange}
-							/>
-							<input
-								type="file"
-								name="file"
-								onChange={handleFileChange}
-							/>
-							<button type="submit">Добавить задачу</button>
-						</form>
+					{errorCode ? (
+						<div>
+							<ErrorPage message={errorCode} returnBack={returnBack} />
+						</div>
+					) : (
+						<div>
+							<div>
+								<h1>Список задач</h1>
+								<form onSubmit={handleSubmit}>
+									<input
+										type="text"
+										name="title"
+										placeholder="Название задачи"
+										required
+										onChange={handleChange}
+									/>
+									<select name="status" onChange={handleChange}>
+										<option value="pending">В ожидании</option>
+										<option value="completed">Завершено</option>
+									</select>
+									<input
+										type="date"
+										name="dueDate"
+										required
+										onChange={handleChange}
+									/>
+									<input
+										type="file"
+										name="file"
+										onChange={handleFileChange}
+									/>
+									<button type="submit">Добавить задачу</button>
+								</form>
 
-						<h2>Фильтровать задачи</h2>
-						<select onChange={(e) => filterTasks(e.target.value)}>
-							<option value="all">Все</option>
-							<option value="pending">В ожидании</option>
-							<option value="completed">Завершено</option>
-						</select>
-						<ul>
-							{Array.from(tasks).map(([id, task]) => {
-								return (
-								<li key={id}>
-									<strong>{task.title}</strong> - {task.status}
-									{task.file && (
-										<div>
-											<br />
-											Прикрепленный файл: {task.file}
-										</div>
-									)}
-									<span id="fltright"><button onClick={() => editTask(id)}>Редактировать</button></span>
-									<span id="fltright">Дата: {task.dueDate}</span>
-								</li>
-								)
-							})}
-						</ul>
-					</div>
-					<button onClick={clearTasks}>Очистить список задач</button>
-					<button id = "redfont" onClick={makeError}>Совершить ошибку</button>
+								<h2>Фильтровать задачи</h2>
+								<select onChange={(e) => filterTasks(e.target.value)}>
+									<option value="all">Все</option>
+									<option value="pending">В ожидании</option>
+									<option value="completed">Завершено</option>
+								</select>
+								<ul>
+									{Array.from(tasks).map(([id, task]) => {
+										return (
+										<li key={id}>
+											<strong>{task.title}</strong> - {task.status}
+											{task.file && (
+												<div>
+													<br />
+													Прикрепленный файл: {task.file}
+												</div>
+											)}
+											<span id="fltright"><button onClick={() => editTask(id)}>Редактировать</button></span>
+											<span id="fltright">Дата: {task.dueDate}</span>
+										</li>
+										)
+									})}
+								</ul>
+							</div>
+							<button onClick={clearTasks}>Очистить список задач</button>
+							<button id = "redfont" onClick={makeError}>Совершить ошибку</button>
+						</div>
+					)}
 				</div>
 			)}
-			</div>
-		)}
 		</div>
 	);
 }

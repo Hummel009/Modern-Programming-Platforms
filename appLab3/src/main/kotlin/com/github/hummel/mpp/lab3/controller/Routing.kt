@@ -7,16 +7,14 @@ import com.github.hummel.mpp.lab3.bean.EditTaskRequest
 import com.github.hummel.mpp.lab3.bean.FilterRequest
 import com.github.hummel.mpp.lab3.bean.Task
 import com.github.hummel.mpp.lab3.bean.User
-import io.ktor.http.HttpHeaders
+import io.ktor.http.Cookie
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.server.application.Application
-import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
-import io.ktor.server.response.respondText
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -24,29 +22,46 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import java.io.File
-import java.util.UUID
 import kotlin.text.toInt
-
-private const val JWT_ISSUER = "h009_issuer"
 
 val tasks = mutableMapOf<Int, Task>()
 
 fun Application.configureRouting() {
 	routing {
-		authenticate {
-			get("/secure-endpoint") {
-				call.respondText("This is a secure endpoint")
+		post("/login") {
+			val user = call.receive<User>()
+			if (isValidUser(user)) {
+				val token = JWT.create()
+					.withClaim("username", user.username)
+					.withClaim("password", user.password)
+					.sign(Algorithm.HMAC256("secret"))
+				call.response.cookies.append(
+					Cookie(name = "jwt", value = token, httpOnly = true, secure = false)
+				)
+				call.respond(HttpStatusCode.OK)
+			} else {
+				call.respond(HttpStatusCode.Unauthorized)
 			}
 		}
 
-		post("/login") {
-			val user = call.receive<User>()
-			if (isValidUser(user.password)) {
-				val token = JWT.create().withClaim("username", user.username)
-					.withClaim("password", UUID.randomUUID().toString()).withIssuer(JWT_ISSUER).sign(Algorithm.none())
-				call.response.cookies.append(HttpHeaders.SetCookie, "token=$token; HttpOnly; Path=/")
-				call.respond(HttpStatusCode.OK)
-			} else {
+		get("/token") {
+			val token = call.request.cookies["jwt"]
+			if (token == null) {
+				call.respond(HttpStatusCode.Unauthorized)
+				return@get
+			}
+
+			try {
+				val decoded = JWT.decode(token)
+				val username = decoded.getClaim("username").asString()
+				val password = decoded.getClaim("password").asString()
+
+				if (isValidUser(User(username, password))) {
+					call.respond(HttpStatusCode.OK)
+				} else {
+					throw Exception()
+				}
+			} catch (_: Exception) {
 				call.respond(HttpStatusCode.Unauthorized)
 			}
 		}
@@ -127,5 +142,11 @@ fun Application.configureRouting() {
 
 fun getNextAvailableId(): Int = if (tasks.isEmpty()) 0 else tasks.keys.max() + 1
 
-fun isValidUser(bcryptHashString: String): Boolean =
-	BCrypt.verifyer().verify("amogus134".toCharArray(), bcryptHashString).verified
+fun isValidUser(user: User): Boolean {
+	val neededUsername = "Hummel009"
+	val neededPassword = BCrypt.withDefaults().hashToString(12, "amogus134".toCharArray())
+	val usernameRule = user.username == neededUsername
+	val passwordRule = BCrypt.verifyer().verify(user.password.toCharArray(), neededPassword).verified
+
+	return usernameRule && passwordRule
+}

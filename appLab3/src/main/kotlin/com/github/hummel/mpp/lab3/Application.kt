@@ -1,15 +1,10 @@
 package com.github.hummel.mpp.lab3
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
-import com.github.hummel.mpp.lab3.bean.User
 import com.github.hummel.mpp.lab3.controller.configureRouting
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.Authentication
-import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -31,24 +26,12 @@ fun Application.module() {
 	}
 	install(CORS) {
 		anyHost()
+		allowCredentials = true
 		allowMethod(HttpMethod.Delete)
 		allowMethod(HttpMethod.Post)
 		allowMethod(HttpMethod.Put)
 		allowMethod(HttpMethod.Get)
 		allowHeader(HttpHeaders.ContentType)
-	}
-	install(Authentication) {
-		jwt {
-			verifier(JWT.require(Algorithm.none()).build())
-			validate { credential ->
-				if (credential.payload.getClaim("username").asString() != null) {
-					User(
-						credential.payload.getClaim("username").asString(),
-						credential.payload.getClaim("password").asString()
-					)
-				} else null
-			}
-		}
 	}
 	configureRouting()
 }
