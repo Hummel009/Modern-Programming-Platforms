@@ -9,6 +9,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.websocket.WebSockets
 import java.io.File
 
 fun main() {
@@ -24,6 +25,7 @@ fun Application.module() {
 	install(ContentNegotiation) {
 		json()
 	}
+	install(WebSockets)
 	install(CORS) {
 		anyHost()
 		allowCredentials = true

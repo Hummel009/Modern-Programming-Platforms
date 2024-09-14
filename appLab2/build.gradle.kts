@@ -11,15 +11,12 @@ group = "com.github.hummel"
 version = LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"))
 
 dependencies {
-	implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
-	implementation("io.ktor:ktor-server-content-negotiation-jvm")
+	implementation("io.ktor:ktor-serialization-kotlinx-json")
+	implementation("io.ktor:ktor-server-content-negotiation")
 
-	implementation("io.ktor:ktor-server-core-jvm")
-	implementation("io.ktor:ktor-server-netty-jvm")
+	implementation("io.ktor:ktor-server-core")
+	implementation("io.ktor:ktor-server-netty")
 	implementation("io.ktor:ktor-server-cors")
-
-	implementation("io.insert-koin:koin-ktor:latest.release")
-	implementation("io.insert-koin:koin-logger-slf4j:latest.release")
 }
 
 java {

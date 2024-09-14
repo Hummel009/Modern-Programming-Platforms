@@ -19,6 +19,7 @@ function App() {
 		password: ''
 	});
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const [webSocket, setWebSocket] = useState(null);
 
 	const handleLoginChange = (e) => {
 		const {
@@ -72,7 +73,14 @@ function App() {
 	};
 
 	useEffect(() => {
-		fetchTasks();
+		const ws = new WebSocket('ws://localhost:3000/edit-task');
+
+		ws.onopen = () => console.log('WebSocket connected');
+		ws.onmessage = (event) => {
+			fetchTasks();
+		};
+
+		setWebSocket(ws);
 	}, []);
 
 	const handleChange = (e) => {
@@ -146,22 +154,14 @@ function App() {
 	};
 
 	const editTask = async (id) => {
-		try {
-			const taskToEdit = tasks.get(id);
-			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
+		const taskToEdit = tasks.get(id);
+		const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
-			const response = await axios.put(`http://localhost:3000/edit-task/${id}`, {
-				title: newTitle
-			}, {
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
-		} catch (err) {
-			setErrorCode(err.response.status);
+		if (newTitle) {
+			webSocket.send(JSON.stringify({ id, title: newTitle }));
 		}
+
+		fetchTasks()
 	};
 
 	const makeError = async () => {

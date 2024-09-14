@@ -18,15 +18,38 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
+import io.ktor.server.websocket.webSocket
 import io.ktor.utils.io.jvm.javaio.toInputStream
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.serialization.json.Json
 import java.io.File
-import kotlin.text.toInt
 
 val tasks = mutableMapOf<Int, Task>()
 
 fun Application.configureRouting() {
+	routing {
+		webSocket("/edit-task") {
+			incoming.consumeEach { frame ->
+				if (frame is Frame.Text) {
+					val jsonString = frame.readText()
+					val request = Json.decodeFromString<EditTaskRequest>(jsonString)
+
+					val taskId = request.id
+					val newTitle = request.title
+
+					if (tasks.containsKey(taskId)) {
+						tasks[taskId]?.title = newTitle
+						send(Frame.Text("Task updated successfully"))
+					} else {
+						send(Frame.Text("Task not found"))
+					}
+				}
+			}
+		}
+	}
 	routing {
 		post("/login") {
 			val user = call.receive<User>()
@@ -121,15 +144,6 @@ fun Application.configureRouting() {
 
 		delete("/clear-tasks") {
 			tasks.clear()
-
-			call.respond(tasks)
-		}
-
-		put("/edit-task/{index}") {
-			val index = call.parameters["index"]!!.toInt()
-			val request = call.receive<EditTaskRequest>()
-
-			tasks[index]!!.title = request.title
 
 			call.respond(tasks)
 		}
