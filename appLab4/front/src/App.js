@@ -77,6 +77,7 @@ function App() {
 
 		ws.onopen = () => console.log('WebSocket connected');
 		ws.onmessage = (event) => {
+		console.log('test test amogus:', event.data);
 			fetchTasks();
 		};
 
