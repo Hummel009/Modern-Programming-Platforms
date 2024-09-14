@@ -62,3 +62,14 @@ li {
 #fltright:last-of-type {
     margin-right: 10px;
 }
+
+#redfont {
+    margin-left: 10px;
+    color: Red;
+    font-weight: Bold;
+}
+
+#greenfont {
+    color: Green;
+    font-weight: Bold;
+}

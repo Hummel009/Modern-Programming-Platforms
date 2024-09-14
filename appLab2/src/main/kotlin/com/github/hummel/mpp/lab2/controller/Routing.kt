@@ -89,6 +89,10 @@ fun Application.configureRouting() {
 
 			call.respond(tasks)
 		}
+
+		post("/{...}") {
+			call.respond(HttpStatusCode.NotFound)
+		}
 	}
 }
 
