@@ -2,7 +2,6 @@ package com.github.hummel.mpp.lab3
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.github.hummel.mpp.lab3.bean.Task
 import com.github.hummel.mpp.lab3.bean.User
 import com.github.hummel.mpp.lab3.controller.configureRouting
 import io.ktor.http.HttpHeaders
@@ -16,8 +15,6 @@ import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.CORS
 import java.io.File
-
-val tasks = mutableListOf<Task>()
 
 fun main() {
 	val uploadsDir = File("uploads")
@@ -34,7 +31,9 @@ fun Application.module() {
 	}
 	install(CORS) {
 		anyHost()
+		allowMethod(HttpMethod.Delete)
 		allowMethod(HttpMethod.Post)
+		allowMethod(HttpMethod.Put)
 		allowMethod(HttpMethod.Get)
 		allowHeader(HttpHeaders.ContentType)
 	}

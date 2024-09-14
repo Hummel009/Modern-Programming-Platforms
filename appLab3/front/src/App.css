@@ -50,3 +50,30 @@ form {
 form * {
 	margin: 2px;
 }
+
+#fltright {
+    float: right;
+}
+
+li {
+    height: 25px;
+}
+
+#fltright:last-of-type {
+    margin-right: 10px;
+}
+
+#redfont {
+    margin-left: 10px;
+    color: Red;
+    font-weight: Bold;
+}
+
+#greenfont {
+    color: Green;
+    font-weight: Bold;
+}
+
+h1 {
+    margin-top: 5px;
+}
