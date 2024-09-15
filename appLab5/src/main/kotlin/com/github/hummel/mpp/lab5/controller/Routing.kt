@@ -25,17 +25,19 @@ import java.io.File
 
 val tasks = mutableMapOf<Int, Task>()
 
-fun Application.configureRouting() {
+fun Application.configureSchema() {
 	schema {
 		mutation("edit_task") {
-			resolver { index: Int, name: String ->
-				tasks[index]!!.title = name
+			resolver { index: Int, title: String ->
+				tasks[index]!!.title = title
 
 				"OK"
 			}
 		}
 	}
+}
 
+fun Application.configureRouting() {
 	routing {
 		post("/login") {
 			val user = call.receive<User>()

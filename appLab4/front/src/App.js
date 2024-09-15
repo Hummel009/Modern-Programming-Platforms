@@ -153,7 +153,7 @@ function App() {
 
 	const clearTasks = async () => {
 		try {
-			const response = await axios.delete('http://localhost:3000/clear-tasks');
+			await axios.delete('http://localhost:3000/clear-tasks');
 			fetchTasks()
 		} catch (err) {
 			setErrorCode(err.response.status);
@@ -166,7 +166,7 @@ function App() {
 			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
 			if (newTitle) {
-				webSocket.send(JSON.stringify({ id, title: newTitle }));
+				webSocket.send(JSON.stringify({ index: id, title: newTitle }));
 			}
 
 			fetchTasks()

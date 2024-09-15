@@ -2,6 +2,7 @@ package com.github.hummel.mpp.lab5
 
 import com.apurebase.kgraphql.GraphQL
 import com.github.hummel.mpp.lab5.controller.configureRouting
+import com.github.hummel.mpp.lab5.controller.configureSchema
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.*
@@ -36,6 +37,7 @@ fun Application.module() {
 	}
 	install(GraphQL) {
 		playground = true
+		configureSchema()
 	}
 	configureRouting()
 }

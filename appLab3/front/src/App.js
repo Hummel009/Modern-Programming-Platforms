@@ -144,7 +144,7 @@ function App() {
 
 	const clearTasks = async () => {
 		try {
-			const response = await axios.delete('http://localhost:3000/clear-tasks');
+			await axios.delete('http://localhost:3000/clear-tasks');
 			fetchTasks();
 		} catch (err) {
 			setErrorCode(err.response.status);
@@ -156,7 +156,7 @@ function App() {
 			const taskToEdit = tasks.get(id);
 			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
-			const response = await axios.put('http://localhost:3000/edit-task',
+			await axios.put('http://localhost:3000/edit-task',
 			{
 				index: id, title: newTitle
 			},

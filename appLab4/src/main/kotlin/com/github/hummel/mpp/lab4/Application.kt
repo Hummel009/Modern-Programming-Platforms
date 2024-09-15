@@ -1,6 +1,7 @@
 package com.github.hummel.mpp.lab4
 
 import com.github.hummel.mpp.lab4.controller.configureRouting
+import com.github.hummel.mpp.lab4.controller.configureWebSocket
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.*
@@ -36,4 +37,5 @@ fun Application.module() {
 	}
 	install(WebSockets)
 	configureRouting()
+	configureWebSocket()
 }

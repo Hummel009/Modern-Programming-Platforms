@@ -152,7 +152,7 @@ function App() {
 
 			const query = `
 				mutation {
-					edit_task(index: ${id}, name: "${newTitle}")
+					edit_task(index: ${id}, title: "${newTitle}")
 				}
 			`;
 

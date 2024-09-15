@@ -30,7 +30,7 @@ import java.io.File
 
 val tasks = mutableMapOf<Int, Task>()
 
-fun Application.configureRouting() {
+fun Application.configureWebSocket() {
 	routing {
 		webSocket("/edit-task") {
 			incoming.consumeEach { frame ->
@@ -48,7 +48,9 @@ fun Application.configureRouting() {
 			}
 		}
 	}
+}
 
+fun Application.configureRouting() {
 	routing {
 		post("/login") {
 			val user = call.receive<User>()
