@@ -17,7 +17,6 @@ import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
-import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
@@ -32,18 +31,28 @@ val tasks = mutableMapOf<Int, Task>()
 
 fun Application.configureWebSocket() {
 	routing {
-		webSocket("/edit-task") {
+		webSocket("/operate") {
 			incoming.consumeEach { frame ->
 				if (frame is Frame.Text) {
 					val jsonString = frame.readText()
-					val request = Json.decodeFromString<EditTaskRequest>(jsonString)
+					val request = try {
+						Json.decodeFromString<EditTaskRequest>(jsonString)
+					} catch (_: Exception) {
+						null
+					}
 
-					val taskId = request.index
-					val newTitle = request.title
+					request?.let { //edit-task
+						val taskId = request.index
+						val newTitle = request.title
 
-					tasks[taskId]!!.title = newTitle
+						tasks[taskId]!!.title = newTitle
 
-					send(Frame.Text("OK"))
+						send(Frame.Text("OK"))
+					} ?: run { //clear-tasks
+						tasks.clear()
+
+						send(Frame.Text("OK"))
+					}
 				}
 			}
 		}
@@ -128,12 +137,6 @@ fun Application.configureRouting() {
 			}.associate { it.key to it.value }
 
 			call.respond(filteredTasks)
-		}
-
-		delete("/clear-tasks") {
-			tasks.clear()
-
-			call.respond(HttpStatusCode.OK)
 		}
 
 		post("/{...}") {

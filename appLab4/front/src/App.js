@@ -22,11 +22,10 @@ function App() {
 	const [webSocket, setWebSocket] = useState(null);
 
 	useEffect(() => {
-		const ws = new WebSocket('ws://localhost:3000/edit-task');
+		const ws = new WebSocket('ws://localhost:3000/operate');
 
 		ws.onopen = () => console.log('WebSocket connected');
 		ws.onmessage = (event) => {
-		console.log('test test amogus:', event.data);
 			fetchTasks();
 		};
 
@@ -153,7 +152,7 @@ function App() {
 
 	const clearTasks = async () => {
 		try {
-			await axios.delete('http://localhost:3000/clear-tasks');
+			webSocket.send(JSON.stringify({ task: "clear" }));
 			fetchTasks()
 		} catch (err) {
 			setErrorCode(err.response.status);
