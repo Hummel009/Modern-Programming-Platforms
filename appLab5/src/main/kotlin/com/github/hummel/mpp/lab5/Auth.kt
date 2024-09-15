@@ -34,6 +34,6 @@ fun isValidUser(username: String, password: String): Boolean {
 }
 
 fun generateToken(user: User): String = JWT.create()
-	.withClaim("name", user.username)
+	.withClaim("username", user.username)
 	.withClaim("password", user.password)
 	.sign(Algorithm.HMAC256("secret")).toString()
