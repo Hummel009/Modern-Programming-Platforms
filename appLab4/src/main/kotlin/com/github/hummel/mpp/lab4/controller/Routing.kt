@@ -1,12 +1,12 @@
 package com.github.hummel.mpp.lab4.controller
 
-import at.favre.lib.crypto.bcrypt.BCrypt
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import com.github.hummel.mpp.lab4.bean.EditTaskRequest
 import com.github.hummel.mpp.lab4.bean.FilterRequest
 import com.github.hummel.mpp.lab4.bean.Task
 import com.github.hummel.mpp.lab4.bean.User
+import com.github.hummel.mpp.lab4.generateToken
+import com.github.hummel.mpp.lab4.isValidToken
+import com.github.hummel.mpp.lab4.isValidUser
 import io.ktor.http.Cookie
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
@@ -38,27 +38,24 @@ fun Application.configureRouting() {
 					val jsonString = frame.readText()
 					val request = Json.decodeFromString<EditTaskRequest>(jsonString)
 
-					val taskId = request.id
+					val taskId = request.index
 					val newTitle = request.title
 
-					if (tasks.containsKey(taskId)) {
-						tasks[taskId]?.title = newTitle
-						send(Frame.Text("Task updated successfully"))
-					} else {
-						send(Frame.Text("Task not found"))
-					}
+					tasks[taskId]!!.title = newTitle
+
+					send(Frame.Text("OK"))
 				}
 			}
 		}
 	}
+
 	routing {
 		post("/login") {
 			val user = call.receive<User>()
+
 			if (isValidUser(user)) {
-				val token = JWT.create()
-					.withClaim("username", user.username)
-					.withClaim("password", user.password)
-					.sign(Algorithm.HMAC256("secret"))
+				val token = generateToken(user)
+
 				call.response.cookies.append(
 					Cookie(name = "jwt", value = token, httpOnly = true, secure = false)
 				)
@@ -70,22 +67,10 @@ fun Application.configureRouting() {
 
 		get("/token") {
 			val token = call.request.cookies["jwt"]
-			if (token == null) {
-				call.respond(HttpStatusCode.Unauthorized)
-				return@get
-			}
 
-			try {
-				val decoded = JWT.decode(token)
-				val username = decoded.getClaim("username").asString()
-				val password = decoded.getClaim("password").asString()
-
-				if (isValidUser(User(username, password))) {
-					call.respond(HttpStatusCode.OK)
-				} else {
-					throw Exception()
-				}
-			} catch (_: Exception) {
+			if (isValidToken(token)) {
+				call.respond(HttpStatusCode.OK)
+			} else {
 				call.respond(HttpStatusCode.Unauthorized)
 			}
 		}
@@ -129,7 +114,7 @@ fun Application.configureRouting() {
 
 			tasks.put(getNextAvailableId(), Task(title, status, dueDate, fileName))
 
-			call.respond(HttpStatusCode.Created)
+			call.respond(HttpStatusCode.OK)
 		}
 
 		post("/filter-tasks") {
@@ -146,7 +131,7 @@ fun Application.configureRouting() {
 		delete("/clear-tasks") {
 			tasks.clear()
 
-			call.respond(tasks)
+			call.respond(HttpStatusCode.OK)
 		}
 
 		post("/{...}") {
@@ -156,12 +141,3 @@ fun Application.configureRouting() {
 }
 
 fun getNextAvailableId(): Int = if (tasks.isEmpty()) 0 else tasks.keys.max() + 1
-
-fun isValidUser(user: User): Boolean {
-	val neededUsername = "Hummel009"
-	val neededPassword = BCrypt.withDefaults().hashToString(12, "amogus134".toCharArray())
-	val usernameRule = user.username == neededUsername
-	val passwordRule = BCrypt.verifyer().verify(user.password.toCharArray(), neededPassword).verified
-
-	return usernameRule && passwordRule
-}

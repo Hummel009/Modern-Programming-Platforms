@@ -38,10 +38,12 @@ function App() {
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			await axios.post('http://localhost:3000/login', {
+			await axios.post('http://localhost:3000/login',
+			{
 				username: loginData.username,
 				password: loginData.password
-			}, {
+			},
+			{
 				withCredentials: true
 			});
 
@@ -54,7 +56,8 @@ function App() {
 
 	const tryUseCookieToken = async () => {
 		try {
-			await axios.get('http://localhost:3000/token', {
+			await axios.get('http://localhost:3000/token',
+			{
 				withCredentials: true
 			});
 
@@ -108,7 +111,9 @@ function App() {
 			for (const key in formData) {
 				form.append(key, formData[key]);
 			}
-			await axios.post('http://localhost:3000/add-task', form, {
+			await axios.post('http://localhost:3000/add-task',
+			form,
+			{
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},
@@ -121,9 +126,11 @@ function App() {
 
 	const filterTasks = async (filter) => {
 		try {
-			const response = await axios.post('http://localhost:3000/filter-tasks', {
+			const response = await axios.post('http://localhost:3000/filter-tasks',
+			{
 				filterStatus: filter
-			}, {
+			},
+			{
 				headers: {
 					'Content-Type': 'application/json'
 				}
@@ -138,8 +145,7 @@ function App() {
 	const clearTasks = async () => {
 		try {
 			const response = await axios.delete('http://localhost:3000/clear-tasks');
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
+			fetchTasks();
 		} catch (err) {
 			setErrorCode(err.response.status);
 		}
@@ -150,15 +156,16 @@ function App() {
 			const taskToEdit = tasks.get(id);
 			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
-			const response = await axios.put(`http://localhost:3000/edit-task/${id}`, {
-				title: newTitle
-			}, {
+			const response = await axios.put('http://localhost:3000/edit-task',
+			{
+				index: id, title: newTitle
+			},
+			{
 				headers: {
 					'Content-Type': 'application/json'
 				}
 			});
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
+			fetchTasks();
 		} catch (err) {
 			setErrorCode(err.response.status);
 		}

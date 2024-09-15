@@ -47,10 +47,12 @@ function App() {
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			await axios.post('http://localhost:3000/login', {
+			await axios.post('http://localhost:3000/login',
+			{
 				username: loginData.username,
 				password: loginData.password
-			}, {
+			},
+			{
 				withCredentials: true
 			});
 
@@ -63,7 +65,8 @@ function App() {
 
 	const tryUseCookieToken = async () => {
 		try {
-			await axios.get('http://localhost:3000/token', {
+			await axios.get('http://localhost:3000/token',
+			{
 				withCredentials: true
 			});
 
@@ -117,7 +120,9 @@ function App() {
 			for (const key in formData) {
 				form.append(key, formData[key]);
 			}
-			await axios.post('http://localhost:3000/add-task', form, {
+			await axios.post('http://localhost:3000/add-task',
+			form,
+			{
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},
@@ -130,9 +135,11 @@ function App() {
 
 	const filterTasks = async (filter) => {
 		try {
-			const response = await axios.post('http://localhost:3000/filter-tasks', {
+			const response = await axios.post('http://localhost:3000/filter-tasks',
+			{
 				filterStatus: filter
-			}, {
+			},
+			{
 				headers: {
 					'Content-Type': 'application/json'
 				}
@@ -147,22 +154,25 @@ function App() {
 	const clearTasks = async () => {
 		try {
 			const response = await axios.delete('http://localhost:3000/clear-tasks');
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
+			fetchTasks()
 		} catch (err) {
 			setErrorCode(err.response.status);
 		}
 	};
 
 	const editTask = async (id) => {
-		const taskToEdit = tasks.get(id);
-		const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
+		try {
+			const taskToEdit = tasks.get(id);
+			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
-		if (newTitle) {
-			webSocket.send(JSON.stringify({ id, title: newTitle }));
+			if (newTitle) {
+				webSocket.send(JSON.stringify({ id, title: newTitle }));
+			}
+
+			fetchTasks()
+		} catch (err) {
+			setErrorCode(err.response.status);
 		}
-
-		fetchTasks()
 	};
 
 	const makeError = async () => {

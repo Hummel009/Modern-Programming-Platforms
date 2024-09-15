@@ -1,6 +1,6 @@
-package com.github.hummel.mpp.lab2.bean;
+package com.github.hummel.mpp.lab2.bean
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class EditTaskRequest(val title: String)
+data class EditTaskRequest(val index: Int, val title: String)

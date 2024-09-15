@@ -26,6 +26,7 @@ fun Application.module() {
 	}
 	install(CORS) {
 		anyHost()
+		allowCredentials = true
 		allowMethod(HttpMethod.Delete)
 		allowMethod(HttpMethod.Post)
 		allowMethod(HttpMethod.Put)

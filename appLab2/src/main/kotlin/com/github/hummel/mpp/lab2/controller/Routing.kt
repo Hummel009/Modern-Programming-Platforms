@@ -17,7 +17,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
-import io.ktor.utils.io.jvm.javaio.toInputStream
 import java.io.File
 
 val tasks = mutableMapOf<Int, Task>()
@@ -63,7 +62,7 @@ fun Application.configureRouting() {
 
 			tasks.put(getNextAvailableId(), Task(title, status, dueDate, fileName))
 
-			call.respond(HttpStatusCode.Created)
+			call.respond(HttpStatusCode.OK)
 		}
 
 		post("/filter-tasks") {
@@ -80,16 +79,18 @@ fun Application.configureRouting() {
 		delete("/clear-tasks") {
 			tasks.clear()
 
-			call.respond(tasks)
+			call.respond(HttpStatusCode.OK)
 		}
 
-		put("/edit-task/{index}") {
-			val index = call.parameters["index"]!!.toInt()
+		put("/edit-task") {
 			val request = call.receive<EditTaskRequest>()
 
-			tasks[index]!!.title = request.title
+			val index = request.index
+			val title = request.title
 
-			call.respond(tasks)
+			tasks[index]!!.title = title
+
+			call.respond(HttpStatusCode.OK)
 		}
 
 		post("/{...}") {

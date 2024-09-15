@@ -1,12 +1,12 @@
 package com.github.hummel.mpp.lab3.controller
 
-import at.favre.lib.crypto.bcrypt.BCrypt
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
 import com.github.hummel.mpp.lab3.bean.EditTaskRequest
 import com.github.hummel.mpp.lab3.bean.FilterRequest
 import com.github.hummel.mpp.lab3.bean.Task
 import com.github.hummel.mpp.lab3.bean.User
+import com.github.hummel.mpp.lab3.generateToken
+import com.github.hummel.mpp.lab3.isValidToken
+import com.github.hummel.mpp.lab3.isValidUser
 import io.ktor.http.Cookie
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
@@ -23,7 +23,6 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
 import java.io.File
-import kotlin.text.toInt
 
 val tasks = mutableMapOf<Int, Task>()
 
@@ -31,11 +30,10 @@ fun Application.configureRouting() {
 	routing {
 		post("/login") {
 			val user = call.receive<User>()
+
 			if (isValidUser(user)) {
-				val token = JWT.create()
-					.withClaim("username", user.username)
-					.withClaim("password", user.password)
-					.sign(Algorithm.HMAC256("secret"))
+				val token = generateToken(user)
+
 				call.response.cookies.append(
 					Cookie(name = "jwt", value = token, httpOnly = true, secure = false)
 				)
@@ -47,22 +45,10 @@ fun Application.configureRouting() {
 
 		get("/token") {
 			val token = call.request.cookies["jwt"]
-			if (token == null) {
-				call.respond(HttpStatusCode.Unauthorized)
-				return@get
-			}
 
-			try {
-				val decoded = JWT.decode(token)
-				val username = decoded.getClaim("username").asString()
-				val password = decoded.getClaim("password").asString()
-
-				if (isValidUser(User(username, password))) {
-					call.respond(HttpStatusCode.OK)
-				} else {
-					throw Exception()
-				}
-			} catch (_: Exception) {
+			if (isValidToken(token)) {
+				call.respond(HttpStatusCode.OK)
+			} else {
 				call.respond(HttpStatusCode.Unauthorized)
 			}
 		}
@@ -106,7 +92,7 @@ fun Application.configureRouting() {
 
 			tasks.put(getNextAvailableId(), Task(title, status, dueDate, fileName))
 
-			call.respond(HttpStatusCode.Created)
+			call.respond(HttpStatusCode.OK)
 		}
 
 		post("/filter-tasks") {
@@ -123,16 +109,18 @@ fun Application.configureRouting() {
 		delete("/clear-tasks") {
 			tasks.clear()
 
-			call.respond(tasks)
+			call.respond(HttpStatusCode.OK)
 		}
 
-		put("/edit-task/{index}") {
-			val index = call.parameters["index"]!!.toInt()
+		put("/edit-task") {
 			val request = call.receive<EditTaskRequest>()
 
-			tasks[index]!!.title = request.title
+			val index = request.index
+			val title = request.title
 
-			call.respond(tasks)
+			tasks[index]!!.title = title
+
+			call.respond(HttpStatusCode.OK)
 		}
 
 		post("/{...}") {
@@ -142,12 +130,3 @@ fun Application.configureRouting() {
 }
 
 fun getNextAvailableId(): Int = if (tasks.isEmpty()) 0 else tasks.keys.max() + 1
-
-fun isValidUser(user: User): Boolean {
-	val neededUsername = "Hummel009"
-	val neededPassword = BCrypt.withDefaults().hashToString(12, "amogus134".toCharArray())
-	val usernameRule = user.username == neededUsername
-	val passwordRule = BCrypt.verifyer().verify(user.password.toCharArray(), neededPassword).verified
-
-	return usernameRule && passwordRule
-}

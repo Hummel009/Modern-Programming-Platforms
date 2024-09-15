@@ -25,7 +25,6 @@ fun Application.module() {
 	install(ContentNegotiation) {
 		json()
 	}
-	install(WebSockets)
 	install(CORS) {
 		anyHost()
 		allowCredentials = true
@@ -35,5 +34,6 @@ fun Application.module() {
 		allowMethod(HttpMethod.Get)
 		allowHeader(HttpHeaders.ContentType)
 	}
+	install(WebSockets)
 	configureRouting()
 }
