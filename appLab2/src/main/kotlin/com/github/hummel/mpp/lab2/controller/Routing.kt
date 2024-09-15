@@ -6,7 +6,9 @@ import com.github.hummel.mpp.lab2.bean.Task
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
+import io.ktor.http.content.streamProvider
 import io.ktor.server.application.Application
+import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -46,7 +48,7 @@ fun Application.configureRouting() {
 					is PartData.FileItem -> {
 						fileName = part.originalFileName
 						val file = File("uploads/${System.currentTimeMillis()}-$fileName")
-						part.provider().toInputStream().use { input ->
+						part.streamProvider().use { input ->
 							file.outputStream().buffered().use { output ->
 								input.copyTo(output)
 							}

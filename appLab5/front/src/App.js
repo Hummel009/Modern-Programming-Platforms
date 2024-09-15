@@ -150,15 +150,23 @@ function App() {
 			const taskToEdit = tasks.get(id);
 			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
-			const response = await axios.put(`http://localhost:3000/edit-task/${id}`, {
-				title: newTitle
+			const query = `
+				mutation {
+					edit_task(index: ${id}, name: "${newTitle}")
+				}
+			`;
+
+			console.log(query)
+
+			await axios.post('http://localhost:3000/graphql', {
+				query: query
 			}, {
 				headers: {
 					'Content-Type': 'application/json'
 				}
 			});
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
+
+			fetchTasks();
 		} catch (err) {
 			setErrorCode(err.response.status);
 		}

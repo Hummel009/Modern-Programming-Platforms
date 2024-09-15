@@ -22,6 +22,9 @@ dependencies {
 
 	implementation("com.auth0:java-jwt:latest.release")
 	implementation("at.favre.lib:bcrypt:latest.release")
+
+	implementation("com.apurebase:kgraphql:latest.release")
+	implementation("com.apurebase:kgraphql-ktor:latest.release")
 }
 
 java {

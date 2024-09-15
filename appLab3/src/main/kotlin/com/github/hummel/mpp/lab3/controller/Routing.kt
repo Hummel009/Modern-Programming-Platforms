@@ -11,7 +11,9 @@ import io.ktor.http.Cookie
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
+import io.ktor.http.content.streamProvider
 import io.ktor.server.application.Application
+import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -20,7 +22,6 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
-import io.ktor.utils.io.jvm.javaio.toInputStream
 import java.io.File
 import kotlin.text.toInt
 
@@ -90,7 +91,7 @@ fun Application.configureRouting() {
 					is PartData.FileItem -> {
 						fileName = part.originalFileName
 						val file = File("uploads/${System.currentTimeMillis()}-$fileName")
-						part.provider().toInputStream().use { input ->
+						part.streamProvider().use { input ->
 							file.outputStream().buffered().use { output ->
 								input.copyTo(output)
 							}
