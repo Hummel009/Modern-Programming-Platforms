@@ -1,6 +1,6 @@
 package com.github.hummel.mpp.lab5.controller
 
-import com.apurebase.kgraphql.KGraphQL.Companion.schema
+import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import com.github.hummel.mpp.lab5.bean.FilterRequest
 import com.github.hummel.mpp.lab5.bean.Task
 import com.github.hummel.mpp.lab5.bean.User
@@ -25,14 +25,12 @@ import java.io.File
 
 val tasks = mutableMapOf<Int, Task>()
 
-fun Application.configureSchema() {
-	schema {
-		mutation("edit_task") {
-			resolver { index: Int, title: String ->
-				tasks[index]!!.title = title
+fun SchemaBuilder.configureSchema() {
+	mutation("edit_task") {
+		resolver { index: Int, title: String ->
+			tasks[index]!!.title = title
 
-				"OK"
-			}
+			"OK"
 		}
 	}
 }

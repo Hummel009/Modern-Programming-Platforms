@@ -156,8 +156,6 @@ function App() {
 				}
 			`;
 
-			console.log(query)
-
 			await axios.post('http://localhost:3000/graphql', {
 				query: query
 			}, {

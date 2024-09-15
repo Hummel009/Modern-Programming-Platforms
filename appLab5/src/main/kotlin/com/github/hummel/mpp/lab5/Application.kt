@@ -37,7 +37,9 @@ fun Application.module() {
 	}
 	install(GraphQL) {
 		playground = true
-		configureSchema()
+		schema {
+			configureSchema()
+		}
 	}
 	configureRouting()
 }
