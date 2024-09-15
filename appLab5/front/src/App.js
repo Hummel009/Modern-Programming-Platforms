@@ -137,9 +137,21 @@ function App() {
 
 	const clearTasks = async () => {
 		try {
-			const response = await axios.delete('http://localhost:3000/clear-tasks');
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
+			const query = `
+				mutation {
+					clear_tasks
+				}
+			`;
+
+			await axios.post('http://localhost:3000/graphql', {
+				query: query
+			}, {
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			fetchTasks();
 		} catch (err) {
 			setErrorCode(err.response.status);
 		}

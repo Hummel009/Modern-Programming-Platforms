@@ -17,7 +17,6 @@ import io.ktor.server.application.call
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
-import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
@@ -29,6 +28,14 @@ fun SchemaBuilder.configureSchema() {
 	mutation("edit_task") {
 		resolver { index: Int, title: String ->
 			tasks[index]!!.title = title
+
+			"OK"
+		}
+	}
+
+	mutation("clear_tasks") {
+		resolver { ->
+			tasks.clear()
 
 			"OK"
 		}
@@ -113,12 +120,6 @@ fun Application.configureRouting() {
 			}.associate { it.key to it.value }
 
 			call.respond(filteredTasks)
-		}
-
-		delete("/clear-tasks") {
-			tasks.clear()
-
-			call.respond(HttpStatusCode.OK)
 		}
 
 		post("/{...}") {
