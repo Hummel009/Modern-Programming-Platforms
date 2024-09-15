@@ -20,6 +20,10 @@ function App() {
 	});
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+	useEffect(() => {
+		fetchTasks();
+	}, []);
+
 	const handleLoginChange = (e) => {
 		const {
 			name,
@@ -70,10 +74,6 @@ function App() {
 			setErrorCode(err.response.status);
 		}
 	};
-
-	useEffect(() => {
-		fetchTasks();
-	}, []);
 
 	const handleChange = (e) => {
 		try {

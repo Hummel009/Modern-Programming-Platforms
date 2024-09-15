@@ -21,6 +21,18 @@ function App() {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const [webSocket, setWebSocket] = useState(null);
 
+	useEffect(() => {
+		const ws = new WebSocket('ws://localhost:3000/edit-task');
+
+		ws.onopen = () => console.log('WebSocket connected');
+		ws.onmessage = (event) => {
+		console.log('test test amogus:', event.data);
+			fetchTasks();
+		};
+
+		setWebSocket(ws);
+	}, []);
+
 	const handleLoginChange = (e) => {
 		const {
 			name,
@@ -71,18 +83,6 @@ function App() {
 			setErrorCode(err.response.status);
 		}
 	};
-
-	useEffect(() => {
-		const ws = new WebSocket('ws://localhost:3000/edit-task');
-
-		ws.onopen = () => console.log('WebSocket connected');
-		ws.onmessage = (event) => {
-		console.log('test test amogus:', event.data);
-			fetchTasks();
-		};
-
-		setWebSocket(ws);
-	}, []);
 
 	const handleChange = (e) => {
 		try {

@@ -15,6 +15,10 @@ function App() {
 	});
 	const [errorCode, setErrorCode] = useState(null);
 
+	useEffect(() => {
+		fetchTasks();
+	}, []);
+
 	const fetchTasks = async () => {
 		try {
 			const response = await axios.get('http://localhost:3000/');
@@ -24,10 +28,6 @@ function App() {
 			setErrorCode(err.response.status);
 		}
 	};
-
-	useEffect(() => {
-		fetchTasks();
-	}, []);
 
 	const handleChange = (e) => {
 		try {
