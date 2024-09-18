@@ -67,8 +67,31 @@ function App() {
 
 	const fetchTasks = async () => {
 		try {
-			const response = await axios.get('http://localhost:3000/');
-			const tasksMap = new Map(Object.entries(response.data));
+			const query = `
+				query {
+					get_tasks {
+						id
+						task {
+							title
+							status
+							dueDate
+							file
+						}
+					}
+				}
+			`;
+
+			const response = await axios.post('http://localhost:3000/graphql', {
+				query: query
+			}, {
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			const tasksMap = new Map(
+				response.data.data.get_tasks.map(taskWrapper => [taskWrapper.id, taskWrapper.task])
+			);
 			setTasks(tasksMap);
 		} catch (err) {
 			setErrorCode(err.response.status);
@@ -121,14 +144,31 @@ function App() {
 
 	const filterTasks = async (filter) => {
 		try {
-			const response = await axios.post('http://localhost:3000/filter-tasks', {
-				filterStatus: filter
+			const query = `
+				query {
+					filter_tasks(filterStatus: "${filter}") {
+						id
+						task {
+							title
+							status
+							dueDate
+							file
+						}
+					}
+				}
+			`;
+
+			const response = await axios.post('http://localhost:3000/graphql', {
+				query: query
 			}, {
 				headers: {
 					'Content-Type': 'application/json'
 				}
 			});
-			const tasksMap = new Map(Object.entries(response.data));
+
+			const tasksMap = new Map(
+				response.data.data.filter_tasks.map(taskWrapper => [taskWrapper.id, taskWrapper.task])
+			);
 			setTasks(tasksMap);
 		} catch (err) {
 			setErrorCode(err.response.status);

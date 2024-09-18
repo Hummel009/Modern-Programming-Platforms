@@ -1,8 +1,8 @@
 package com.github.hummel.mpp.lab5.controller
 
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.github.hummel.mpp.lab5.bean.FilterRequest
 import com.github.hummel.mpp.lab5.bean.Task
+import com.github.hummel.mpp.lab5.bean.TaskWrapper
 import com.github.hummel.mpp.lab5.bean.User
 import com.github.hummel.mpp.lab5.generateToken
 import com.github.hummel.mpp.lab5.isValidToken
@@ -40,6 +40,20 @@ fun SchemaBuilder.configureSchema() {
 			"OK"
 		}
 	}
+
+	query("get_tasks") {
+		resolver { ->
+			tasks.toTaskWrapperList()
+		}
+	}
+
+	query("filter_tasks") {
+		resolver { filterStatus: String ->
+			tasks.asSequence().filter {
+				it.value.status == filterStatus || filterStatus == "all"
+			}.associate { it.key to it.value }.toMutableMap().toTaskWrapperList()
+		}
+	}
 }
 
 fun Application.configureRouting() {
@@ -67,10 +81,6 @@ fun Application.configureRouting() {
 			} else {
 				call.respond(HttpStatusCode.Unauthorized)
 			}
-		}
-
-		get("/") {
-			call.respond(tasks)
 		}
 
 		post("/add-task") {
@@ -111,17 +121,6 @@ fun Application.configureRouting() {
 			call.respond(HttpStatusCode.OK)
 		}
 
-		post("/filter-tasks") {
-			val request = call.receive<FilterRequest>()
-			val filterStatus = request.filterStatus
-
-			val filteredTasks = tasks.asSequence().filter {
-				it.value.status == filterStatus || filterStatus == "all"
-			}.associate { it.key to it.value }
-
-			call.respond(filteredTasks)
-		}
-
 		post("/{...}") {
 			call.respond(HttpStatusCode.NotFound)
 		}
@@ -129,3 +128,5 @@ fun Application.configureRouting() {
 }
 
 fun getNextAvailableId(): Int = if (tasks.isEmpty()) 0 else tasks.keys.max() + 1
+
+fun MutableMap<Int, Task>.toTaskWrapperList(): List<TaskWrapper> = map { TaskWrapper(it.key, it.value) }
