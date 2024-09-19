@@ -24,6 +24,16 @@ function App() {
 		fetchTasks();
 	}, []);
 
+	const fetchTasks = async () => {
+		try {
+			const response = await axios.get('http://localhost:3000/');
+			const tasksMap = new Map(Object.entries(response.data));
+			setTasks(tasksMap);
+		} catch (err) {
+			setErrorCode(err.response.status);
+		}
+	};
+
 	const handleLoginChange = (e) => {
 		const {
 			name,
@@ -65,16 +75,6 @@ function App() {
 			fetchTasks();
 		} catch (error) {
 			alert('Login failed. Please check your credentials.');
-		}
-	};
-
-	const fetchTasks = async () => {
-		try {
-			const response = await axios.get('http://localhost:3000/');
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
-		} catch (err) {
-			setErrorCode(err.response.status);
 		}
 	};
 

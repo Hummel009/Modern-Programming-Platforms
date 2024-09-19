@@ -3,18 +3,15 @@ package com.github.hummel.mpp.lab5.controller
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import com.github.hummel.mpp.lab5.bean.Task
 import com.github.hummel.mpp.lab5.bean.TaskWrapper
-import com.github.hummel.mpp.lab5.bean.User
 import com.github.hummel.mpp.lab5.generateToken
 import com.github.hummel.mpp.lab5.isValidToken
 import com.github.hummel.mpp.lab5.isValidUser
-import io.ktor.http.Cookie
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
-import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
@@ -54,25 +51,22 @@ fun SchemaBuilder.configureSchema() {
 			}.associate { it.key to it.value }.toMutableMap().toTaskWrapperList()
 		}
 	}
+
+	mutation("login") {
+		resolver { username: String, password: String ->
+			if (isValidUser(username, password)) {
+				val token = generateToken(username, password)
+
+				token
+			} else {
+				throw Exception()
+			}
+		}
+	}
 }
 
 fun Application.configureRouting() {
 	routing {
-		post("/login") {
-			val user = call.receive<User>()
-
-			if (isValidUser(user)) {
-				val token = generateToken(user)
-
-				call.response.cookies.append(
-					Cookie(name = "jwt", value = token, httpOnly = true, secure = false)
-				)
-				call.respond(HttpStatusCode.OK)
-			} else {
-				call.respond(HttpStatusCode.Unauthorized)
-			}
-		}
-
 		get("/token") {
 			val token = call.request.cookies["jwt"]
 

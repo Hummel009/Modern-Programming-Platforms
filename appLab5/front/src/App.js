@@ -24,47 +24,6 @@ function App() {
 		fetchTasks();
 	}, []);
 
-	const handleLoginChange = (e) => {
-		const {
-			name,
-			value
-		} = e.target;
-		setLoginData({
-			...loginData,
-			[name]: value
-		});
-	};
-
-	const handleLoginSubmit = async (e) => {
-		e.preventDefault();
-		try {
-			await axios.post('http://localhost:3000/login', {
-				username: loginData.username,
-				password: loginData.password
-			}, {
-				withCredentials: true
-			});
-
-			setIsLoggedIn(true);
-			fetchTasks();
-		} catch (error) {
-			alert('Login failed. Please check your credentials.');
-		}
-	};
-
-	const tryUseCookieToken = async () => {
-		try {
-			await axios.get('http://localhost:3000/token', {
-				withCredentials: true
-			});
-
-			setIsLoggedIn(true);
-			fetchTasks();
-		} catch (error) {
-			alert('Login failed. Please check your credentials.');
-		}
-	};
-
 	const fetchTasks = async () => {
 		try {
 			const query = `
@@ -95,6 +54,53 @@ function App() {
 			setTasks(tasksMap);
 		} catch (err) {
 			setErrorCode(err.response.status);
+		}
+	};
+
+	const handleLoginChange = (e) => {
+		const {
+			name,
+			value
+		} = e.target;
+		setLoginData({
+			...loginData,
+			[name]: value
+		});
+	};
+
+	const handleLoginSubmit = async (e) => {
+		e.preventDefault();
+		try {
+			const query = `
+				mutation {
+					login(username: "${loginData.username}", password: "${loginData.password}")
+				}
+			`;
+
+			const response = await axios.post('http://localhost:3000/graphql', {
+				query: query
+			});
+
+			const token = response.data.data.login;
+            document.cookie = `jwt=${token}; path=/; secure=false; SameSite=Lax`;
+
+			setIsLoggedIn(true);
+			fetchTasks();
+		} catch (error) {
+			alert('Login failed. Please check your credentials.');
+		}
+	};
+
+	const tryUseCookieToken = async () => {
+		try {
+			await axios.get('http://localhost:3000/token', {
+				withCredentials: true
+			});
+
+			setIsLoggedIn(true);
+			fetchTasks();
+		} catch (error) {
+			alert('Login failed. Please check your credentials.');
 		}
 	};
 
