@@ -3,7 +3,6 @@ package com.github.hummel.mpp.lab5
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.github.hummel.mpp.lab5.bean.User
 
 fun isValidToken(token: String?): Boolean {
 	if (token == null) {
@@ -17,13 +16,6 @@ fun isValidToken(token: String?): Boolean {
 	return isValidUser(username, password)
 }
 
-fun isValidUser(user: User): Boolean {
-	val username = user.username
-	val password = user.password
-
-	return isValidUser(username, password)
-}
-
 fun isValidUser(username: String, password: String): Boolean {
 	val neededUsername = "Hummel009"
 	val neededPassword = BCrypt.withDefaults().hashToString(12, "amogus134".toCharArray())
@@ -32,8 +24,6 @@ fun isValidUser(username: String, password: String): Boolean {
 
 	return usernameRule && passwordRule
 }
-
-fun generateToken(user: User): String = generateToken(user.username, user.password)
 
 fun generateToken(username: String, password: String): String = JWT.create()
 	.withClaim("username", username)
