@@ -72,7 +72,7 @@ function App() {
 		e.preventDefault();
 		try {
 			const query = `
-				mutation {
+				query {
 					login(username: "${loginData.username}", password: "${loginData.password}")
 				}
 			`;
@@ -82,7 +82,7 @@ function App() {
 			});
 
 			const token = response.data.data.login;
-            document.cookie = `jwt=${token}; path=/; secure=false; SameSite=Lax`;
+			document.cookie = `jwt=${token}; path=/; secure=false; SameSite=Lax`;
 
 			setIsLoggedIn(true);
 			fetchTasks();
@@ -93,8 +93,22 @@ function App() {
 
 	const tryUseCookieToken = async () => {
 		try {
-			await axios.get('http://localhost:3000/token', {
-				withCredentials: true
+			const cookies = document.cookie.split('; ');
+			const tokenCookie = cookies.find(row => row.startsWith('jwt='));
+			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+
+			if (!token) {
+				throw new Error('No token found');
+			}
+
+			const query = `
+				query {
+					token(token: "${token}")
+				}
+			`;
+
+			await axios.post('http://localhost:3000/graphql', {
+				query: query
 			});
 
 			setIsLoggedIn(true);
@@ -184,7 +198,7 @@ function App() {
 	const clearTasks = async () => {
 		try {
 			const query = `
-				mutation {
+				query {
 					clear_tasks
 				}
 			`;
@@ -209,7 +223,7 @@ function App() {
 			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
 			const query = `
-				mutation {
+				query {
 					edit_task(index: ${id}, title: "${newTitle}")
 				}
 			`;

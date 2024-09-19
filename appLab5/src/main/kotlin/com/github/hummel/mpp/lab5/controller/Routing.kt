@@ -14,7 +14,6 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
-import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import java.io.File
@@ -22,19 +21,19 @@ import java.io.File
 val tasks = mutableMapOf<Int, Task>()
 
 fun SchemaBuilder.configureSchema() {
-	mutation("edit_task") {
+	query("edit_task") {
 		resolver { index: Int, title: String ->
 			tasks[index]!!.title = title
 
-			"OK"
+			true
 		}
 	}
 
-	mutation("clear_tasks") {
+	query("clear_tasks") {
 		resolver { ->
 			tasks.clear()
 
-			"OK"
+			true
 		}
 	}
 
@@ -52,31 +51,29 @@ fun SchemaBuilder.configureSchema() {
 		}
 	}
 
-	mutation("login") {
+	query("login") {
 		resolver { username: String, password: String ->
 			if (isValidUser(username, password)) {
-				val token = generateToken(username, password)
-
-				token
+				generateToken(username, password)
 			} else {
 				throw Exception()
 			}
+		}
+	}
+
+	query("token") {
+		resolver { token: String ->
+			if (!isValidToken(token)) {
+				throw Exception()
+			}
+
+			true
 		}
 	}
 }
 
 fun Application.configureRouting() {
 	routing {
-		get("/token") {
-			val token = call.request.cookies["jwt"]
-
-			if (isValidToken(token)) {
-				call.respond(HttpStatusCode.OK)
-			} else {
-				call.respond(HttpStatusCode.Unauthorized)
-			}
-		}
-
 		post("/add-task") {
 			val multipart = call.receiveMultipart()
 			var title = ""
