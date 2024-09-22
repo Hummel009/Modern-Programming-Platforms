@@ -19,17 +19,29 @@ function App() {
 		password: ''
 	});
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
-	const [webSocket, setWebSocket] = useState(null);
+
+	const [editTaskWs, setEditTaskWs] = useState(null);
+	const [clearTasksWs, setClearTasksWs] = useState(null);
 
 	useEffect(() => {
-		const ws = new WebSocket('ws://localhost:3000/operate');
+		fetchTasks();
 
-		ws.onopen = () => console.log('WebSocket connected');
-		ws.onmessage = (event) => {
+		const editTaskWs = new WebSocket('ws://localhost:3000/edit_task');
+		editTaskWs.onmessage = function(event) {
 			fetchTasks();
 		};
+		setEditTaskWs(editTaskWs);
 
-		setWebSocket(ws);
+		const clearTasksWs = new WebSocket('ws://localhost:3000/clear_tasks');
+		clearTasksWs.onmessage = function(event) {
+			fetchTasks();
+		};
+		setClearTasksWs(clearTasksWs);
+
+		return () => {
+			editTaskWs.close();
+			clearTasksWs.close();
+		};
 	}, []);
 
 	const fetchTasks = async () => {
@@ -152,8 +164,7 @@ function App() {
 
 	const clearTasks = async () => {
 		try {
-			webSocket.send(JSON.stringify({ task: "clear" }));
-			fetchTasks()
+			clearTasksWs.send("");
 		} catch (err) {
 			setErrorCode(err.response.status);
 		}
@@ -165,10 +176,8 @@ function App() {
 			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
 			if (newTitle) {
-				webSocket.send(JSON.stringify({ index: id, title: newTitle }));
+				editTaskWs.send(JSON.stringify({ index: id, title: newTitle }));
 			}
-
-			fetchTasks()
 		} catch (err) {
 			setErrorCode(err.response.status);
 		}

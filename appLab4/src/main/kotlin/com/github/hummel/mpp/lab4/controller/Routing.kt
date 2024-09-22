@@ -22,38 +22,56 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
+import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.serialization.json.Json
 import java.io.File
 
 val tasks = mutableMapOf<Int, Task>()
+val clients = mutableSetOf<WebSocketSession>()
 
 fun Application.configureWebSocket() {
 	routing {
-		webSocket("/operate") {
-			incoming.consumeEach { frame ->
-				if (frame is Frame.Text) {
-					val jsonString = frame.readText()
-					val request = try {
-						Json.decodeFromString<EditTaskRequest>(jsonString)
-					} catch (_: Exception) {
-						null
-					}
+		webSocket("/edit_task") {
+			clients.add(this)
 
-					request?.let { //edit-task
+			try {
+				incoming.consumeEach { frame ->
+					if (frame is Frame.Text) {
+						val text = frame.readText()
+						val request = Json.decodeFromString<EditTaskRequest>(text)
+
 						val taskId = request.index
 						val newTitle = request.title
 
 						tasks[taskId]!!.title = newTitle
 
-						send(Frame.Text("OK"))
-					} ?: run { //clear-tasks
-						tasks.clear()
-
-						send(Frame.Text("OK"))
+						clients.forEach { client ->
+							client.send(Frame.Text("OK"))
+						}
 					}
 				}
+			} finally {
+				clients.remove(this)
+			}
+		}
+
+		webSocket("/clear_tasks") {
+			clients.add(this)
+
+			try {
+				incoming.consumeEach { frame ->
+					if (frame is Frame.Text) {
+						tasks.clear()
+
+						clients.forEach { client ->
+							client.send(Frame.Text("OK"))
+						}
+					}
+				}
+			} finally {
+				clients.remove(this)
 			}
 		}
 	}
