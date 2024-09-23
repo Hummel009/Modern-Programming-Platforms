@@ -75,15 +75,6 @@ function App() {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
-
-		return () => {
-			loginWsRef.current.close();
-			tokenWsRef.current.close();
-			getTasksWsRef.current.close();
-			clearTasksWsRef.current.close();
-			filterTasksWsRef.current.close();
-			editTaskWsRef.current.close();
-		};
 	}, []);
 
 	const fetchTasks = async () => {
