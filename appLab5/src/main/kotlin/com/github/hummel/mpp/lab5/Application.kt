@@ -3,6 +3,8 @@ package com.github.hummel.mpp.lab5
 import com.apurebase.kgraphql.GraphQL
 import com.github.hummel.mpp.lab5.controller.configureRouting
 import com.github.hummel.mpp.lab5.controller.configureSchema
+import com.github.hummel.mpp.lab5.controller.tasks
+import com.github.hummel.mpp.lab5.entity.Task
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.server.application.*
@@ -21,6 +23,14 @@ fun main() {
 }
 
 fun Application.module() {
+	tasks.put(
+		0, Task(
+			title = "title",
+			status = "status",
+			dueDate = "dueDate",
+			file = null
+		)
+	)
 	install(CORS) {
 		anyHost()
 		allowCredentials = true

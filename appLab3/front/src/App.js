@@ -45,18 +45,16 @@ function App() {
 	};
 
 	const editTask = async (index) => {
-		try {
-			const taskToEdit = tasks.get(index);
-			const title = prompt("Введите новое название задачи:", taskToEdit.title);
+		const taskToEdit = tasks.get(index);
+		const title = prompt("Введите новое название задачи:", taskToEdit.title);
 
+		if (title) {
 			const response = await axios.put('http://localhost:2999/edit-task',
 			{
 				index: index, title: title
 			});
 			const tasksMap = new Map(Object.entries(response.data));
 			setTasks(tasksMap);
-		} catch (e) {
-			setErrorCode(e.response.status);
 		}
 	};
 
@@ -72,17 +70,6 @@ function App() {
 		fetchTasks()
 		setErrorCode(null);
 	}
-
-	const handleLoginChange = (e) => {
-		const {
-			name,
-			value
-		} = e.target;
-		setLoginData({
-			...loginData,
-			[name]: value
-		});
-	};
 
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
@@ -142,6 +129,17 @@ function App() {
 		} = e.target;
 		setFormData({
 			...formData,
+			[name]: value
+		});
+	};
+
+	const handleLoginChange = (e) => {
+		const {
+			name,
+			value
+		} = e.target;
+		setLoginData({
+			...loginData,
 			[name]: value
 		});
 	};

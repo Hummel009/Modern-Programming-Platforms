@@ -130,17 +130,6 @@ function App() {
 		setErrorCode(null);
 	}
 
-	const handleLoginChange = (e) => {
-		const {
-			name,
-			value
-		} = e.target;
-		setLoginData({
-			...loginData,
-			[name]: value
-		});
-	};
-
 	const handleLoginSubmit = async (e) => {
 		if (loginWsRef.current) {
 			e.preventDefault();
@@ -185,6 +174,17 @@ function App() {
 		} = e.target;
 		setFormData({
 			...formData,
+			[name]: value
+		});
+	};
+
+	const handleLoginChange = (e) => {
+		const {
+			name,
+			value
+		} = e.target;
+		setLoginData({
+			...loginData,
 			[name]: value
 		});
 	};

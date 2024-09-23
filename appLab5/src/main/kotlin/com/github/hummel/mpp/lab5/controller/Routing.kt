@@ -36,11 +36,11 @@ fun SchemaBuilder.configureSchema() {
 
 	query("token") {
 		resolver { token: String ->
-			if (!isValidToken(token)) {
+			if (isValidToken(token)) {
 				"OK"
+			} else {
+				"Unauthorized"
 			}
-
-			"Unauthorized"
 		}
 	}
 

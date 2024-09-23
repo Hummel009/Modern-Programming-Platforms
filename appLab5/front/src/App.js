@@ -21,220 +21,70 @@ function App() {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	useEffect(() => {
-		fetchTasks();
 	}, []);
 
 	const fetchTasks = async () => {
-		try {
-			const query = `
-				query {
-					get_tasks {
-						id
-						task {
-							title
-							status
-							dueDate
-							file
-						}
-					}
-				}
-			`;
-
-			const response = await axios.post('http://localhost:2999/graphql', {
-				query: query
-			}, {
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-
-			const tasksMap = new Map(
-				response.data.data.get_tasks.map(taskWrapper => [taskWrapper.id, taskWrapper.task])
-			);
-			setTasks(tasksMap);
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const handleLoginChange = (e) => {
-		const {
-			name,
-			value
-		} = e.target;
-		setLoginData({
-			...loginData,
-			[name]: value
-		});
-	};
-
-	const handleLoginSubmit = async (e) => {
-		e.preventDefault();
-		try {
-			const query = `
-				query {
-					login(username: "${loginData.username}", password: "${loginData.password}")
-				}
-			`;
-
-			const response = await axios.post('http://localhost:2999/graphql', {
-				query: query
-			});
-
-			const token = response.data.data.login;
-			document.cookie = `jwt=${token}; path=/; secure=false; SameSite=Lax`;
-
-			setIsLoggedIn(true);
-			fetchTasks();
-		} catch (error) {
-			alert('Login failed. Please check your credentials.');
-		}
-	};
-
-	const tryUseCookieToken = async () => {
-		try {
-			const cookies = document.cookie.split('; ');
-			const tokenCookie = cookies.find(row => row.startsWith('jwt='));
-			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
-
-			const query = `
-				query {
-					token(token: "${token}")
-				}
-			`;
-
-			await axios.post('http://localhost:2999/graphql', {
-				query: query
-			});
-
-			setIsLoggedIn(true);
-			fetchTasks();
-		} catch (error) {
-			alert('Login failed. Please check your credentials.');
-		}
-	};
-
-	const handleChange = (e) => {
-		try {
-			const {
-				name,
-				value
-			} = e.target;
-			setFormData({
-				...formData,
-				[name]: value
-			});
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const handleFileChange = (e) => {
-		try {
-			setFormData({
-				...formData,
-				file: e.target.files[0]
-			});
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const handleSubmit = async (e) => {
-		try {
-			e.preventDefault();
-			const form = new FormData();
-			for (const key in formData) {
-				form.append(key, formData[key]);
+		const query = `
+			query {
+			   	get_tasks
 			}
-			await axios.post('http://localhost:2999/add-task', form, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
-			fetchTasks();
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
+		`;
 
-	const filterTasks = async (filter) => {
-		try {
-			const query = `
-				query {
-					filter_tasks(filterStatus: "${filter}") {
-						id
-						task {
-							title
-							status
-							dueDate
-							file
-						}
-					}
-				}
-			`;
+		const response = await axios.post('http://localhost:2999/graphql', {
+			query: query
+		});
 
-			const response = await axios.post('http://localhost:2999/graphql', {
-				query: query
-			}, {
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-
-			const tasksMap = new Map(
-				response.data.data.filter_tasks.map(taskWrapper => [taskWrapper.id, taskWrapper.task])
-			);
-			setTasks(tasksMap);
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+		const tasksMap = new Map(Object.entries(JSON.parse(response.data.data.get_tasks)));
+		setTasks(tasksMap);
 	};
 
 	const clearTasks = async () => {
-		try {
-			const query = `
-				query {
-					clear_tasks
-				}
-			`;
+		const query = `
+			query {
+				clear_tasks
+			}
+		`;
 
-			await axios.post('http://localhost:2999/graphql', {
-				query: query
-			}, {
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
+		const response = await axios.post('http://localhost:2999/graphql', {
+			query: query
+		});
 
-			fetchTasks();
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+		const tasksMap = new Map(Object.entries(JSON.parse(response.data.data.clear_tasks)));
+		setTasks(tasksMap);
 	};
 
-	const editTask = async (id) => {
-		try {
-			const taskToEdit = tasks.get(id);
-			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
+	const filterTasks = async (filter) => {
+		const query = `
+			query {
+				filter_tasks(filter: "${filter}")
+			}
+		`;
 
+		const response = await axios.post('http://localhost:2999/graphql', {
+			query: query
+		});
+
+		const tasksMap = new Map(Object.entries(JSON.parse(response.data.data.filter_tasks)));
+		setTasks(tasksMap);
+	};
+
+	const editTask = async (index) => {
+		const taskToEdit = tasks.get(index);
+		const title = prompt("Введите новое название задачи:", taskToEdit.title);
+
+		if (title) {
 			const query = `
 				query {
-					edit_task(index: ${id}, title: "${newTitle}")
+					edit_task(index: ${index}, title: "${title}")
 				}
 			`;
 
-			await axios.post('http://localhost:2999/graphql', {
+			const response = await axios.post('http://localhost:2999/graphql', {
 				query: query
-			}, {
-				headers: {
-					'Content-Type': 'application/json'
-				}
 			});
 
-			fetchTasks();
-		} catch (err) {
-			setErrorCode(err.response.status);
+			const tasksMap = new Map(Object.entries(JSON.parse(response.data.data.edit_task)));
+			setTasks(tasksMap);
 		}
 	};
 
@@ -250,6 +100,98 @@ function App() {
 		fetchTasks()
 		setErrorCode(null);
 	}
+
+	const handleLoginSubmit = async (e) => {
+		e.preventDefault();
+		const query = `
+			query {
+				login(username: "${loginData.username}", password: "${loginData.password}")
+			}
+		`;
+
+		const response = await axios.post('http://localhost:2999/graphql', {
+			query: query
+		});
+
+		const auth = response.data.data.login;
+		if (auth !== "Unauthorized") {
+			document.cookie = `jwt=${auth}; path=/; secure=false; SameSite=Lax`;
+			setIsLoggedIn(true);
+			fetchTasks();
+		} else {
+			alert('Login failed. Please check your credentials.');
+		}
+	};
+
+	const tryUseCookieToken = async () => {
+		const cookies = document.cookie.split('; ');
+		const tokenCookie = cookies.find(row => row.startsWith('jwt='));
+		const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+
+		const query = `
+			query {
+				token(token: "${token}")
+			}
+		`;
+
+		const response = await axios.post('http://localhost:2999/graphql', {
+			query: query
+		});
+
+		const auth = response.data.data.token;
+
+		if (auth !== "Unauthorized") {
+			setIsLoggedIn(true);
+			fetchTasks();
+		} else {
+			alert('Login failed. Please check your credentials.');
+		}
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const form = new FormData();
+		for (const key in formData) {
+			form.append(key, formData[key]);
+		}
+		await axios.post('http://localhost:2999/add-task',
+		form,
+		{
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		});
+		fetchTasks();
+	};
+
+	const handleChange = (e) => {
+		const {
+			name,
+			value
+		} = e.target;
+		setFormData({
+			...formData,
+			[name]: value
+		});
+	};
+
+	const handleLoginChange = (e) => {
+		const {
+			name,
+			value
+		} = e.target;
+		setLoginData({
+			...loginData,
+			[name]: value
+		});
+	};
+
+	const handleFileChange = (e) => {
+		setFormData({
+			...formData,
+			file: e.target.files[0]
+		});
+	};
 
 	return (
 		<div>
