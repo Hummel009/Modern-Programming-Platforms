@@ -58,10 +58,10 @@ fun Application.configureRouting() {
 			val jsonRequest = call.receiveText()
 
 			val editTaskRequest = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
-			val taskId = editTaskRequest.index
-			val taskTitle = editTaskRequest.title
+			val index = editTaskRequest.index
+			val title = editTaskRequest.title
 
-			tasks[taskId]!!.title = taskTitle
+			tasks[index]!!.title = title
 
 			val jsonResponse = gson.toJson(tasks)
 

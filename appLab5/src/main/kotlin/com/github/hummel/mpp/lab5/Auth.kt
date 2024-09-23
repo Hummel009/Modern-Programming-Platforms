@@ -5,15 +5,14 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 
 fun isValidToken(token: String?): Boolean {
-	if (token == null) {
-		return false
+	return try {
+		val decoded = JWT.decode(token)
+		val username = decoded.getClaim("username").asString()
+		val password = decoded.getClaim("password").asString()
+		isValidUser(username, password)
+	} catch (_: Exception) {
+		false
 	}
-
-	val decoded = JWT.decode(token)
-	val username = decoded.getClaim("username").asString()
-	val password = decoded.getClaim("password").asString()
-
-	return isValidUser(username, password)
 }
 
 fun isValidUser(username: String, password: String): Boolean {

@@ -11,7 +11,6 @@ group = "com.github.hummel"
 version = LocalDate.now().format(DateTimeFormatter.ofPattern("yy.MM.dd"))
 
 dependencies {
-	implementation("io.ktor:ktor-serialization-kotlinx-json")
 	implementation("io.ktor:ktor-server-content-negotiation")
 
 	implementation("io.ktor:ktor-server-core")
@@ -25,6 +24,8 @@ dependencies {
 
 	implementation("com.apurebase:kgraphql:latest.release")
 	implementation("com.apurebase:kgraphql-ktor:latest.release")
+
+	implementation("com.google.code.gson:gson:latest.release")
 }
 
 java {

@@ -92,7 +92,7 @@ fun Application.configureWebSocket() {
 			try {
 				incoming.consumeEach { frame ->
 					if (frame is Frame.Text) {
-						val jsonResponse = Gson().toJson(tasks)
+						val jsonResponse = gson.toJson(tasks)
 
 						getTasksSubscribers.forEach { it.send(Frame.Text(jsonResponse)) }
 					}
@@ -163,10 +163,10 @@ fun Application.configureWebSocket() {
 						val jsonRequest = frame.readText()
 
 						val editTaskRequest = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
-						val taskId = editTaskRequest.index
-						val taskTitle = editTaskRequest.title
+						val index = editTaskRequest.index
+						val title = editTaskRequest.title
 
-						tasks[taskId]!!.title = taskTitle
+						tasks[index]!!.title = title
 
 						val jsonResponse = gson.toJson(tasks)
 

@@ -1,11 +1,11 @@
 package com.github.hummel.mpp.lab5.controller
 
 import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.github.hummel.mpp.lab5.bean.Task
-import com.github.hummel.mpp.lab5.bean.TaskWrapper
+import com.github.hummel.mpp.lab5.entity.Task
 import com.github.hummel.mpp.lab5.generateToken
 import com.github.hummel.mpp.lab5.isValidToken
 import com.github.hummel.mpp.lab5.isValidUser
+import com.google.gson.Gson
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
@@ -14,49 +14,22 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import java.io.File
 
 val tasks = mutableMapOf<Int, Task>()
+val gson = Gson()
 
 fun SchemaBuilder.configureSchema() {
-	query("edit_task") {
-		resolver { index: Int, title: String ->
-			tasks[index]!!.title = title
-
-			true
-		}
-	}
-
-	query("clear_tasks") {
-		resolver { ->
-			tasks.clear()
-
-			true
-		}
-	}
-
-	query("get_tasks") {
-		resolver { ->
-			tasks.toTaskWrapperList()
-		}
-	}
-
-	query("filter_tasks") {
-		resolver { filterStatus: String ->
-			tasks.asSequence().filter {
-				it.value.status == filterStatus || filterStatus == "all"
-			}.associate { it.key to it.value }.toMutableMap().toTaskWrapperList()
-		}
-	}
-
 	query("login") {
 		resolver { username: String, password: String ->
 			if (isValidUser(username, password)) {
-				generateToken(username, password)
+				val textResponse = generateToken(username, password)
+				textResponse
 			} else {
-				throw Exception()
+				"Unauthorized"
 			}
 		}
 	}
@@ -64,10 +37,42 @@ fun SchemaBuilder.configureSchema() {
 	query("token") {
 		resolver { token: String ->
 			if (!isValidToken(token)) {
-				throw Exception()
+				"OK"
 			}
 
-			true
+			"Unauthorized"
+		}
+	}
+
+	query("get_tasks") {
+		resolver { ->
+			gson.toJson(tasks)
+		}
+	}
+
+	query("clear_tasks") {
+		resolver { ->
+			tasks.clear()
+
+			gson.toJson(tasks)
+		}
+	}
+
+	query("filter_tasks") {
+		resolver { filter: String ->
+			val filteredTasks = tasks.asSequence().filter {
+				it.value.status == filter || filter == "all"
+			}.associate { it.key to it.value }
+
+			gson.toJson(filteredTasks)
+		}
+	}
+
+	query("edit_task") {
+		resolver { index: Int, title: String ->
+			tasks[index]!!.title = title
+
+			gson.toJson(tasks)
 		}
 	}
 }
@@ -112,12 +117,10 @@ fun Application.configureRouting() {
 			call.respond(HttpStatusCode.OK)
 		}
 
-		post("/{...}") {
+		get("{...}") {
 			call.respond(HttpStatusCode.NotFound)
 		}
 	}
 }
 
 fun getNextAvailableId(): Int = if (tasks.isEmpty()) 0 else tasks.keys.max() + 1
-
-fun MutableMap<Int, Task>.toTaskWrapperList(): List<TaskWrapper> = map { TaskWrapper(it.key, it.value) }
