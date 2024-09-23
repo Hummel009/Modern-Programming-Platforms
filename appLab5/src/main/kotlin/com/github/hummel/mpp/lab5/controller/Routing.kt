@@ -26,8 +26,7 @@ fun SchemaBuilder.configureSchema() {
 	query("login") {
 		resolver { username: String, password: String ->
 			if (isValidUser(username, password)) {
-				val textResponse = generateToken(username, password)
-				textResponse
+				generateToken(username, password)
 			} else {
 				"Unauthorized"
 			}
