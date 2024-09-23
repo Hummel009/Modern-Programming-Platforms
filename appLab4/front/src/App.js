@@ -30,10 +30,10 @@ function App() {
 	useEffect(() => {
 		const loginWs = new WebSocket('ws://localhost:3000/login');
 		loginWs.onmessage = function(event) {
-			const answer = event.data;
+			const response = event.data;
 
-			if (answer !== "Unauthorized") {
-				document.cookie = `jwt=${answer}; path=/; secure=false; SameSite=Lax`;
+			if (response !== "Unauthorized") {
+				document.cookie = `jwt=${response}; path=/; secure=false; SameSite=Lax`;
 				setIsLoggedIn(true);
 			} else {
 				alert('Login failed. Please check your credentials.');
@@ -43,9 +43,9 @@ function App() {
 
 		const tokenWs = new WebSocket('ws://localhost:3000/token');
 		tokenWs.onmessage = function(event) {
-			const answer = event.data;
+			const response = event.data;
 
-			if (answer !== "Unauthorized") {
+			if (response !== "Unauthorized") {
 				setIsLoggedIn(true);
 			} else {
 			 	alert('Login failed. Please check your credentials.');
