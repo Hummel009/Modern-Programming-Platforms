@@ -32,7 +32,7 @@ function App() {
 		loginWs.onmessage = function(event) {
 			const answer = event.data;
 
-			if (answer !== "ERROR") {
+			if (answer !== "Unauthorized") {
 				document.cookie = `jwt=${answer}; path=/; secure=false; SameSite=Lax`;
 				setIsLoggedIn(true);
 			} else {
@@ -45,7 +45,7 @@ function App() {
 		tokenWs.onmessage = function(event) {
 			const answer = event.data;
 
-			if (answer !== "ERROR") {
+			if (answer !== "Unauthorized") {
 				setIsLoggedIn(true);
 			} else {
 			 	alert('Login failed. Please check your credentials.');
@@ -67,19 +67,19 @@ function App() {
 		};
 		setClearTasksWs(clearTasksWs);
 
-		const editTaskWs = new WebSocket('ws://localhost:3000/edit_task');
-		editTaskWs.onmessage = function(event) {
-			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
-			setTasks(tasksMap);
-		};
-		setEditTaskWs(editTaskWs);
-
 		const filterTasksWs = new WebSocket('ws://localhost:3000/filter_tasks');
 		filterTasksWs.onmessage = function(event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
 		setFilterTasksWs(filterTasksWs);
+
+		const editTaskWs = new WebSocket('ws://localhost:3000/edit_task');
+		editTaskWs.onmessage = function(event) {
+			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
+			setTasks(tasksMap);
+		};
+		setEditTaskWs(editTaskWs);
 	}, []);
 
 	const fetchTasks = async () => {
@@ -90,6 +90,12 @@ function App() {
 		clearTasksWs.send("");
 	};
 
+	const filterTasks = async (filter) => {
+		filterTasksWs.send(JSON.stringify({
+			filter: filter
+		}));
+	};
+
 	const editTask = async (index) => {
 		const taskToEdit = tasks.get(index);
 		const title = prompt("Введите новое название задачи:", taskToEdit.title);
@@ -97,12 +103,6 @@ function App() {
 		if (title) {
 			editTaskWs.send(JSON.stringify({ index: index, title: title }));
 		}
-	};
-
-	const filterTasks = async (filter) => {
-		filterTasksWs.send(JSON.stringify({
-			filter: filter
-		}));
 	};
 
 	const makeError = async () => {

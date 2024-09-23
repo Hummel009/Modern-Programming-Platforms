@@ -17,8 +17,8 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
@@ -48,7 +48,7 @@ fun Application.configureWebSocket() {
 							val textResponse = generateToken(user)
 							loginSubscribers.forEach { it.send(Frame.Text(textResponse)) }
 						} else {
-							loginSubscribers.forEach { it.send(Frame.Text("ERROR")) }
+							loginSubscribers.forEach { it.send(Frame.Text("Unauthorized")) }
 						}
 					}
 				}
@@ -74,7 +74,7 @@ fun Application.configureWebSocket() {
 						if (isValidToken(token)) {
 							tokenSubscribers.forEach { it.send(Frame.Text("OK")) }
 						} else {
-							tokenSubscribers.forEach { it.send(Frame.Text("ERROR")) }
+							tokenSubscribers.forEach { it.send(Frame.Text("Unauthorized")) }
 						}
 					}
 				}
@@ -125,33 +125,6 @@ fun Application.configureWebSocket() {
 			}
 		}
 
-		val editTaskSubscribers = mutableSetOf<WebSocketSession>()
-		webSocket("/edit_task") {
-			editTaskSubscribers.add(this)
-
-			try {
-				incoming.consumeEach { frame ->
-					if (frame is Frame.Text) {
-						val jsonRequest = frame.readText()
-
-						val editTaskRequest = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
-						val taskId = editTaskRequest.index
-						val taskTitle = editTaskRequest.title
-
-						tasks[taskId]!!.title = taskTitle
-
-						val jsonResponse = gson.toJson(tasks)
-
-						editTaskSubscribers.forEach { it.send(Frame.Text(jsonResponse)) }
-					}
-				}
-			} catch (e: Exception) {
-				e.printStackTrace()
-			} finally {
-				editTaskSubscribers.remove(this)
-			}
-		}
-
 		val filterTasksSubscribers = mutableSetOf<WebSocketSession>()
 		webSocket("/filter_tasks") {
 			filterTasksSubscribers.add(this)
@@ -177,6 +150,33 @@ fun Application.configureWebSocket() {
 				e.printStackTrace()
 			} finally {
 				filterTasksSubscribers.remove(this)
+			}
+		}
+
+		val editTaskSubscribers = mutableSetOf<WebSocketSession>()
+		webSocket("/edit_task") {
+			editTaskSubscribers.add(this)
+
+			try {
+				incoming.consumeEach { frame ->
+					if (frame is Frame.Text) {
+						val jsonRequest = frame.readText()
+
+						val editTaskRequest = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
+						val taskId = editTaskRequest.index
+						val taskTitle = editTaskRequest.title
+
+						tasks[taskId]!!.title = taskTitle
+
+						val jsonResponse = gson.toJson(tasks)
+
+						editTaskSubscribers.forEach { it.send(Frame.Text(jsonResponse)) }
+					}
+				}
+			} catch (e: Exception) {
+				e.printStackTrace()
+			} finally {
+				editTaskSubscribers.remove(this)
 			}
 		}
 	}
@@ -222,10 +222,8 @@ fun Application.configureRouting() {
 			call.respond(HttpStatusCode.OK)
 		}
 
-		route("{...}") {
-			handle {
-				throw Exception()
-			}
+		get("{...}") {
+			call.respond(HttpStatusCode.NotFound)
 		}
 	}
 }
