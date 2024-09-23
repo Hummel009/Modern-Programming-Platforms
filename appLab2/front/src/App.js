@@ -21,7 +21,7 @@ function App() {
 
 	const fetchTasks = async () => {
 		try {
-			const response = await axios.get('http://localhost:3000/');
+			const response = await axios.get('http://localhost:2999/');
 			const tasksMap = new Map(Object.entries(response.data));
 			setTasks(tasksMap);
 		} catch (err) {
@@ -62,7 +62,7 @@ function App() {
 			for (const key in formData) {
 				form.append(key, formData[key]);
 			}
-			await axios.post('http://localhost:3000/add-task',
+			await axios.post('http://localhost:2999/add-task',
 			form,
 			{
 				headers: {
@@ -77,7 +77,7 @@ function App() {
 
 	const filterTasks = async (filter) => {
 		try {
-			const response = await axios.post('http://localhost:3000/filter-tasks',
+			const response = await axios.post('http://localhost:2999/filter-tasks',
 			{
 				filterStatus: filter
 			},
@@ -95,7 +95,7 @@ function App() {
 
 	const clearTasks = async () => {
 		try {
-			await axios.delete('http://localhost:3000/clear-tasks');
+			await axios.delete('http://localhost:2999/clear-tasks');
 			fetchTasks();
 		} catch (err) {
 			setErrorCode(err.response.status);
@@ -107,7 +107,7 @@ function App() {
 			const taskToEdit = tasks.get(id);
 			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
-			await axios.put('http://localhost:3000/edit-task',
+			await axios.put('http://localhost:2999/edit-task',
 			{
 				index: id, title: newTitle
 			},
@@ -124,7 +124,7 @@ function App() {
 
 	const makeError = async () => {
 		try {
-			await axios.post('http://localhost:3000/jojoreference');
+			await axios.post('http://localhost:2999/jojoreference');
 		} catch (err) {
 			setErrorCode(err.response.status);
 		}

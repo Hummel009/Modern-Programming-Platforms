@@ -20,6 +20,8 @@ dependencies {
 
 	implementation("com.auth0:java-jwt:latest.release")
 	implementation("at.favre.lib:bcrypt:latest.release")
+
+	implementation("com.google.code.gson:gson:latest.release")
 }
 
 java {

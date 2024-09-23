@@ -107,7 +107,7 @@ function App() {
 
 	const makeError = async () => {
 		try {
-			await axios.get('http://localhost:3000/jojoreference');
+			await axios.get('http://localhost:2999/jojoreference');
 		} catch (e) {
 			setErrorCode(e.response.status);
         }
@@ -152,7 +152,7 @@ function App() {
 		for (const key in formData) {
 			form.append(key, formData[key]);
 		}
-		await axios.post('http://localhost:3000/add-task',
+		await axios.post('http://localhost:2999/add-task',
 		form,
 		{
 			headers: {

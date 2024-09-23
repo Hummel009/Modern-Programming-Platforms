@@ -40,7 +40,7 @@ function App() {
 				}
 			`;
 
-			const response = await axios.post('http://localhost:3000/graphql', {
+			const response = await axios.post('http://localhost:2999/graphql', {
 				query: query
 			}, {
 				headers: {
@@ -77,7 +77,7 @@ function App() {
 				}
 			`;
 
-			const response = await axios.post('http://localhost:3000/graphql', {
+			const response = await axios.post('http://localhost:2999/graphql', {
 				query: query
 			});
 
@@ -103,7 +103,7 @@ function App() {
 				}
 			`;
 
-			await axios.post('http://localhost:3000/graphql', {
+			await axios.post('http://localhost:2999/graphql', {
 				query: query
 			});
 
@@ -147,7 +147,7 @@ function App() {
 			for (const key in formData) {
 				form.append(key, formData[key]);
 			}
-			await axios.post('http://localhost:3000/add-task', form, {
+			await axios.post('http://localhost:2999/add-task', form, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
 				},
@@ -174,7 +174,7 @@ function App() {
 				}
 			`;
 
-			const response = await axios.post('http://localhost:3000/graphql', {
+			const response = await axios.post('http://localhost:2999/graphql', {
 				query: query
 			}, {
 				headers: {
@@ -199,7 +199,7 @@ function App() {
 				}
 			`;
 
-			await axios.post('http://localhost:3000/graphql', {
+			await axios.post('http://localhost:2999/graphql', {
 				query: query
 			}, {
 				headers: {
@@ -224,7 +224,7 @@ function App() {
 				}
 			`;
 
-			await axios.post('http://localhost:3000/graphql', {
+			await axios.post('http://localhost:2999/graphql', {
 				query: query
 			}, {
 				headers: {
@@ -240,7 +240,7 @@ function App() {
 
 	const makeError = async () => {
 		try {
-			await axios.post('http://localhost:3000/jojoreference');
+			await axios.post('http://localhost:2999/jojoreference');
 		} catch (err) {
 			setErrorCode(err.response.status);
 		}

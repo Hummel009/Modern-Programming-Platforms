@@ -21,18 +21,63 @@ function App() {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	useEffect(() => {
-		fetchTasks();
 	}, []);
 
 	const fetchTasks = async () => {
-		try {
-			const response = await axios.get('http://localhost:3000/');
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+		const response = await axios.get('http://localhost:2999/get-tasks');
+		const tasksMap = new Map(Object.entries(response));
+		setTasks(tasksMap);
 	};
+
+	const clearTasks = async () => {
+		const response = await axios.delete('http://localhost:2999/clear-tasks');
+        const tasksMap = new Map(Object.entries(response));
+        setTasks(tasksMap);
+	};
+
+	const filterTasks = async (filter) => {
+		const response = await axios.get('http://localhost:2999/filter-tasks',
+		{
+			filter: filter
+		},
+		{
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		const tasksMap = new Map(Object.entries(response.data));
+		setTasks(tasksMap);
+	};
+
+	const editTask = async (index) => {
+		const taskToEdit = tasks.get(index);
+		const title = prompt("Введите новое название задачи:", taskToEdit.title);
+
+		const response = await axios.put('http://localhost:2999/edit-task',
+		{
+			index: index, title: title
+		},
+		{
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
+		const tasksMap = new Map(Object.entries(response.data));
+		setTasks(tasksMap);
+	};
+
+	const makeError = async () => {
+		try {
+			await axios.get('http://localhost:2999/jojoreference');
+		} catch (e) {
+			setErrorCode(e.response.status);
+		}
+	}
+
+	const returnBack = async () => {
+		fetchTasks()
+		setErrorCode(null);
+	}
 
 	const handleLoginChange = (e) => {
 		const {
@@ -48,17 +93,14 @@ function App() {
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			await axios.post('http://localhost:3000/login',
+			const response = await axios.post('http://localhost:2999/login',
 			{
 				username: loginData.username,
 				password: loginData.password
-			},
-			{
-				withCredentials: true
 			});
 
+			document.cookie = `jwt=${response}; path=/; secure=false; SameSite=Lax`;
 			setIsLoggedIn(true);
-			fetchTasks();
 		} catch (error) {
 			alert('Login failed. Please check your credentials.');
 		}
@@ -66,16 +108,28 @@ function App() {
 
 	const tryUseCookieToken = async () => {
 		try {
-			await axios.get('http://localhost:3000/token',
-			{
-				withCredentials: true
-			});
+			await axios.post('http://localhost:2999/token');
 
 			setIsLoggedIn(true);
-			fetchTasks();
 		} catch (error) {
 			alert('Login failed. Please check your credentials.');
 		}
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const form = new FormData();
+		for (const key in formData) {
+			form.append(key, formData[key]);
+		}
+		await axios.post('http://localhost:2999/add-task',
+		form,
+		{
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		});
+		fetchTasks();
 	};
 
 	const handleChange = (e) => {
@@ -103,86 +157,6 @@ function App() {
 			setErrorCode(err.response.status);
 		}
 	};
-
-	const handleSubmit = async (e) => {
-		try {
-			e.preventDefault();
-			const form = new FormData();
-			for (const key in formData) {
-				form.append(key, formData[key]);
-			}
-			await axios.post('http://localhost:3000/add-task',
-			form,
-			{
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
-			fetchTasks();
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const filterTasks = async (filter) => {
-		try {
-			const response = await axios.post('http://localhost:3000/filter-tasks',
-			{
-				filterStatus: filter
-			},
-			{
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const clearTasks = async () => {
-		try {
-			await axios.delete('http://localhost:3000/clear-tasks');
-			fetchTasks();
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const editTask = async (id) => {
-		try {
-			const taskToEdit = tasks.get(id);
-			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
-
-			await axios.put('http://localhost:3000/edit-task',
-			{
-				index: id, title: newTitle
-			},
-			{
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-			fetchTasks();
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const makeError = async () => {
-		try {
-			await axios.post('http://localhost:3000/jojoreference');
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	}
-
-	const returnBack = async () => {
-		fetchTasks()
-		setErrorCode(null);
-	}
 
 	return (
 		<div>

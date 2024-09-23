@@ -19,7 +19,7 @@ fun main() {
 		uploadsDir.mkdirs()
 	}
 
-	embeddedServer(Netty, port = 3000, module = Application::module).start(wait = true)
+	embeddedServer(Netty, port = 2999, module = Application::module).start(wait = true)
 }
 
 fun Application.module() {
