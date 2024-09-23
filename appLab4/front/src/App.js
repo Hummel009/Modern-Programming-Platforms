@@ -1,6 +1,7 @@
 import React, {
 	useState,
-	useEffect
+	useEffect,
+	useRef
 } from 'react';
 import axios from 'axios';
 import './App.css'
@@ -20,93 +21,100 @@ function App() {
 	});
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-	const [loginWs, setLoginWs] = useState(null);
-	const [tokenWs, setTokenWs] = useState(null);
-	const [getTasksWs, setGetTasksWs] = useState(null);
-	const [clearTasksWs, setClearTasksWs] = useState(null);
-	const [editTaskWs, setEditTaskWs] = useState(null);
-	const [filterTasksWs, setFilterTasksWs] = useState(null);
+	const loginWsRef = useRef(null);
+	const tokenWsRef = useRef(null);
+	const getTasksWsRef = useRef(null);
+	const clearTasksWsRef = useRef(null);
+	const editTaskWsRef = useRef(null);
+	const filterTasksWsRef = useRef(null);
 
 	useEffect(() => {
-		const loginWs = new WebSocket('ws://localhost:2999/login');
-		loginWs.onmessage = function(event) {
+		loginWsRef.current = new WebSocket('ws://localhost:2999/login');
+		loginWsRef.current.onmessage = function(event) {
 			const response = event.data;
-
 			if (response !== "Unauthorized") {
 				document.cookie = `jwt=${response}; path=/; secure=false; SameSite=Lax`;
 				setIsLoggedIn(true);
-
 				fetchTasks();
 			} else {
 				alert('Login failed. Please check your credentials.');
 			}
 		};
-		setLoginWs(loginWs);
 
-		const tokenWs = new WebSocket('ws://localhost:2999/token');
-		tokenWs.onmessage = function(event) {
+		tokenWsRef.current = new WebSocket('ws://localhost:2999/token');
+		tokenWsRef.current.onmessage = function(event) {
 			const response = event.data;
-
 			if (response !== "Unauthorized") {
 				setIsLoggedIn(true);
-
 				fetchTasks();
 			} else {
-			 	alert('Login failed. Please check your credentials.');
+				alert('Login failed. Please check your credentials.');
 			}
 		};
-		setTokenWs(tokenWs);
 
-		const getTasksWs = new WebSocket('ws://localhost:2999/get_tasks');
-		getTasksWs.onmessage = function(event) {
+		getTasksWsRef.current = new WebSocket('ws://localhost:2999/get_tasks');
+		getTasksWsRef.current.onmessage = function(event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
-		setGetTasksWs(getTasksWs);
 
-		const clearTasksWs = new WebSocket('ws://localhost:2999/clear_tasks');
-		clearTasksWs.onmessage = function(event) {
+		clearTasksWsRef.current = new WebSocket('ws://localhost:2999/clear_tasks');
+		clearTasksWsRef.current.onmessage = function(event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
-		setClearTasksWs(clearTasksWs);
 
-		const filterTasksWs = new WebSocket('ws://localhost:2999/filter_tasks');
-		filterTasksWs.onmessage = function(event) {
+		filterTasksWsRef.current = new WebSocket('ws://localhost:2999/filter_tasks');
+		filterTasksWsRef.current.onmessage = function(event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
-		setFilterTasksWs(filterTasksWs);
 
-		const editTaskWs = new WebSocket('ws://localhost:2999/edit_task');
-		editTaskWs.onmessage = function(event) {
+		editTaskWsRef.current = new WebSocket('ws://localhost:2999/edit_task');
+		editTaskWsRef.current.onmessage = function(event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
-		setEditTaskWs(editTaskWs);
+
+		return () => {
+			loginWsRef.current.close();
+			tokenWsRef.current.close();
+			getTasksWsRef.current.close();
+			clearTasksWsRef.current.close();
+			filterTasksWsRef.current.close();
+			editTaskWsRef.current.close();
+		};
 	}, []);
 
 	const fetchTasks = async () => {
-		getTasksWs.send("");
+		if (getTasksWsRef.current) {
+			getTasksWsRef.current.send("");
+		}
 	};
 
 	const clearTasks = async () => {
-		clearTasksWs.send("");
+		if (clearTasksWsRef.current) {
+    		clearTasksWsRef.current.send("");
+    	}
 	};
 
 	const filterTasks = async (filter) => {
-		filterTasksWs.send(JSON.stringify({
-			filter: filter
-		}));
+		if (filterTasksWsRef.current) {
+			filterTasksWsRef.current.send(JSON.stringify({
+				filter: filter
+			}));
+    	}
 	};
 
 	const editTask = async (index) => {
-		const taskToEdit = tasks.get(index);
-		const title = prompt("Введите новое название задачи:", taskToEdit.title);
+		if (editTaskWsRef.current) {
+			const taskToEdit = tasks.get(index);
+			const title = prompt("Введите новое название задачи:", taskToEdit.title);
 
-		if (title) {
-			editTaskWs.send(JSON.stringify({ index: index, title: title }));
-		}
+			if (title) {
+				editTaskWsRef.current.send(JSON.stringify({ index: index, title: title }));
+			}
+    	}
 	};
 
 	const makeError = async () => {
@@ -114,7 +122,7 @@ function App() {
 			await axios.get('http://localhost:2999/jojoreference');
 		} catch (e) {
 			setErrorCode(e.response.status);
-        }
+		}
 	}
 
 	const returnBack = async () => {
@@ -134,20 +142,24 @@ function App() {
 	};
 
 	const handleLoginSubmit = async (e) => {
-		e.preventDefault();
-		loginWs.send(JSON.stringify({
-			username: loginData.username,
-			password: loginData.password
-		}));
+		if (loginWsRef.current) {
+			e.preventDefault();
+			loginWsRef.current.send(JSON.stringify({
+				username: loginData.username,
+				password: loginData.password
+			}));
+		}
 	};
 
 	const tryUseCookieToken = async () => {
-		const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-		const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+		if (tokenWsRef.current) {
+			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
 
-		tokenWs.send(JSON.stringify({
-			token: token
-		}));
+			tokenWsRef.current.send(JSON.stringify({
+				token: token
+			}));
+		}
 	};
 
 	const handleSubmit = async (e) => {
