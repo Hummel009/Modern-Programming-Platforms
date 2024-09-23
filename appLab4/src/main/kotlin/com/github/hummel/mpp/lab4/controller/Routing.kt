@@ -1,77 +1,182 @@
 package com.github.hummel.mpp.lab4.controller
 
-import com.github.hummel.mpp.lab4.bean.EditTaskRequest
-import com.github.hummel.mpp.lab4.bean.FilterRequest
-import com.github.hummel.mpp.lab4.bean.Task
-import com.github.hummel.mpp.lab4.bean.User
+import com.github.hummel.mpp.lab4.dto.EditTaskRequest
+import com.github.hummel.mpp.lab4.dto.FilterRequest
+import com.github.hummel.mpp.lab4.dto.TokenRequest
+import com.github.hummel.mpp.lab4.dto.UserRequest
+import com.github.hummel.mpp.lab4.entity.Task
 import com.github.hummel.mpp.lab4.generateToken
 import com.github.hummel.mpp.lab4.isValidToken
 import com.github.hummel.mpp.lab4.isValidUser
-import io.ktor.http.Cookie
+import com.google.gson.Gson
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
-import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
-import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.webSocket
 import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
 import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.serialization.json.Json
 import java.io.File
 
 val tasks = mutableMapOf<Int, Task>()
-val clients = mutableSetOf<WebSocketSession>()
+val gson = Gson()
 
 fun Application.configureWebSocket() {
 	routing {
-		webSocket("/edit_task") {
-			clients.add(this)
+		val loginSubscribers = mutableSetOf<WebSocketSession>()
+		webSocket("/login") {
+			loginSubscribers.add(this)
 
 			try {
 				incoming.consumeEach { frame ->
 					if (frame is Frame.Text) {
-						val text = frame.readText()
-						val request = Json.decodeFromString<EditTaskRequest>(text)
+						val jsonRequest = frame.readText()
 
-						val taskId = request.index
-						val newTitle = request.title
+						val userRequest = gson.fromJson(jsonRequest, UserRequest::class.java)
+						val user = userRequest.toEntity()
 
-						tasks[taskId]!!.title = newTitle
-
-						clients.forEach { client ->
-							client.send(Frame.Text("OK"))
+						if (isValidUser(user)) {
+							val textResponse = generateToken(user)
+							loginSubscribers.forEach { it.send(Frame.Text(textResponse)) }
+						} else {
+							loginSubscribers.forEach { it.send(Frame.Text("ERROR")) }
 						}
 					}
 				}
+			} catch (e: Exception) {
+				e.printStackTrace()
 			} finally {
-				clients.remove(this)
+				loginSubscribers.remove(this)
 			}
 		}
 
+		val tokenSubscribers = mutableSetOf<WebSocketSession>()
+		webSocket("/token") {
+			tokenSubscribers.add(this)
+
+			try {
+				incoming.consumeEach { frame ->
+					if (frame is Frame.Text) {
+						val jsonRequest = frame.readText()
+
+						val tokenRequest = gson.fromJson(jsonRequest, TokenRequest::class.java)
+						val token = tokenRequest.token
+
+						if (isValidToken(token)) {
+							tokenSubscribers.forEach { it.send(Frame.Text("OK")) }
+						} else {
+							tokenSubscribers.forEach { it.send(Frame.Text("ERROR")) }
+						}
+					}
+				}
+			} catch (e: Exception) {
+				e.printStackTrace()
+			} finally {
+				tokenSubscribers.remove(this)
+			}
+		}
+
+		val getTasksSubscribers = mutableSetOf<WebSocketSession>()
+		webSocket("/get_tasks") {
+			getTasksSubscribers.add(this)
+
+			try {
+				incoming.consumeEach { frame ->
+					if (frame is Frame.Text) {
+						val jsonResponse = Gson().toJson(tasks)
+
+						getTasksSubscribers.forEach { it.send(Frame.Text(jsonResponse)) }
+					}
+				}
+			} catch (e: Exception) {
+				e.printStackTrace()
+			} finally {
+				getTasksSubscribers.remove(this)
+			}
+		}
+
+		val clearTasksSubscribers = mutableSetOf<WebSocketSession>()
 		webSocket("/clear_tasks") {
-			clients.add(this)
+			clearTasksSubscribers.add(this)
 
 			try {
 				incoming.consumeEach { frame ->
 					if (frame is Frame.Text) {
 						tasks.clear()
 
-						clients.forEach { client ->
-							client.send(Frame.Text("OK"))
-						}
+						val jsonResponse = gson.toJson(tasks)
+
+						clearTasksSubscribers.forEach { it.send(Frame.Text(jsonResponse)) }
 					}
 				}
+			} catch (e: Exception) {
+				e.printStackTrace()
 			} finally {
-				clients.remove(this)
+				clearTasksSubscribers.remove(this)
+			}
+		}
+
+		val editTaskSubscribers = mutableSetOf<WebSocketSession>()
+		webSocket("/edit_task") {
+			editTaskSubscribers.add(this)
+
+			try {
+				incoming.consumeEach { frame ->
+					if (frame is Frame.Text) {
+						val jsonRequest = frame.readText()
+
+						val editTaskRequest = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
+						val taskId = editTaskRequest.index
+						val taskTitle = editTaskRequest.title
+
+						tasks[taskId]!!.title = taskTitle
+
+						val jsonResponse = gson.toJson(tasks)
+
+						editTaskSubscribers.forEach { it.send(Frame.Text(jsonResponse)) }
+					}
+				}
+			} catch (e: Exception) {
+				e.printStackTrace()
+			} finally {
+				editTaskSubscribers.remove(this)
+			}
+		}
+
+		val filterTasksSubscribers = mutableSetOf<WebSocketSession>()
+		webSocket("/filter_tasks") {
+			filterTasksSubscribers.add(this)
+
+			try {
+				incoming.consumeEach { frame ->
+					if (frame is Frame.Text) {
+						val jsonRequest = frame.readText()
+
+						val filterRequest = gson.fromJson(jsonRequest, FilterRequest::class.java)
+						val filterStatus = filterRequest.filter
+
+						val filteredTasks = tasks.asSequence().filter {
+							it.value.status == filterStatus || filterStatus == "all"
+						}.associate { it.key to it.value }
+
+						val jsonResponse = gson.toJson(filteredTasks)
+
+						filterTasksSubscribers.forEach { it.send(Frame.Text(jsonResponse)) }
+					}
+				}
+			} catch (e: Exception) {
+				e.printStackTrace()
+			} finally {
+				filterTasksSubscribers.remove(this)
 			}
 		}
 	}
@@ -79,35 +184,6 @@ fun Application.configureWebSocket() {
 
 fun Application.configureRouting() {
 	routing {
-		post("/login") {
-			val user = call.receive<User>()
-
-			if (isValidUser(user)) {
-				val token = generateToken(user)
-
-				call.response.cookies.append(
-					Cookie(name = "jwt", value = token, httpOnly = true, secure = false)
-				)
-				call.respond(HttpStatusCode.OK)
-			} else {
-				call.respond(HttpStatusCode.Unauthorized)
-			}
-		}
-
-		get("/token") {
-			val token = call.request.cookies["jwt"]
-
-			if (isValidToken(token)) {
-				call.respond(HttpStatusCode.OK)
-			} else {
-				call.respond(HttpStatusCode.Unauthorized)
-			}
-		}
-
-		get("/") {
-			call.respond(tasks)
-		}
-
 		post("/add-task") {
 			val multipart = call.receiveMultipart()
 			var title = ""
@@ -146,19 +222,10 @@ fun Application.configureRouting() {
 			call.respond(HttpStatusCode.OK)
 		}
 
-		post("/filter-tasks") {
-			val request = call.receive<FilterRequest>()
-			val filterStatus = request.filterStatus
-
-			val filteredTasks = tasks.asSequence().filter {
-				it.value.status == filterStatus || filterStatus == "all"
-			}.associate { it.key to it.value }
-
-			call.respond(filteredTasks)
-		}
-
-		post("/{...}") {
-			call.respond(HttpStatusCode.NotFound)
+		route("{...}") {
+			handle {
+				throw Exception()
+			}
 		}
 	}
 }

@@ -20,39 +20,103 @@ function App() {
 	});
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-	const [editTaskWs, setEditTaskWs] = useState(null);
+	const [loginWs, setLoginWs] = useState(null);
+	const [tokenWs, setTokenWs] = useState(null);
+	const [getTasksWs, setGetTasksWs] = useState(null);
 	const [clearTasksWs, setClearTasksWs] = useState(null);
+	const [editTaskWs, setEditTaskWs] = useState(null);
+	const [filterTasksWs, setFilterTasksWs] = useState(null);
 
 	useEffect(() => {
-		fetchTasks();
+		const loginWs = new WebSocket('ws://localhost:3000/login');
+		loginWs.onmessage = function(event) {
+			const answer = event.data;
 
-		const editTaskWs = new WebSocket('ws://localhost:3000/edit_task');
-		editTaskWs.onmessage = function(event) {
-			fetchTasks();
+			if (answer !== "ERROR") {
+				document.cookie = `jwt=${answer}; path=/; secure=false; SameSite=Lax`;
+				setIsLoggedIn(true);
+			} else {
+				alert('Login failed. Please check your credentials.');
+			}
 		};
-		setEditTaskWs(editTaskWs);
+		setLoginWs(loginWs);
+
+		const tokenWs = new WebSocket('ws://localhost:3000/token');
+		tokenWs.onmessage = function(event) {
+			const answer = event.data;
+
+			if (answer !== "ERROR") {
+				setIsLoggedIn(true);
+			} else {
+			 	alert('Login failed. Please check your credentials.');
+			}
+		};
+		setTokenWs(tokenWs);
+
+		const getTasksWs = new WebSocket('ws://localhost:3000/get_tasks');
+		getTasksWs.onmessage = function(event) {
+			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
+			setTasks(tasksMap);
+		};
+		setGetTasksWs(getTasksWs);
 
 		const clearTasksWs = new WebSocket('ws://localhost:3000/clear_tasks');
 		clearTasksWs.onmessage = function(event) {
-			fetchTasks();
+			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
+			setTasks(tasksMap);
 		};
 		setClearTasksWs(clearTasksWs);
 
-		return () => {
-			editTaskWs.close();
-			clearTasksWs.close();
+		const editTaskWs = new WebSocket('ws://localhost:3000/edit_task');
+		editTaskWs.onmessage = function(event) {
+			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
+			setTasks(tasksMap);
 		};
+		setEditTaskWs(editTaskWs);
+
+		const filterTasksWs = new WebSocket('ws://localhost:3000/filter_tasks');
+		filterTasksWs.onmessage = function(event) {
+			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
+			setTasks(tasksMap);
+		};
+		setFilterTasksWs(filterTasksWs);
 	}, []);
 
 	const fetchTasks = async () => {
-		try {
-			const response = await axios.get('http://localhost:3000/');
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
-		} catch (err) {
-			setErrorCode(err.response.status);
+		getTasksWs.send("");
+	};
+
+	const clearTasks = async () => {
+		clearTasksWs.send("");
+	};
+
+	const editTask = async (index) => {
+		const taskToEdit = tasks.get(index);
+		const title = prompt("Введите новое название задачи:", taskToEdit.title);
+
+		if (title) {
+			editTaskWs.send(JSON.stringify({ index: index, title: title }));
 		}
 	};
+
+	const filterTasks = async (filter) => {
+		filterTasksWs.send(JSON.stringify({
+			filter: filter
+		}));
+	};
+
+	const makeError = async () => {
+		try {
+			await axios.get('http://localhost:3000/jojoreference');
+		} catch (e) {
+			setErrorCode(e.response.status);
+        }
+	}
+
+	const returnBack = async () => {
+		fetchTasks()
+		setErrorCode(null);
+	}
 
 	const handleLoginChange = (e) => {
 		const {
@@ -67,134 +131,54 @@ function App() {
 
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
-		try {
-			await axios.post('http://localhost:3000/login',
-			{
-				username: loginData.username,
-				password: loginData.password
-			},
-			{
-				withCredentials: true
-			});
-
-			setIsLoggedIn(true);
-			fetchTasks();
-		} catch (error) {
-			alert('Login failed. Please check your credentials.');
-		}
+		loginWs.send(JSON.stringify({
+			username: loginData.username,
+			password: loginData.password
+		}));
 	};
 
 	const tryUseCookieToken = async () => {
-		try {
-			await axios.get('http://localhost:3000/token',
-			{
-				withCredentials: true
-			});
+		const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+		const token = tokenCookie ? tokenCookie.split('=')[1] : null;
 
-			setIsLoggedIn(true);
-			fetchTasks();
-		} catch (error) {
-			alert('Login failed. Please check your credentials.');
-		}
-	};
-
-	const handleChange = (e) => {
-		try {
-			const {
-				name,
-				value
-			} = e.target;
-			setFormData({
-				...formData,
-				[name]: value
-			});
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const handleFileChange = (e) => {
-		try {
-			setFormData({
-				...formData,
-				file: e.target.files[0]
-			});
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+		tokenWs.send(JSON.stringify({
+			token: token
+		}));
 	};
 
 	const handleSubmit = async (e) => {
-		try {
-			e.preventDefault();
-			const form = new FormData();
-			for (const key in formData) {
-				form.append(key, formData[key]);
-			}
-			await axios.post('http://localhost:3000/add-task',
-			form,
-			{
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
-			fetchTasks();
-		} catch (err) {
-			setErrorCode(err.response.status);
+		e.preventDefault();
+		const form = new FormData();
+		for (const key in formData) {
+			form.append(key, formData[key]);
 		}
-	};
-
-	const filterTasks = async (filter) => {
-		try {
-			const response = await axios.post('http://localhost:3000/filter-tasks',
-			{
-				filterStatus: filter
+		await axios.post('http://localhost:3000/add-task',
+		form,
+		{
+			headers: {
+				'Content-Type': 'multipart/form-data',
 			},
-			{
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+		});
+		fetchTasks();
 	};
 
-	const clearTasks = async () => {
-		try {
-			clearTasksWs.send("");
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+	const handleChange = (e) => {
+		const {
+			name,
+			value
+		} = e.target;
+		setFormData({
+			...formData,
+			[name]: value
+		});
 	};
 
-	const editTask = async (id) => {
-		try {
-			const taskToEdit = tasks.get(id);
-			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
-
-			if (newTitle) {
-				editTaskWs.send(JSON.stringify({ index: id, title: newTitle }));
-			}
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+	const handleFileChange = (e) => {
+		setFormData({
+			...formData,
+			file: e.target.files[0]
+		});
 	};
-
-	const makeError = async () => {
-		try {
-			await axios.post('http://localhost:3000/jojoreference');
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	}
-
-	const returnBack = async () => {
-		fetchTasks()
-		setErrorCode(null);
-	}
 
 	return (
 		<div>

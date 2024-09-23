@@ -97,10 +97,6 @@ function App() {
 			const tokenCookie = cookies.find(row => row.startsWith('jwt='));
 			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
 
-			if (!token) {
-				throw new Error('No token found');
-			}
-
 			const query = `
 				query {
 					token(token: "${token}")

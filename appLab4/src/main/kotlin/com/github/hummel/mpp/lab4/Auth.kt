@@ -3,18 +3,17 @@ package com.github.hummel.mpp.lab4
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.github.hummel.mpp.lab4.bean.User
+import com.github.hummel.mpp.lab4.entity.User
 
 fun isValidToken(token: String?): Boolean {
-	if (token == null) {
-		return false
+	return try {
+		val decoded = JWT.decode(token)
+		val username = decoded.getClaim("username").asString()
+		val password = decoded.getClaim("password").asString()
+		isValidUser(username, password)
+	} catch (_: Exception) {
+		false
 	}
-
-	val decoded = JWT.decode(token)
-	val username = decoded.getClaim("username").asString()
-	val password = decoded.getClaim("password").asString()
-
-	return isValidUser(username, password)
 }
 
 fun isValidUser(user: User): Boolean {
