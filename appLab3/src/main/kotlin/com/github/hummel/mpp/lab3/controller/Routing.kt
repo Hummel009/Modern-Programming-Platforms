@@ -72,7 +72,7 @@ fun Application.configureRouting() {
 			call.respond(jsonResponse)
 		}
 
-		get("/filter-tasks") {
+		post("/filter-tasks") {
 			val jsonRequest = call.receiveText()
 
 			val filterRequest = gson.fromJson(jsonRequest, FilterRequest::class.java)

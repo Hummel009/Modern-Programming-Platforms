@@ -35,6 +35,8 @@ function App() {
 			if (response !== "Unauthorized") {
 				document.cookie = `jwt=${response}; path=/; secure=false; SameSite=Lax`;
 				setIsLoggedIn(true);
+
+				fetchTasks();
 			} else {
 				alert('Login failed. Please check your credentials.');
 			}
@@ -47,6 +49,8 @@ function App() {
 
 			if (response !== "Unauthorized") {
 				setIsLoggedIn(true);
+
+				fetchTasks();
 			} else {
 			 	alert('Login failed. Please check your credentials.');
 			}

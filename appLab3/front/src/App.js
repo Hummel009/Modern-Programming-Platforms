@@ -25,25 +25,20 @@ function App() {
 
 	const fetchTasks = async () => {
 		const response = await axios.get('http://localhost:2999/get-tasks');
-		const tasksMap = new Map(Object.entries(response));
+		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
 	};
 
 	const clearTasks = async () => {
 		const response = await axios.delete('http://localhost:2999/clear-tasks');
-        const tasksMap = new Map(Object.entries(response));
+        const tasksMap = new Map(Object.entries(response.data));
         setTasks(tasksMap);
 	};
 
 	const filterTasks = async (filter) => {
-		const response = await axios.get('http://localhost:2999/filter-tasks',
+		const response = await axios.post('http://localhost:2999/filter-tasks',
 		{
 			filter: filter
-		},
-		{
-			headers: {
-				'Content-Type': 'application/json'
-			}
 		});
 		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
@@ -56,11 +51,6 @@ function App() {
 		const response = await axios.put('http://localhost:2999/edit-task',
 		{
 			index: index, title: title
-		},
-		{
-			headers: {
-				'Content-Type': 'application/json'
-			}
 		});
 		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
@@ -99,8 +89,10 @@ function App() {
 				password: loginData.password
 			});
 
-			document.cookie = `jwt=${response}; path=/; secure=false; SameSite=Lax`;
+			document.cookie = `jwt=${response.data}; path=/; secure=false; SameSite=Lax`;
 			setIsLoggedIn(true);
+
+			fetchTasks();
 		} catch (error) {
 			alert('Login failed. Please check your credentials.');
 		}
@@ -108,9 +100,16 @@ function App() {
 
 	const tryUseCookieToken = async () => {
 		try {
-			await axios.post('http://localhost:2999/token');
+			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+
+			await axios.post('http://localhost:2999/token', {
+				token: token
+			});
 
 			setIsLoggedIn(true);
+
+			fetchTasks();
 		} catch (error) {
 			alert('Login failed. Please check your credentials.');
 		}
