@@ -28,7 +28,7 @@ function App() {
 	const [filterTasksWs, setFilterTasksWs] = useState(null);
 
 	useEffect(() => {
-		const loginWs = new WebSocket('ws://localhost:3000/login');
+		const loginWs = new WebSocket('ws://localhost:2999/login');
 		loginWs.onmessage = function(event) {
 			const response = event.data;
 
@@ -43,7 +43,7 @@ function App() {
 		};
 		setLoginWs(loginWs);
 
-		const tokenWs = new WebSocket('ws://localhost:3000/token');
+		const tokenWs = new WebSocket('ws://localhost:2999/token');
 		tokenWs.onmessage = function(event) {
 			const response = event.data;
 
@@ -57,28 +57,28 @@ function App() {
 		};
 		setTokenWs(tokenWs);
 
-		const getTasksWs = new WebSocket('ws://localhost:3000/get_tasks');
+		const getTasksWs = new WebSocket('ws://localhost:2999/get_tasks');
 		getTasksWs.onmessage = function(event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
 		setGetTasksWs(getTasksWs);
 
-		const clearTasksWs = new WebSocket('ws://localhost:3000/clear_tasks');
+		const clearTasksWs = new WebSocket('ws://localhost:2999/clear_tasks');
 		clearTasksWs.onmessage = function(event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
 		setClearTasksWs(clearTasksWs);
 
-		const filterTasksWs = new WebSocket('ws://localhost:3000/filter_tasks');
+		const filterTasksWs = new WebSocket('ws://localhost:2999/filter_tasks');
 		filterTasksWs.onmessage = function(event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
 		setFilterTasksWs(filterTasksWs);
 
-		const editTaskWs = new WebSocket('ws://localhost:3000/edit_task');
+		const editTaskWs = new WebSocket('ws://localhost:2999/edit_task');
 		editTaskWs.onmessage = function(event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
