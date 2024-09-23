@@ -45,15 +45,19 @@ function App() {
 	};
 
 	const editTask = async (index) => {
-		const taskToEdit = tasks.get(index);
-		const title = prompt("Введите новое название задачи:", taskToEdit.title);
+		try {
+			const taskToEdit = tasks.get(index);
+			const title = prompt("Введите новое название задачи:", taskToEdit.title);
 
-		const response = await axios.put('http://localhost:2999/edit-task',
-		{
-			index: index, title: title
-		});
-		const tasksMap = new Map(Object.entries(response.data));
-		setTasks(tasksMap);
+			const response = await axios.put('http://localhost:2999/edit-task',
+			{
+				index: index, title: title
+			});
+			const tasksMap = new Map(Object.entries(response.data));
+			setTasks(tasksMap);
+		} catch (e) {
+			setErrorCode(e.response.status);
+		}
 	};
 
 	const makeError = async () => {
@@ -132,29 +136,21 @@ function App() {
 	};
 
 	const handleChange = (e) => {
-		try {
-			const {
-				name,
-				value
-			} = e.target;
-			setFormData({
-				...formData,
-				[name]: value
-			});
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+		const {
+			name,
+			value
+		} = e.target;
+		setFormData({
+			...formData,
+			[name]: value
+		});
 	};
 
 	const handleFileChange = (e) => {
-		try {
-			setFormData({
-				...formData,
-				file: e.target.files[0]
-			});
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+		setFormData({
+			...formData,
+			file: e.target.files[0]
+		});
 	};
 
 	return (

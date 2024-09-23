@@ -17,6 +17,8 @@ dependencies {
 	implementation("io.ktor:ktor-server-core")
 	implementation("io.ktor:ktor-server-netty")
 	implementation("io.ktor:ktor-server-cors")
+
+	implementation("com.google.code.gson:gson:latest.release")
 }
 
 java {

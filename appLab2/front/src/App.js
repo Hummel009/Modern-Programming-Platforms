@@ -20,113 +20,47 @@ function App() {
 	}, []);
 
 	const fetchTasks = async () => {
-		try {
-			const response = await axios.get('http://localhost:2999/');
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const handleChange = (e) => {
-		try {
-			const {
-				name,
-				value
-			} = e.target;
-			setFormData({
-				...formData,
-				[name]: value
-			});
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const handleFileChange = (e) => {
-		try {
-			setFormData({
-				...formData,
-				file: e.target.files[0]
-			});
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const handleSubmit = async (e) => {
-		try {
-			e.preventDefault();
-			const form = new FormData();
-			for (const key in formData) {
-				form.append(key, formData[key]);
-			}
-			await axios.post('http://localhost:2999/add-task',
-			form,
-			{
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
-			fetchTasks();
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
-	};
-
-	const filterTasks = async (filter) => {
-		try {
-			const response = await axios.post('http://localhost:2999/filter-tasks',
-			{
-				filterStatus: filter
-			},
-			{
-				headers: {
-					'Content-Type': 'application/json'
-				}
-			});
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+		const response = await axios.get('http://localhost:2999/get-tasks');
+		const tasksMap = new Map(Object.entries(response.data));
+		setTasks(tasksMap);
 	};
 
 	const clearTasks = async () => {
-		try {
-			await axios.delete('http://localhost:2999/clear-tasks');
-			fetchTasks();
-		} catch (err) {
-			setErrorCode(err.response.status);
-		}
+		const response = await axios.delete('http://localhost:2999/clear-tasks');
+        const tasksMap = new Map(Object.entries(response.data));
+        setTasks(tasksMap);
 	};
 
-	const editTask = async (id) => {
-		try {
-			const taskToEdit = tasks.get(id);
-			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
+	const filterTasks = async (filter) => {
+		const response = await axios.post('http://localhost:2999/filter-tasks',
+		{
+			filter: filter
+		});
+		const tasksMap = new Map(Object.entries(response.data));
+		setTasks(tasksMap);
+	};
 
-			await axios.put('http://localhost:2999/edit-task',
+	const editTask = async (index) => {
+		try {
+			const taskToEdit = tasks.get(index);
+			const title = prompt("Введите новое название задачи:", taskToEdit.title);
+
+			const response = await axios.put('http://localhost:2999/edit-task',
 			{
-				index: id, title: newTitle
-			},
-			{
-				headers: {
-					'Content-Type': 'application/json'
-				}
+				index: index, title: title
 			});
-			fetchTasks();
-		} catch (err) {
-			setErrorCode(err.response.status);
+			const tasksMap = new Map(Object.entries(response.data));
+			setTasks(tasksMap);
+		} catch (e) {
+			setErrorCode(e.response.status);
 		}
 	};
 
 	const makeError = async () => {
 		try {
-			await axios.post('http://localhost:2999/jojoreference');
-		} catch (err) {
-			setErrorCode(err.response.status);
+			await axios.get('http://localhost:2999/jojoreference');
+		} catch (e) {
+			setErrorCode(e.response.status);
 		}
 	}
 
@@ -134,6 +68,40 @@ function App() {
 		fetchTasks()
 		setErrorCode(null);
 	}
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const form = new FormData();
+		for (const key in formData) {
+			form.append(key, formData[key]);
+		}
+		await axios.post('http://localhost:2999/add-task',
+		form,
+		{
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		});
+		fetchTasks();
+	};
+
+	const handleChange = (e) => {
+		const {
+			name,
+			value
+		} = e.target;
+		setFormData({
+			...formData,
+			[name]: value
+		});
+	};
+
+	const handleFileChange = (e) => {
+		setFormData({
+			...formData,
+			file: e.target.files[0]
+		});
+	};
 
 	return (
 		<div>
