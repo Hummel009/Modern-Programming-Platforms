@@ -40,7 +40,7 @@ function App() {
 
 	const clearTasks = async () => {
 		const query = `
-			query {
+			mutation {
 				clear_tasks
 			}
 		`;
@@ -55,7 +55,7 @@ function App() {
 
 	const filterTasks = async (filter) => {
 		const query = `
-			query {
+			mutation {
 				filter_tasks(filter: "${filter}")
 			}
 		`;
@@ -74,7 +74,7 @@ function App() {
 
 		if (title) {
 			const query = `
-				query {
+				mutation {
 					edit_task(index: ${index}, title: "${title}")
 				}
 			`;
@@ -104,7 +104,7 @@ function App() {
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
 		const query = `
-			query {
+			mutation {
 				login(username: "${loginData.username}", password: "${loginData.password}")
 			}
 		`;
@@ -129,7 +129,7 @@ function App() {
 		const token = tokenCookie ? tokenCookie.split('=')[1] : null;
 
 		const query = `
-			query {
+			mutation {
 				token(token: "${token}")
 			}
 		`;

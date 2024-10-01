@@ -23,7 +23,7 @@ val tasks = mutableMapOf<Int, Task>()
 val gson = Gson()
 
 fun SchemaBuilder.configureSchema() {
-	query("login") {
+	mutation("login") {
 		resolver { username: String, password: String ->
 			if (isValidUser(username, password)) {
 				generateToken(username, password)
@@ -33,7 +33,7 @@ fun SchemaBuilder.configureSchema() {
 		}
 	}
 
-	query("token") {
+	mutation("token") {
 		resolver { token: String ->
 			if (isValidToken(token)) {
 				"OK"
@@ -49,7 +49,7 @@ fun SchemaBuilder.configureSchema() {
 		}
 	}
 
-	query("clear_tasks") {
+	mutation("clear_tasks") {
 		resolver { ->
 			tasks.clear()
 
@@ -57,7 +57,7 @@ fun SchemaBuilder.configureSchema() {
 		}
 	}
 
-	query("filter_tasks") {
+	mutation("filter_tasks") {
 		resolver { filter: String ->
 			val filteredTasks = tasks.asSequence().filter {
 				it.value.status == filter || filter == "all"
@@ -67,7 +67,7 @@ fun SchemaBuilder.configureSchema() {
 		}
 	}
 
-	query("edit_task") {
+	mutation("edit_task") {
 		resolver { index: Int, title: String ->
 			tasks[index]!!.title = title
 
