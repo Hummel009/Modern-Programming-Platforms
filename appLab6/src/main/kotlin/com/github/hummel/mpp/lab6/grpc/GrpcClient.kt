@@ -20,7 +20,7 @@ fun main() {
 	}
 }
 
-class GrpcClient(channel: Channel?) {
+class GrpcClient(channel: Channel) {
 	private val blockingStub: GreeterBlockingStub = GreeterGrpc.newBlockingStub(channel)
 
 	fun greet(name: String) {
