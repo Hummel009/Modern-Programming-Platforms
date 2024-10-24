@@ -4,7 +4,6 @@ import com.github.hummel.mpp.lab6.grpc.GreeterGrpc.GreeterBlockingStub
 import io.grpc.Channel
 import io.grpc.Grpc
 import io.grpc.InsecureChannelCredentials
-import io.grpc.StatusRuntimeException
 import java.util.concurrent.TimeUnit
 
 fun main() {
@@ -26,13 +25,7 @@ class GrpcClient(channel: Channel) {
 	fun greet(name: String) {
 		println("Will try to greet $name...")
 		val request = HelloRequest.newBuilder().setName(name).build()
-		var response = try {
-			blockingStub.sayHello(request)
-		} catch (e: StatusRuntimeException) {
-			e.printStackTrace()
-			null
-		}
-
+		var response = blockingStub.sayHello(request)
 		println("Greeting: " + response?.getMessage())
 	}
 }

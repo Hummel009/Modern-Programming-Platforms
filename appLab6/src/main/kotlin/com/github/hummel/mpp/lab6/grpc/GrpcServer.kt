@@ -15,7 +15,7 @@ fun main() {
 }
 
 class GrpcServer {
-	private var server: Server? = null
+	private lateinit var server: Server
 
 	fun start() {
 		val port = 50051
@@ -34,19 +34,15 @@ class GrpcServer {
 	}
 
 	fun stop() {
-		if (server != null) {
-			server!!.shutdown().awaitTermination(30, TimeUnit.SECONDS)
-		}
+		server.shutdown().awaitTermination(30, TimeUnit.SECONDS)
 	}
 
 	fun blockUntilShutdown() {
-		if (server != null) {
-			server!!.awaitTermination()
-		}
+		server.awaitTermination()
 	}
 
 	class GreeterImpl : GreeterImplBase() {
-		override fun sayHello(req: HelloRequest, responseObserver: StreamObserver<HelloReply?>) {
+		override fun sayHello(req: HelloRequest, responseObserver: StreamObserver<HelloReply>) {
 			val reply = HelloReply.newBuilder().setMessage("Hello " + req.getName()).build()
 			responseObserver.onNext(reply)
 			responseObserver.onCompleted()
