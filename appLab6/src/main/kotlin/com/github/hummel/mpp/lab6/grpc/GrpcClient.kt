@@ -26,6 +26,6 @@ class GrpcClient(channel: Channel) {
 		println("Will try to greet $name...")
 		val request = HelloRequest.newBuilder().setName(name).build()
 		var response = blockingStub.sayHello(request)
-		println("Greeting: " + response?.getMessage())
+		println("Greeting: " + response.getMessage())
 	}
 }
