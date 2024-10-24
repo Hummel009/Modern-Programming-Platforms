@@ -1,6 +1,5 @@
 package com.github.hummel.mpp.lab6.grpc
 
-import com.github.hummel.mpp.lab6.grpc.GreeterGrpc.GreeterBlockingStub
 import io.grpc.Channel
 import io.grpc.Grpc
 import io.grpc.InsecureChannelCredentials
@@ -20,7 +19,7 @@ fun main() {
 }
 
 class GrpcClient(channel: Channel) {
-	private val blockingStub: GreeterBlockingStub = GreeterGrpc.newBlockingStub(channel)
+	private val blockingStub = GreeterGrpc.newBlockingStub(channel)
 
 	fun greet(name: String) {
 		println("Will try to greet $name...")
