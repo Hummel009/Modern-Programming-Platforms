@@ -3,12 +3,13 @@ package com.github.hummel.mpp.lab6.controller
 import com.github.hummel.mpp.lab6.dto.EditTaskRequest
 import com.github.hummel.mpp.lab6.dto.FilterRequest
 import com.github.hummel.mpp.lab6.dto.TokenRequest
-import com.github.hummel.mpp.lab6.dto.UserRequest
 import com.github.hummel.mpp.lab6.entity.Task
-import com.github.hummel.mpp.lab6.generateToken
+import com.github.hummel.mpp.lab6.grpc.ServerGrpc
+import com.github.hummel.mpp.lab6.grpc.StringRequest
 import com.github.hummel.mpp.lab6.isValidToken
-import com.github.hummel.mpp.lab6.isValidUser
 import com.google.gson.Gson
+import io.grpc.Grpc
+import io.grpc.InsecureChannelCredentials
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
@@ -29,19 +30,20 @@ val tasks = mutableMapOf<Int, Task>()
 val gson = Gson()
 
 fun Application.configureRouting() {
+	val channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build()
+	val grpcServer = ServerGrpc.newBlockingStub(channel)
+
 	routing {
 		post("/login") {
 			val jsonRequest = call.receiveText()
 
-			val userRequest = gson.fromJson(jsonRequest, UserRequest::class.java)
-			val user = userRequest.toEntity()
+			val request = StringRequest.newBuilder().setValue(jsonRequest).build()
+			var response = grpcServer.login(request)
 
-			if (isValidUser(user)) {
-				val textResponse = generateToken(user)
-
-				call.respond(textResponse)
-			} else {
+			if (response.getValue() == HttpStatusCode.Unauthorized.toString()) {
 				call.respond(HttpStatusCode.Unauthorized)
+			} else {
+				call.respond(response.getValue())
 			}
 		}
 
