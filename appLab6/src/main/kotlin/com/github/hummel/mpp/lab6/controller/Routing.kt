@@ -1,10 +1,8 @@
 package com.github.hummel.mpp.lab6.controller
 
-import com.github.hummel.mpp.lab6.entity.Task
-import com.github.hummel.mpp.lab6.getNextAvailableId
+import com.github.hummel.mpp.lab6.grpc.AddRequest
 import com.github.hummel.mpp.lab6.grpc.ServerGrpc
 import com.github.hummel.mpp.lab6.grpc.StringRequest
-import com.github.hummel.mpp.lab6.tasks
 import com.google.gson.Gson
 import io.grpc.Grpc
 import io.grpc.InsecureChannelCredentials
@@ -122,7 +120,8 @@ fun Application.configureRouting() {
 				part.dispose()
 			}
 
-			tasks.put(getNextAvailableId(), Task(title, status, dueDate, fileName))
+			val request = AddRequest.newBuilder().setTitle(title).setStatus(status).setDueDate(dueDate).build()
+			grpcServer.addTask(request)
 
 			call.respond(HttpStatusCode.OK)
 		}

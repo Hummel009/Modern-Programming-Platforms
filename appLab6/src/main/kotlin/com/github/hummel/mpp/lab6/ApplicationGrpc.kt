@@ -6,6 +6,7 @@ import com.github.hummel.mpp.lab6.dto.FilterRequest
 import com.github.hummel.mpp.lab6.dto.TokenRequest
 import com.github.hummel.mpp.lab6.dto.UserRequest
 import com.github.hummel.mpp.lab6.entity.Task
+import com.github.hummel.mpp.lab6.grpc.AddRequest
 import com.github.hummel.mpp.lab6.grpc.ServerGrpc.ServerImplBase
 import com.github.hummel.mpp.lab6.grpc.StringReply
 import com.github.hummel.mpp.lab6.grpc.StringRequest
@@ -14,10 +15,20 @@ import io.grpc.InsecureServerCredentials
 import io.grpc.stub.StreamObserver
 import io.ktor.http.HttpStatusCode
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
 
 val tasks = mutableMapOf<Int, Task>()
 
 fun main() {
+	for (i in 0..9) {
+		tasks[i] = Task(
+			title = "title$i",
+			status = if (Random.nextBoolean()) "completed" else "pending",
+			dueDate = "dueDate$i",
+			file = null
+		)
+	}
+
 	val port = 2998
 
 	var server = Grpc.newServerBuilderForPort(
@@ -102,6 +113,15 @@ class ServerImpl : ServerImplBase() {
 		val title = editTaskRequest.title
 
 		tasks[index]!!.title = title
+
+		val reply = StringReply.newBuilder().setValue(gson.toJson(tasks)).build()
+
+		responseObserver.onNext(reply)
+		responseObserver.onCompleted()
+	}
+
+	override fun addTask(task: AddRequest, responseObserver: StreamObserver<StringReply>) {
+		tasks.put(getNextAvailableId(), Task(task.title, task.status, task.dueDate, null))
 
 		val reply = StringReply.newBuilder().setValue(gson.toJson(tasks)).build()
 

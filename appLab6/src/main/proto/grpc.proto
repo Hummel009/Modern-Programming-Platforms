@@ -13,6 +13,7 @@ service Server {
   rpc ClearTasks (StringRequest) returns (StringReply) {}
   rpc FilterTasks (StringRequest) returns (StringReply) {}
   rpc EditTask (StringRequest) returns (StringReply) {}
+  rpc AddTask (AddRequest) returns (StringReply) {}
 }
 
 message StringRequest {
@@ -21,4 +22,10 @@ message StringRequest {
 
 message StringReply {
   string value = 1;
+}
+
+message AddRequest {
+  string title = 1;
+  string status = 2;
+  string dueDate = 3;
 }
