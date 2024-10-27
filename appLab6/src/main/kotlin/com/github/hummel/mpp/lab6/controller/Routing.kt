@@ -1,12 +1,10 @@
 package com.github.hummel.mpp.lab6.controller
 
-import com.github.hummel.mpp.lab6.dto.EditTaskRequest
-import com.github.hummel.mpp.lab6.dto.FilterRequest
-import com.github.hummel.mpp.lab6.dto.TokenRequest
 import com.github.hummel.mpp.lab6.entity.Task
+import com.github.hummel.mpp.lab6.getNextAvailableId
 import com.github.hummel.mpp.lab6.grpc.ServerGrpc
 import com.github.hummel.mpp.lab6.grpc.StringRequest
-import com.github.hummel.mpp.lab6.isValidToken
+import com.github.hummel.mpp.lab6.tasks
 import com.google.gson.Gson
 import io.grpc.Grpc
 import io.grpc.InsecureChannelCredentials
@@ -26,7 +24,6 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
 import java.io.File
 
-val tasks = mutableMapOf<Int, Task>()
 val gson = Gson()
 
 fun Application.configureRouting() {
@@ -50,57 +47,46 @@ fun Application.configureRouting() {
 		post("/token") {
 			val jsonRequest = call.receiveText()
 
-			val tokenRequest = gson.fromJson(jsonRequest, TokenRequest::class.java)
-			val token = tokenRequest.token
+			val request = StringRequest.newBuilder().setValue(jsonRequest).build()
+			var response = grpcServer.token(request)
 
-			if (isValidToken(token)) {
-				call.respond(HttpStatusCode.OK)
-			} else {
+			if (response.getValue() == HttpStatusCode.Unauthorized.toString()) {
 				call.respond(HttpStatusCode.Unauthorized)
+			} else {
+				call.respond(HttpStatusCode.OK)
 			}
 		}
 
 		get("/get-tasks") {
-			val jsonResponse = gson.toJson(tasks)
+			val request = StringRequest.newBuilder().setValue("").build()
+			var response = grpcServer.getTasks(request)
 
-			call.respond(jsonResponse)
+			call.respond(response.getValue())
 		}
 
 		delete("/clear-tasks") {
-			tasks.clear()
+			val request = StringRequest.newBuilder().setValue("").build()
+			var response = grpcServer.clearTasks(request)
 
-			val jsonResponse = gson.toJson(tasks)
-
-			call.respond(jsonResponse)
+			call.respond(response.getValue())
 		}
 
 		post("/filter-tasks") {
 			val jsonRequest = call.receiveText()
 
-			val filterRequest = gson.fromJson(jsonRequest, FilterRequest::class.java)
-			val filter = filterRequest.filter
+			val request = StringRequest.newBuilder().setValue(jsonRequest).build()
+			var response = grpcServer.filterTasks(request)
 
-			val filteredTasks = tasks.asSequence().filter {
-				it.value.status == filter || filter == "all"
-			}.associate { it.key to it.value }
-
-			val jsonResponse = gson.toJson(filteredTasks)
-
-			call.respond(jsonResponse)
+			call.respond(response.getValue())
 		}
 
 		put("/edit-task") {
 			val jsonRequest = call.receiveText()
 
-			val editTaskRequest = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
-			val index = editTaskRequest.index
-			val title = editTaskRequest.title
+			val request = StringRequest.newBuilder().setValue(jsonRequest).build()
+			var response = grpcServer.editTask(request)
 
-			tasks[index]!!.title = title
-
-			val jsonResponse = gson.toJson(tasks)
-
-			call.respond(jsonResponse)
+			call.respond(response.getValue())
 		}
 
 		post("/add-task") {
@@ -146,5 +132,3 @@ fun Application.configureRouting() {
 		}
 	}
 }
-
-fun getNextAvailableId(): Int = if (tasks.isEmpty()) 0 else tasks.keys.max() + 1
