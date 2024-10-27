@@ -27,7 +27,7 @@ import java.io.File
 val gson = Gson()
 
 fun Application.configureRouting() {
-	val channel = Grpc.newChannelBuilder("localhost:50051", InsecureChannelCredentials.create()).build()
+	val channel = Grpc.newChannelBuilder("localhost:2998", InsecureChannelCredentials.create()).build()
 	val grpcServer = ServerGrpc.newBlockingStub(channel)
 
 	routing {

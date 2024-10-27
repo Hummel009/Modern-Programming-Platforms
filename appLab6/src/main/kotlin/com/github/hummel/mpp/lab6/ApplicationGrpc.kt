@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 val tasks = mutableMapOf<Int, Task>()
 
 fun main() {
-	val port = 50051
+	val port = 2998
 
 	var server = Grpc.newServerBuilderForPort(
 		port, InsecureServerCredentials.create()
