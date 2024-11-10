@@ -260,13 +260,13 @@ function App() {
 								<Route path="/login" element={
 									<div>
 										<h1>
-											<span id="lang-enter">Вход</span>
+											<span id="lang-enter">Уваход</span>
 										</h1>
 										<form onSubmit={handleLoginSubmit} className="main-fieldset">
 											<input
 												type="text"
 												name="username"
-												placeholder="Имя пользователя"
+												placeholder="Імя ўдзельніка"
 												onChange={handleLoginChange}
 												required
 											/>
@@ -277,20 +277,20 @@ function App() {
 												onChange={handleLoginChange}
 												required
 											/>
-											<button type="submit" className="wds-button">Войти</button>
+											<button type="submit" className="wds-button">Увайсці</button>
 										</form>
 									</div>
 								} />
 								<Route path="/register" element={
 									<div>
 										<h1>
-											<span id="lang-enter">Регистрация</span>
+											<span id="lang-enter">Рэгістрацыя</span>
 										</h1>
 										<form onSubmit={handleRegisterSubmit} className="main-fieldset">
 											<input
 												type="text"
 												name="username"
-												placeholder="Имя пользователя"
+												placeholder="Імя ўдзельніка"
 												onChange={handleRegisterChange}
 												required
 											/>
@@ -301,7 +301,7 @@ function App() {
 												onChange={handleRegisterChange}
 												required
 											/>
-											<button type="submit" className="wds-button">Зарегистрироваться</button>
+											<button type="submit" className="wds-button">Зарэгістравацца</button>
 										</form>
 									</div>
 								} />
@@ -311,14 +311,16 @@ function App() {
 							{isLoggedIn ? (
 								<div>
 									<h1>
-										<span className = "status" style={{ color: 'green' }}>Вход осуществлён</span>
+										<span className = "status" style={{ color: 'green' }}>Уваход здзейснены</span>
 									</h1>
-									<button onClick={deleteCookieToken} className="wds-button">Выйти из аккаунта</button>
+									<button onClick={deleteCookieToken} className="wds-button">Выйсці</button>
 								</div>
 							) : (
-								<h1>
-									<span className = "status" style={{ color: 'red' }}>Вход не осуществлён</span>
-								</h1>
+								<div>
+									<h1>
+										<span className = "status" style={{ color: 'red' }}>Уваход не здзейснены</span>
+									</h1>
+								</div>
 							)}
 						</aside>
 					</div>
