@@ -1,14 +1,11 @@
 package com.github.hummel.mpp.course.controller
 
-import com.github.hummel.mpp.course.addUser
 import com.github.hummel.mpp.course.dto.EditTaskRequest
 import com.github.hummel.mpp.course.dto.FilterRequest
 import com.github.hummel.mpp.course.dto.TokenRequest
 import com.github.hummel.mpp.course.dto.UserRequest
 import com.github.hummel.mpp.course.entity.Task
-import com.github.hummel.mpp.course.generateToken
-import com.github.hummel.mpp.course.isValidToken
-import com.github.hummel.mpp.course.isValidUser
+import com.github.hummel.mpp.course.service.AuthService
 import com.google.gson.Gson
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
@@ -35,13 +32,12 @@ fun Application.configureRouting() {
 			val jsonRequest = call.receiveText()
 
 			val userRequest = gson.fromJson(jsonRequest, UserRequest::class.java)
-
-			addUser(userRequest.username, userRequest.password)
-
 			val user = userRequest.toEntity()
 
-			if (isValidUser(user)) {
-				val textResponse = generateToken(user)
+			AuthService.addUser(user)
+
+			if (AuthService.isValidUser(user)) {
+				val textResponse = AuthService.generateToken(user)
 
 				call.respond(textResponse)
 			} else {
@@ -55,8 +51,8 @@ fun Application.configureRouting() {
 			val userRequest = gson.fromJson(jsonRequest, UserRequest::class.java)
 			val user = userRequest.toEntity()
 
-			if (isValidUser(user)) {
-				val textResponse = generateToken(user)
+			if (AuthService.isValidUser(user)) {
+				val textResponse = AuthService.generateToken(user)
 
 				call.respond(textResponse)
 			} else {
@@ -70,7 +66,7 @@ fun Application.configureRouting() {
 			val tokenRequest = gson.fromJson(jsonRequest, TokenRequest::class.java)
 			val token = tokenRequest.token
 
-			if (isValidToken(token)) {
+			if (AuthService.isValidToken(token)) {
 				call.respond(HttpStatusCode.OK)
 			} else {
 				call.respond(HttpStatusCode.Unauthorized)
