@@ -226,7 +226,6 @@ function App() {
 										</ul>
 
 										<button onClick={clearTasks} className="wds-button">Очистить список задач</button>
-										<button id='redfont' onClick={makeError}>Совершить ошибку</button>
 									</div>
 								}/>
 								<Route path="/login" element={
@@ -281,9 +280,12 @@ function App() {
 						</main>
 						<aside className='right-rail search'>
 							{isLoggedIn ? (
-								<h1>
-									<span className = "status" style={{ color: 'green' }}>Вход осуществлён</span>
-								</h1>
+								<div>
+									<h1>
+										<span className = "status" style={{ color: 'green' }}>Вход осуществлён</span>
+									</h1>
+									<button onClick={deleteCookieToken} className="wds-button">Выйти из аккаунта</button>
+								</div>
 							) : (
 								<h1>
 									<span className = "status" style={{ color: 'red' }}>Вход не осуществлён</span>
