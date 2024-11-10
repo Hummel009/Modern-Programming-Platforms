@@ -21,10 +21,10 @@ export const GlobalNavigation = () => (
 export const LocalNavigation = () => (
 	<div className="page-header">
 		<nav className="local-navigation">
-			<Link to="/index">
+			<Link to="/">
 				<span id="lang-main">Галоўная</span>
 			</Link>
-			<Link to="/registration">
+			<Link to="/register">
 				<span id="lang-register">Рэгістрацыя</span>
 			</Link>
 			<Link to="/login">

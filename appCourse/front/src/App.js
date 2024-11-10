@@ -164,7 +164,7 @@ function App() {
 					<div class="page has-right-rail">
 						<main className="page-main">
 							<Routes>
-								<Route path="/index" element={
+								<Route path="/" element={
 										<div>
 											{ errorCode ? (
 												<ErrorPage message={errorCode} returnBack={returnBack} />
@@ -233,8 +233,10 @@ function App() {
 								}/>
 								<Route path="/login" element={
 									<div>
+										<h1>
+											<span id="lang-enter">Вход</span>
+										</h1>
 										<form onSubmit={handleLoginSubmit} className="main-fieldset">
-											<legend id="lang-translate">Вход</legend>
 											<input
 												type="text"
 												name="username"
@@ -252,13 +254,15 @@ function App() {
 											<button type="submit" className="wds-button">Войти</button>
 										</form>
 										<br />
-										<button id="greenfont" onClick={tryUseCookieToken}>Войти через токен</button>
+										<button className="wds-button" onClick={tryUseCookieToken}>Войти через токен</button>
 									</div>
 								} />
-								<Route path="/registration" element={
+								<Route path="/register" element={
 									<div>
+										<h1>
+											<span id="lang-enter">Регистрация</span>
+										</h1>
 										<form onSubmit={handleLoginSubmit} className="main-fieldset">
-											<legend id="lang-translate">Регистрация</legend>
 											<input
 												type="text"
 												name="username"
@@ -273,10 +277,8 @@ function App() {
 												onChange={handleLoginChange}
 												required
 											/>
-											<button type="submit" className="wds-button">Войти</button>
+											<button type="submit" className="wds-button">Зарегистрироваться</button>
 										</form>
-										<br />
-										<button id="greenfont" onClick={tryUseCookieToken}>Войти через токен</button>
 									</div>
 								} />
 							</Routes>
