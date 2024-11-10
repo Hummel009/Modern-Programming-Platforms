@@ -5,7 +5,6 @@ plugins {
 	id("org.jetbrains.kotlin.jvm")
 	id("org.jetbrains.kotlin.plugin.serialization")
 	id("io.ktor.plugin")
-	id("com.google.protobuf") version "latest.release"
 }
 
 group = "com.github.hummel"
@@ -20,11 +19,6 @@ dependencies {
 
 	implementation("com.auth0:java-jwt:latest.release")
 	implementation("at.favre.lib:bcrypt:latest.release")
-
-	runtimeOnly("io.grpc:grpc-netty-shaded:latest.release")
-	implementation("io.grpc:grpc-protobuf:latest.release")
-	implementation("io.grpc:grpc-stub:latest.release")
-	compileOnly("org.apache.tomcat:annotations-api:latest.release")
 }
 
 java {
@@ -34,26 +28,8 @@ java {
 }
 
 application {
-	mainClass = "com.github.hummel.mpp.lab6.ApplicationKt"
+	mainClass = "com.github.hummel.mpp.course.ApplicationKt"
 
 	val isDevelopment = project.ext.has("development")
 	applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-}
-
-protobuf {
-	protoc {
-		artifact = "com.google.protobuf:protoc:3.25.3"
-	}
-	plugins {
-		create("grpc") {
-			artifact = "io.grpc:protoc-gen-grpc-java:latest.release"
-		}
-	}
-	generateProtoTasks {
-		all().forEach {
-			it.plugins {
-				create("grpc")
-			}
-		}
-	}
 }
