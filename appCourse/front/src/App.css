@@ -173,6 +173,18 @@ body {
 	height: 34px;
 }
 
+@media (max-width: 1050px) {
+	.page.has-right-rail {
+		display: block;
+	}
+
+	.page.has-right-rail .right-rail {
+		width: 100% !important;
+		padding-bottom: 100px;
+		padding-top: 100px;
+	}
+}
+
 /* CONTENT MAIN */
 .page-main [class^="featured"] {
 	display: none;
