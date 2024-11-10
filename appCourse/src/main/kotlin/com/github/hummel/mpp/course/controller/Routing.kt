@@ -1,5 +1,6 @@
 package com.github.hummel.mpp.course.controller
 
+import com.github.hummel.mpp.course.addUser
 import com.github.hummel.mpp.course.dto.EditTaskRequest
 import com.github.hummel.mpp.course.dto.FilterRequest
 import com.github.hummel.mpp.course.dto.TokenRequest
@@ -30,6 +31,24 @@ val gson = Gson()
 
 fun Application.configureRouting() {
 	routing {
+		post("/register") {
+			val jsonRequest = call.receiveText()
+
+			val userRequest = gson.fromJson(jsonRequest, UserRequest::class.java)
+
+			addUser(userRequest.username, userRequest.password)
+
+			val user = userRequest.toEntity()
+
+			if (isValidUser(user)) {
+				val textResponse = generateToken(user)
+
+				call.respond(textResponse)
+			} else {
+				call.respond(HttpStatusCode.Unauthorized)
+			}
+		}
+
 		post("/login") {
 			val jsonRequest = call.receiveText()
 

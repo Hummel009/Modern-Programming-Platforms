@@ -5,6 +5,13 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.github.hummel.mpp.course.entity.User
 
+val accounts = mutableMapOf<String, String>()
+
+fun addUser(username: String, password: String) {
+	val hashedPassword = BCrypt.withDefaults().hashToString(12, password.toCharArray())
+	accounts[username] = hashedPassword
+}
+
 fun isValidToken(token: String?): Boolean {
 	return try {
 		val decoded = JWT.decode(token)
@@ -24,12 +31,9 @@ fun isValidUser(user: User): Boolean {
 }
 
 fun isValidUser(username: String, password: String): Boolean {
-	val neededUsername = "Hummel009"
-	val neededPassword = BCrypt.withDefaults().hashToString(12, "amogus134".toCharArray())
-	val usernameRule = username == neededUsername
-	val passwordRule = BCrypt.verifyer().verify(password.toCharArray(), neededPassword).verified
+	val hashedPassword = accounts[username] ?: return false
 
-	return usernameRule && passwordRule
+	return BCrypt.verifyer().verify(password.toCharArray(), hashedPassword).verified
 }
 
 fun generateToken(user: User): String = JWT.create()

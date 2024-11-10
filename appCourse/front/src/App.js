@@ -1,6 +1,7 @@
 import React, {
 	useState,
-	useEffect
+	useEffect,
+	useCallback
 } from 'react';
 import axios from 'axios';
 import './App.css'
@@ -19,11 +20,31 @@ function App() {
 		username: '',
 		password: ''
 	});
+	const [registerData, setRegisterData] = useState({
+		username: '',
+		password: ''
+	});
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+	const tryUseCookieToken = useCallback(async () => {
+		try {
+			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+
+			await axios.post('http://localhost:2999/token', {
+			token: token
+			});
+
+			setIsLoggedIn(true);
+			fetchTasks();
+		} catch (error) {
+			console.error("Error using cookie token:", error);
+		}
+	}, []);
 
 	useEffect(() => {
 		tryUseCookieToken()
-	}, []);
+	}, [tryUseCookieToken]);
 
 	const fetchTasks = async () => {
 		const response = await axios.get('http://localhost:2999/get-tasks');
@@ -60,10 +81,6 @@ function App() {
 		}
 	};
 
-	const makeError = async () => {
-		await axios.get('http://localhost:2999/jojoreference');
-	}
-
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
 		try {
@@ -82,15 +99,16 @@ function App() {
 		}
 	};
 
-	const tryUseCookieToken = async () => {
+	const handleRegisterSubmit = async (e) => {
+		e.preventDefault();
 		try {
-			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
-
-			await axios.post('http://localhost:2999/token', {
-				token: token
+			const response = await axios.post('http://localhost:2999/register',
+			{
+				username: registerData.username,
+				password: registerData.password
 			});
 
+			document.cookie = `jwt=${response.data}; path=/; secure=false; SameSite=Lax`;
 			setIsLoggedIn(true);
 
 			fetchTasks();
@@ -144,6 +162,17 @@ function App() {
 		} = e.target;
 		setLoginData({
 			...loginData,
+			[name]: value
+		});
+	};
+
+	const handleRegisterChange = (e) => {
+		const {
+			name,
+			value
+		} = e.target;
+		setRegisterData({
+			...registerData,
 			[name]: value
 		});
 	};
@@ -257,19 +286,19 @@ function App() {
 										<h1>
 											<span id="lang-enter">Регистрация</span>
 										</h1>
-										<form onSubmit={handleLoginSubmit} className="main-fieldset">
+										<form onSubmit={handleRegisterSubmit} className="main-fieldset">
 											<input
 												type="text"
 												name="username"
 												placeholder="Имя пользователя"
-												onChange={handleLoginChange}
+												onChange={handleRegisterChange}
 												required
 											/>
 											<input
 												type="password"
 												name="password"
 												placeholder="Пароль"
-												onChange={handleLoginChange}
+												onChange={handleRegisterChange}
 												required
 											/>
 											<button type="submit" className="wds-button">Зарегистрироваться</button>
