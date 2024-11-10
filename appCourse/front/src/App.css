@@ -240,36 +240,37 @@ body {
 }
 
 .wds-button:disabled {
-    background-color: #a9a9a9;
-    color: Black;
-    cursor: not-allowed;
-    opacity: 0.6;
+	background-color: #a9a9a9;
+	color: Black;
+	cursor: not-allowed;
+	opacity: 0.6;
 }
 
 .wds-button:disabled:hover {
-    background-color: #a9a9a9;
-    color: Black;
+	background-color: #a9a9a9;
+	color: Black;
 }
 
 /* FIELDSET REGISTER, LOGIN*/
 .page-main input {
-    background: transparent !important;
-    display: block;
-    padding: 1em;
-    margin: 1em 0;
+	background: transparent !important;
+	display: block;
+	padding: 1em;
+	margin: 1em 0;
 	border-radius: 3px;
 	border: 2px solid;
+	outline: none;
 }
 
 .right-rail .status {
 	display: block;
-    padding: 24px 36px;
-    text-align: center;
+	padding: 24px 36px;
+	text-align: center;
 }
 
 .right-rail .wds-button {
 	display: block;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
 }
