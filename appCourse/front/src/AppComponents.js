@@ -36,9 +36,6 @@ export const LocalNavigation = () => (
 			<Link to="/cart">
 				<span id="lang-cart">Кош</span>
 			</Link>
-			<Link to="/admin">
-				<span id="lang-admin">Кабінет адміністратара</span>
-			</Link>
 		</nav>
 	</div>
 );

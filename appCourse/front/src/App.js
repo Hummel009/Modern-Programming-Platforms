@@ -255,6 +255,30 @@ function App() {
 										<button id="greenfont" onClick={tryUseCookieToken}>Войти через токен</button>
 									</div>
 								} />
+								<Route path="/registration" element={
+									<div>
+										<form onSubmit={handleLoginSubmit} className="main-fieldset">
+											<legend id="lang-translate">Регистрация</legend>
+											<input
+												type="text"
+												name="username"
+												placeholder="Имя пользователя"
+												onChange={handleLoginChange}
+												required
+											/>
+											<input
+												type="password"
+												name="password"
+												placeholder="Пароль"
+												onChange={handleLoginChange}
+												required
+											/>
+											<button type="submit" className="wds-button">Войти</button>
+										</form>
+										<br />
+										<button id="greenfont" onClick={tryUseCookieToken}>Войти через токен</button>
+									</div>
+								} />
 							</Routes>
 						</main>
 						<aside className='right-rail search'>
