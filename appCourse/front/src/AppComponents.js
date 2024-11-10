@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export const GlobalNavigation = () => (
 	<div className="global-navigation">
@@ -20,24 +21,24 @@ export const GlobalNavigation = () => (
 export const LocalNavigation = () => (
 	<div className="page-header">
 		<nav className="local-navigation">
-			<a href="/index">
+			<Link to="/index">
 				<span id="lang-main">Галоўная</span>
-			</a>
-			<a href="/registration">
+			</Link>
+			<Link to="/registration">
 				<span id="lang-register">Рэгістрацыя</span>
-			</a>
-			<a href="/login">
+			</Link>
+			<Link to="/login">
 				<span id="lang-enter">Уваход</span>
-			</a>
-			<a href="/profile">
+			</Link>
+			<Link to="/profile">
 				<span id="lang-profile">Профіль</span>
-			</a>
-			<a href="/cart">
+			</Link>
+			<Link to="/cart">
 				<span id="lang-cart">Кош</span>
-			</a>
-			<a href="/admin">
+			</Link>
+			<Link to="/admin">
 				<span id="lang-admin">Кабінет адміністратара</span>
-			</a>
+			</Link>
 		</nav>
 	</div>
 );

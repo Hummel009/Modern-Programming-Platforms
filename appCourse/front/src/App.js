@@ -5,6 +5,7 @@ import React, {
 import axios from 'axios';
 import './App.css'
 import { GlobalNavigation, LocalNavigation } from './AppComponents.js'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
 	const [tasks, setTasks] = useState(new Map());
@@ -153,7 +154,7 @@ function App() {
 	};
 
 	return (
-		<>
+		<Router>
 			<div className="page-background"></div>
 			<GlobalNavigation />
 			<div className="main-container">
@@ -162,96 +163,99 @@ function App() {
 					<LocalNavigation />
 					<div class="page has-right-rail">
 						<main className="page-main">
-							{ !isLoggedIn ? (
-								<div>
-									<form onSubmit={handleLoginSubmit} className="main-fieldset">
-										<legend id="lang-translate">Вход</legend>
-										<input
-											type="text"
-											name="username"
-											placeholder="Имя пользователя"
-											onChange={handleLoginChange}
-											required
-										/>
-										<input
-											type="password"
-											name="password"
-											placeholder="Пароль"
-											onChange={handleLoginChange}
-											required
-										/>
-										<button type="submit" className="wds-button">Войти</button>
-									</form>
-									<br />
-									<button id="greenfont" onClick={tryUseCookieToken}>Войти через токен</button>
-								</div>
-							) : (
-								<div>
-									{ errorCode ? (
-										<ErrorPage message={errorCode} returnBack={returnBack} />
-									) : (
+							<Routes>
+								<Route path="/index" element={
 										<div>
-											<h1>Список задач</h1>
-											<form onSubmit={handleSubmit} className="main-fieldset">
-												<legend id="lang-translate">Добавить задачу</legend>
-												<input
-													type="text"
-													name="title"
-													placeholder="Название задачи"
-													required
-													onChange={handleChange}
-												/>
-												<select name="status" onChange={handleChange}>
-													<option value="pending">В ожидании</option>
-													<option value="completed">Завершено</option>
-												</select>
-												<input
-													type="date"
-													name="dueDate"
-													required
-													onChange={handleChange}
-												/>
-												<input
-													type="file"
-													name="file"
-													onChange={handleFileChange}
-												/>
-												<button type="submit" className="wds-button">Добавить задачу</button>
-											</form>
+											{ errorCode ? (
+												<ErrorPage message={errorCode} returnBack={returnBack} />
+											) : (
+												<div>
+													<h1>Список задач</h1>
+													<form onSubmit={handleSubmit} className="main-fieldset">
+														<legend id="lang-translate">Добавить задачу</legend>
+														<input
+															type="text"
+															name="title"
+															placeholder="Название задачи"
+															required
+															onChange={handleChange}
+														/>
+														<select name="status" onChange={handleChange}>
+															<option value="pending">В ожидании</option>
+															<option value="completed">Завершено</option>
+														</select>
+														<input
+															type="date"
+															name="dueDate"
+															required
+															onChange={handleChange}
+														/>
+														<input
+															type="file"
+															name="file"
+															onChange={handleFileChange}
+														/>
+														<button type="submit" className="wds-button">Добавить задачу</button>
+													</form>
 
-											<h2>Фильтровать задачи</h2>
-											<select onChange={(e) => filterTasks(e.target.value)}>
-												<option value="all">Все</option>
-												<option value="pending">В ожидании</option>
-												<option value="completed">Завершено</option>
-											</select>
+													<h2>Фильтровать задачи</h2>
+													<select onChange={(e) => filterTasks(e.target.value)}>
+														<option value="all">Все</option>
+														<option value="pending">В ожидании</option>
+														<option value="completed">Завершено</option>
+													</select>
 
-											<ul>
-												{Array.from(tasks).map(([id, task]) => {
-													return (
-														<li key={id}>
-															<strong>{task.title}</strong> - {task.status}
-															{task.file && (
-																<div>
-																	<br />
-																	Прикрепленный файл: {task.file}
-																</div>
-															)}
-															<span id="fltright">
-																<button onClick={() => editTask(id)}>Редактировать</button>
-															</span>
-															<span id="fltright">Дата: {task.dueDate}</span>
-														</li>
-													);
-												})}
-											</ul>
+													<ul>
+														{Array.from(tasks).map(([id, task]) => {
+															return (
+																<li key={id}>
+																	<strong>{task.title}</strong> - {task.status}
+																	{task.file && (
+																		<div>
+																			<br />
+																			Прикрепленный файл: {task.file}
+																		</div>
+																	)}
+																	<span id="fltright">
+																		<button onClick={() => editTask(id)}>Редактировать</button>
+																	</span>
+																	<span id="fltright">Дата: {task.dueDate}</span>
+																</li>
+															);
+														})}
+													</ul>
 
-											<button onClick={clearTasks} className="wds-button">Очистить список задач</button>
-											<button id='redfont' onClick={makeError}>Совершить ошибку</button>
+													<button onClick={clearTasks} className="wds-button">Очистить список задач</button>
+													<button id='redfont' onClick={makeError}>Совершить ошибку</button>
+												</div>
+											)}
 										</div>
-									)}
-								</div>
-							)}
+								}/>
+								<Route path="/login" element={
+									<div>
+										<form onSubmit={handleLoginSubmit} className="main-fieldset">
+											<legend id="lang-translate">Вход</legend>
+											<input
+												type="text"
+												name="username"
+												placeholder="Имя пользователя"
+												onChange={handleLoginChange}
+												required
+											/>
+											<input
+												type="password"
+												name="password"
+												placeholder="Пароль"
+												onChange={handleLoginChange}
+												required
+											/>
+											<button type="submit" className="wds-button">Войти</button>
+										</form>
+										<br />
+										<button id="greenfont" onClick={tryUseCookieToken}>Войти через токен</button>
+									</div>
+								} />
+							</Routes>
 						</main>
 						<aside className='right-rail search'>
 							<div className='noframe'>
@@ -276,7 +280,7 @@ function App() {
 					</div>
 				</div>
 			</div>
-		</>
+		</Router>
 	);
 }
 
