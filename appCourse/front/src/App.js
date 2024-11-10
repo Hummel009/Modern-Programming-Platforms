@@ -15,7 +15,6 @@ function App() {
 		dueDate: '',
 		file: null,
 	});
-	const [errorCode, setErrorCode] = useState(null);
 	const [loginData, setLoginData] = useState({
 		username: '',
 		password: ''
@@ -23,6 +22,7 @@ function App() {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	useEffect(() => {
+		tryUseCookieToken()
 	}, []);
 
 	const fetchTasks = async () => {
@@ -61,16 +61,7 @@ function App() {
 	};
 
 	const makeError = async () => {
-		try {
-			await axios.get('http://localhost:2999/jojoreference');
-		} catch (e) {
-			setErrorCode(e.response.status);
-		}
-	}
-
-	const returnBack = async () => {
-		fetchTasks()
-		setErrorCode(null);
+		await axios.get('http://localhost:2999/jojoreference');
 	}
 
 	const handleLoginSubmit = async (e) => {
@@ -104,9 +95,20 @@ function App() {
 
 			fetchTasks();
 		} catch (error) {
-			alert('Login failed. Please check your credentials.');
 		}
 	};
+
+	const deleteCookieToken = () => {
+		try {
+			document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+
+			setIsLoggedIn(false);
+
+			fetchTasks();
+		} catch (error) {
+			alert('Error occurred while trying to delete the cookie.');
+		}
+	}
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -165,71 +167,67 @@ function App() {
 						<main className="page-main">
 							<Routes>
 								<Route path="/" element={
-										<div>
-											{ errorCode ? (
-												<ErrorPage message={errorCode} returnBack={returnBack} />
-											) : (
-												<div>
-													<h1>Список задач</h1>
-													<form onSubmit={handleSubmit} className="main-fieldset">
-														<legend id="lang-translate">Добавить задачу</legend>
-														<input
-															type="text"
-															name="title"
-															placeholder="Название задачи"
-															required
-															onChange={handleChange}
-														/>
-														<select name="status" onChange={handleChange}>
-															<option value="pending">В ожидании</option>
-															<option value="completed">Завершено</option>
-														</select>
-														<input
-															type="date"
-															name="dueDate"
-															required
-															onChange={handleChange}
-														/>
-														<input
-															type="file"
-															name="file"
-															onChange={handleFileChange}
-														/>
-														<button type="submit" className="wds-button">Добавить задачу</button>
-													</form>
+									<div>
+										<h1>
+											<span id="lang-enter">Список задач</span>
+										</h1>
+										<form onSubmit={handleSubmit} className="main-fieldset">
+											<legend id="lang-translate">Добавить задачу</legend>
+											<input
+												type="text"
+												name="title"
+												placeholder="Название задачи"
+												required
+												onChange={handleChange}
+											/>
+											<select name="status" onChange={handleChange}>
+												<option value="pending">В ожидании</option>
+												<option value="completed">Завершено</option>
+											</select>
+											<input
+												type="date"
+												name="dueDate"
+												required
+												onChange={handleChange}
+											/>
+											<input
+												type="file"
+												name="file"
+												onChange={handleFileChange}
+											/>
+											<button type="submit" className="wds-button">Добавить задачу</button>
+										</form>
 
-													<h2>Фильтровать задачи</h2>
-													<select onChange={(e) => filterTasks(e.target.value)}>
-														<option value="all">Все</option>
-														<option value="pending">В ожидании</option>
-														<option value="completed">Завершено</option>
-													</select>
+										<h2>Фильтровать задачи</h2>
+										<select onChange={(e) => filterTasks(e.target.value)}>
+											<option value="all">Все</option>
+											<option value="pending">В ожидании</option>
+											<option value="completed">Завершено</option>
+										</select>
 
-													<ul>
-														{Array.from(tasks).map(([id, task]) => {
-															return (
-																<li key={id}>
-																	<strong>{task.title}</strong> - {task.status}
-																	{task.file && (
-																		<div>
-																			<br />
-																			Прикрепленный файл: {task.file}
-																		</div>
-																	)}
-																	<span id="fltright">
-																		<button onClick={() => editTask(id)}>Редактировать</button>
-																	</span>
-																	<span id="fltright">Дата: {task.dueDate}</span>
-																</li>
-															);
-														})}
-													</ul>
+										<ul>
+											{Array.from(tasks).map(([id, task]) => {
+												return (
+													<li key={id}>
+														<strong>{task.title}</strong> - {task.status}
+														{task.file && (
+															<div>
+																<br />
+																Прикрепленный файл: {task.file}
+															</div>
+														)}
+														<span id="fltright">
+															<button onClick={() => editTask(id)}>Редактировать</button>
+														</span>
+														<span id="fltright">Дата: {task.dueDate}</span>
+													</li>
+												);
+											})}
+										</ul>
 
-													<button onClick={clearTasks} className="wds-button">Очистить список задач</button>
-													<button id='redfont' onClick={makeError}>Совершить ошибку</button>
-												</div>
-											)}
-										</div>
+										<button onClick={clearTasks} className="wds-button">Очистить список задач</button>
+										<button id='redfont' onClick={makeError}>Совершить ошибку</button>
+									</div>
 								}/>
 								<Route path="/login" element={
 									<div>
@@ -253,8 +251,6 @@ function App() {
 											/>
 											<button type="submit" className="wds-button">Войти</button>
 										</form>
-										<br />
-										<button className="wds-button" onClick={tryUseCookieToken}>Войти через токен</button>
 									</div>
 								} />
 								<Route path="/register" element={
@@ -284,39 +280,20 @@ function App() {
 							</Routes>
 						</main>
 						<aside className='right-rail search'>
-							<div className='noframe'>
-								<h1><span id='lang-search'>Пошук</span></h1>
-								<form >
-									<input className='hstyle' type='search' id='mySearch' name='q'/>
-									<button className='wds-button' id='find' type='submit'>Пошук</button>
-								</form>
-							</div>
-							<form>
-								<fieldset className='rc-fieldset'>
-									<legend id='lang-translate'>Перакласці</legend>
-									<label>
-										<input type='radio' name='lang' value='be' id='lang-be'/> Беларуская
-									</label>
-									<label>
-										<input type='radio' name='lang' value='en' id='lang-en'/> English
-									</label>
-								</fieldset>
-							</form>
+							{isLoggedIn ? (
+								<h1>
+									<span className = "status" style={{ color: 'green' }}>Вход осуществлён</span>
+								</h1>
+							) : (
+								<h1>
+									<span className = "status" style={{ color: 'red' }}>Вход не осуществлён</span>
+								</h1>
+							)}
 						</aside>
 					</div>
 				</div>
 			</div>
 		</Router>
-	);
-}
-
-function ErrorPage({ message, returnBack }) {
-	return (
-		<div>
-			<h1>Произошла ошибка</h1>
-			<p>Код ошибки — {message}</p>
-			<button id="greenfont" onClick={returnBack}>Вернуться</button>
-		</div>
 	);
 }
 

@@ -239,22 +239,6 @@ body {
 	color: #7d4924;
 }
 
-/* FIELDSET LANG */
-.right-rail .main-fieldset {
-	margin-bottom: 15px !important;
-	border-radius: 3px;
-	border: 2px solid;
-}
-
-.right-rail .rc-fieldset {
-	margin-left: 20px !important;
-	border-radius: 3px;
-	border: 2px solid;
-	position: absolute;
-	bottom: 20px;
-	width: 270px;
-}
-
 /* FIELDSET REGISTER, LOGIN*/
 .page-main input {
     background: transparent !important;
@@ -265,10 +249,8 @@ body {
 	border: 2px solid;
 }
 
-/* FIELDSET REGISTER, LOGIN*/
-.right-rail input {
-    background: transparent !important;
-    margin-right: 1em;
-	border-radius: 3px;
-	border: 2px solid;
+.right-rail .status {
+	display: block;
+    padding: 24px 36px;
+    text-align: center;
 }
