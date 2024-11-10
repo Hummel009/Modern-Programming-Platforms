@@ -113,6 +113,7 @@ function App() {
 
 			fetchTasks();
 		} catch (error) {
+			alert('Register failed. Please check your credentials.');
 		}
 	};
 
@@ -277,7 +278,11 @@ function App() {
 												onChange={handleLoginChange}
 												required
 											/>
-											<button type="submit" className="wds-button">Увайсці</button>
+											{isLoggedIn ? (
+												<button disabled type="submit" className="wds-button">Увайсці</button>
+											) : (
+												<button type="submit" className="wds-button">Увайсці</button>
+											)}
 										</form>
 									</div>
 								} />
@@ -301,7 +306,11 @@ function App() {
 												onChange={handleRegisterChange}
 												required
 											/>
-											<button type="submit" className="wds-button">Зарэгістравацца</button>
+											{isLoggedIn ? (
+												<button disabled type="submit" className="wds-button">Зарэгістравацца</button>
+											) : (
+												<button type="submit" className="wds-button">Зарэгістравацца</button>
+											)}
 										</form>
 									</div>
 								} />

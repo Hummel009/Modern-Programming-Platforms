@@ -8,7 +8,7 @@ object AuthDao {
 	fun initTable() {
 		val sql = """
 		CREATE TABLE IF NOT EXISTS users (
-			username VARCHAR(1024) NOT NULL,
+			username VARCHAR(255) UNIQUE NOT NULL,
 			password VARCHAR(1024) NOT NULL
 		)
 		""".trimIndent()
@@ -20,15 +20,19 @@ object AuthDao {
 		}
 	}
 
-	fun addUser(username: String, hashedPassword: String) {
+	fun addUser(username: String, hashedPassword: String): Boolean {
 		val sql = "INSERT INTO users (username, password) VALUES (?, ?)"
-		try {
+		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setString(1, username)
 			pstmt.setString(2, hashedPassword)
 			pstmt.executeUpdate()
+
+			true
 		} catch (e: SQLException) {
 			e.printStackTrace()
+
+			false
 		}
 	}
 

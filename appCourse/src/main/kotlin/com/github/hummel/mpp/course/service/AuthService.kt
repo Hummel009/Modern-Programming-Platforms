@@ -5,12 +5,13 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.github.hummel.mpp.course.dao.AuthDao
 import com.github.hummel.mpp.course.entity.User
+import com.sun.org.apache.xpath.internal.operations.Bool
 
 object AuthService {
-	fun addUser(user: User) {
+	fun addUser(user: User): Boolean {
 		val hashedPassword = BCrypt.withDefaults().hashToString(12, user.password.toCharArray())
 
-		AuthDao.addUser(user.username, hashedPassword)
+		return AuthDao.addUser(user.username, hashedPassword)
 	}
 
 	fun isValidToken(token: String?): Boolean {
