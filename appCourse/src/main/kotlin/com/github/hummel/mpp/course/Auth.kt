@@ -3,13 +3,13 @@ package com.github.hummel.mpp.course
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.github.hummel.mpp.course.dao.AuthDao
 import com.github.hummel.mpp.course.entity.User
-
-val accounts = mutableMapOf<String, String>()
 
 fun addUser(username: String, password: String) {
 	val hashedPassword = BCrypt.withDefaults().hashToString(12, password.toCharArray())
-	accounts[username] = hashedPassword
+
+	AuthDao.addUser(username, hashedPassword)
 }
 
 fun isValidToken(token: String?): Boolean {
@@ -31,9 +31,9 @@ fun isValidUser(user: User): Boolean {
 }
 
 fun isValidUser(username: String, password: String): Boolean {
-	val hashedPassword = accounts[username] ?: return false
+	val user = AuthDao.findUserByUsername(username) ?: return false
 
-	return BCrypt.verifyer().verify(password.toCharArray(), hashedPassword).verified
+	return BCrypt.verifyer().verify(password.toCharArray(), user.password).verified
 }
 
 fun generateToken(user: User): String = JWT.create()

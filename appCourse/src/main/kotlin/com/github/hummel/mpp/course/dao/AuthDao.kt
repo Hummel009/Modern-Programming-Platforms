@@ -1,0 +1,49 @@
+package com.github.hummel.mpp.course.dao
+
+import com.github.hummel.mpp.course.connection
+import com.github.hummel.mpp.course.entity.User
+import java.sql.SQLException
+
+object AuthDao {
+	fun initTable() {
+		val sql = """
+		CREATE TABLE IF NOT EXISTS users (
+			username VARCHAR(1024) NOT NULL,
+			password VARCHAR(1024) NOT NULL
+		)
+		""".trimIndent()
+
+		try {
+			connection.createStatement().execute(sql)
+		} catch (e: SQLException) {
+			e.printStackTrace()
+		}
+	}
+
+	fun addUser(username: String, hashedPassword: String) {
+		val sql = "INSERT INTO users (username, password) VALUES (?, ?)"
+		try {
+			val pstmt = connection.prepareStatement(sql)
+			pstmt.setString(1, username)
+			pstmt.setString(2, hashedPassword)
+			pstmt.executeUpdate()
+		} catch (e: SQLException) {
+			e.printStackTrace()
+		}
+	}
+
+	fun findUserByUsername(username: String): User? {
+		val sql = "SELECT * FROM users WHERE username = ?"
+		try {
+			val pstmt = connection.prepareStatement(sql)
+			pstmt.setString(1, username)
+			val rs = pstmt.executeQuery()
+			if (rs.next()) {
+				return User(rs.getString("username"), rs.getString("password"))
+			}
+		} catch (e: SQLException) {
+			e.printStackTrace()
+		}
+		return null
+	}
+}

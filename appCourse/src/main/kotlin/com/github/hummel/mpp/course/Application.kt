@@ -1,6 +1,7 @@
 package com.github.hummel.mpp.course
 
 import com.github.hummel.mpp.course.controller.configureRouting
+import com.github.hummel.mpp.course.dao.AuthDao
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.server.application.*
@@ -8,6 +9,10 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.cors.routing.CORS
 import java.io.File
+import java.sql.Connection
+import java.sql.DriverManager
+
+lateinit var connection: Connection
 
 fun main() {
 	val uploadsDir = File("uploads")
@@ -28,5 +33,12 @@ fun Application.module() {
 		allowMethod(HttpMethod.Get)
 		allowHeader(HttpHeaders.ContentType)
 	}
+
+	Class.forName("org.postgresql.Driver")
+
+	connection = DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "root", "")
+
+	AuthDao.initTable()
+
 	configureRouting()
 }

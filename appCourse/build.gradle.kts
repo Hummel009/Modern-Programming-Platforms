@@ -19,6 +19,9 @@ dependencies {
 
 	implementation("com.auth0:java-jwt:latest.release")
 	implementation("at.favre.lib:bcrypt:latest.release")
+
+	implementation("org.postgresql:postgresql:latest.release")
+	implementation("com.h2database:h2:latest.release")
 }
 
 java {
