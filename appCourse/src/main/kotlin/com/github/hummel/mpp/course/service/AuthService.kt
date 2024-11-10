@@ -5,7 +5,6 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.github.hummel.mpp.course.dao.AuthDao
 import com.github.hummel.mpp.course.entity.User
-import com.sun.org.apache.xpath.internal.operations.Bool
 
 object AuthService {
 	fun addUser(user: User): Boolean {
@@ -35,8 +34,7 @@ object AuthService {
 	fun generateToken(user: User): String = JWT.create().apply {
 		withClaim("username", user.username)
 		withClaim("password", user.password)
-		sign(Algorithm.HMAC256("secret"))
-	}.toString()
+	}.sign(Algorithm.HMAC256("secret"))
 
 	private fun isValidUser(username: String, password: String): Boolean {
 		val user = AuthDao.findUserByUsername(username) ?: return false

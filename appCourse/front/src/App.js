@@ -32,10 +32,11 @@ function App() {
 			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
 
 			await axios.post('http://localhost:2999/token', {
-			token: token
+				token: token
 			});
 
 			setIsLoggedIn(true);
+
 			fetchTasks();
 		} catch (error) {
 			console.error("Error using cookie token:", error);
@@ -258,34 +259,6 @@ function App() {
 										<button onClick={clearTasks} className="wds-button">Очистить список задач</button>
 									</div>
 								}/>
-								<Route path="/login" element={
-									<div>
-										<h1>
-											<span id="lang-enter">Уваход</span>
-										</h1>
-										<form onSubmit={handleLoginSubmit} className="main-fieldset">
-											<input
-												type="text"
-												name="username"
-												placeholder="Імя ўдзельніка"
-												onChange={handleLoginChange}
-												required
-											/>
-											<input
-												type="password"
-												name="password"
-												placeholder="Пароль"
-												onChange={handleLoginChange}
-												required
-											/>
-											{isLoggedIn ? (
-												<button disabled type="submit" className="wds-button">Увайсці</button>
-											) : (
-												<button type="submit" className="wds-button">Увайсці</button>
-											)}
-										</form>
-									</div>
-								} />
 								<Route path="/register" element={
 									<div>
 										<h1>
@@ -310,6 +283,34 @@ function App() {
 												<button disabled type="submit" className="wds-button">Зарэгістравацца</button>
 											) : (
 												<button type="submit" className="wds-button">Зарэгістравацца</button>
+											)}
+										</form>
+									</div>
+								} />
+								<Route path="/login" element={
+									<div>
+										<h1>
+											<span id="lang-enter">Уваход</span>
+										</h1>
+										<form onSubmit={handleLoginSubmit} className="main-fieldset">
+											<input
+												type="text"
+												name="username"
+												placeholder="Імя ўдзельніка"
+												onChange={handleLoginChange}
+												required
+											/>
+											<input
+												type="password"
+												name="password"
+												placeholder="Пароль"
+												onChange={handleLoginChange}
+												required
+											/>
+											{isLoggedIn ? (
+												<button disabled type="submit" className="wds-button">Увайсці</button>
+											) : (
+												<button type="submit" className="wds-button">Увайсці</button>
 											)}
 										</form>
 									</div>
