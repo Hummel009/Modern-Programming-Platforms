@@ -6,7 +6,6 @@ export const Login = (
 		setIsLoggedIn,
 		loginData,
 		setLoginData,
-		fetchTasks,
 		fetchUserData
 	}
 ) => {
@@ -22,7 +21,6 @@ export const Login = (
 			document.cookie = `jwt=${response.data}; path=/; secure=false; SameSite=Lax`;
 			setIsLoggedIn(true);
 
-			fetchTasks();
 			fetchUserData();
 		} catch (error) {
 			alert('Login failed. Please check your credentials.');

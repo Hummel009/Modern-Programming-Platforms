@@ -2,34 +2,24 @@ package com.github.hummel.mpp.course.controller
 
 import com.github.hummel.mpp.course.dto.ChangePasswordRequest
 import com.github.hummel.mpp.course.dto.ChangeUsernameRequest
-import com.github.hummel.mpp.course.dto.EditTaskRequest
-import com.github.hummel.mpp.course.dto.FilterTasksRequest
 import com.github.hummel.mpp.course.dto.LoginRequest
 import com.github.hummel.mpp.course.dto.ProfileRequest
 import com.github.hummel.mpp.course.dto.RegisterRequest
 import com.github.hummel.mpp.course.dto.TokenRequest
-import com.github.hummel.mpp.course.entity.Order
 import com.github.hummel.mpp.course.service.AuthService
+import com.github.hummel.mpp.course.service.MainService
 import com.github.hummel.mpp.course.service.ProfileService
 import com.google.gson.Gson
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.PartData
-import io.ktor.http.content.forEachPart
-import io.ktor.http.content.streamProvider
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
-import io.ktor.server.request.receiveMultipart
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
-import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import java.io.File
 
-val tasks = mutableMapOf<Int, Order>()
 val gson = Gson()
 
 fun Application.configureRouting() {
@@ -135,7 +125,7 @@ fun Application.configureRouting() {
 
 				val request = gson.fromJson(jsonRequest, ChangePasswordRequest::class.java)
 				val token = AuthService.decomposeToken(request.token)
-				val newPassword = request.setNewPassword
+				val newPassword = request.newPassword
 
 				val username = token?.username
 				val password = token?.password
@@ -152,86 +142,21 @@ fun Application.configureRouting() {
 			}
 		}
 
-		route("tasks") {
+		route("books") {
 			get {
-				val jsonResponse = gson.toJson(tasks)
+				val books = MainService.getAllBooks()
+
+				val jsonResponse = gson.toJson(books)
 
 				call.respond(jsonResponse)
 			}
 
-			delete("/clear") {
-				tasks.clear()
+			get("/authors") {
+				val authors = MainService.getAllAuthors()
 
-				val jsonResponse = gson.toJson(tasks)
-
-				call.respond(jsonResponse)
-			}
-
-			post("/filter") {
-				val jsonRequest = call.receiveText()
-
-				val request = gson.fromJson(jsonRequest, FilterTasksRequest::class.java)
-				val filter = request.filter
-
-				val filteredTasks = tasks.asSequence().filter {
-					it.value.author == filter || filter == "all"
-				}.associate { it.key to it.value }
-
-				val jsonResponse = gson.toJson(filteredTasks)
+				val jsonResponse = gson.toJson(authors)
 
 				call.respond(jsonResponse)
-			}
-
-			put("/edit") {
-				val jsonRequest = call.receiveText()
-
-				val request = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
-				val index = request.index
-				val title = request.title
-
-				tasks[index]!!.title = title
-
-				val jsonResponse = gson.toJson(tasks)
-
-				call.respond(jsonResponse)
-			}
-
-			post("/add") {
-				val multipart = call.receiveMultipart()
-				var title = ""
-				var status = ""
-				var dueDate = ""
-				var fileName: String? = null
-
-				multipart.forEachPart { part ->
-					when (part) {
-						is PartData.FormItem -> {
-							when (part.name) {
-								"title" -> title = part.value
-								"status" -> status = part.value
-								"dueDate" -> dueDate = part.value
-							}
-						}
-
-						is PartData.FileItem -> {
-							fileName = part.originalFileName
-							val file = File("uploads/${System.currentTimeMillis()}-$fileName")
-							part.streamProvider().use { input ->
-								file.outputStream().buffered().use { output ->
-									input.copyTo(output)
-								}
-							}
-						}
-
-						is PartData.BinaryChannelItem -> {}
-						is PartData.BinaryItem -> {}
-					}
-					part.dispose()
-				}
-
-				tasks.put(getNextAvailableId(), Order(title, status, dueDate, "fileName"))
-
-				call.respond(HttpStatusCode.OK)
 			}
 		}
 
@@ -240,5 +165,3 @@ fun Application.configureRouting() {
 		}
 	}
 }
-
-fun getNextAvailableId(): Int = if (tasks.isEmpty()) 0 else tasks.keys.max() + 1

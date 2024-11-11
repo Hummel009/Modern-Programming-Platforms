@@ -6,7 +6,6 @@ export const Register = (
 		setIsLoggedIn,
 		registerData,
 		setRegisterData,
-		fetchTasks,
 		fetchUserData
 	}
 ) => {
@@ -22,7 +21,6 @@ export const Register = (
 			document.cookie = `jwt=${response.data}; path=/; secure=false; SameSite=Lax`;
 			setIsLoggedIn(true);
 
-			fetchTasks();
 			fetchUserData();
 		} catch (error) {
 			alert('Register failed. Please check your credentials.');

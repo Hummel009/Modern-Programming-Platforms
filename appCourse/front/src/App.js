@@ -15,13 +15,8 @@ import { Cart } from './components/PageCart.js'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
-	const [tasks, setTasks] = useState(new Map());
-	const [formData, setFormData] = useState({
-		title: '',
-		status: 'pending',
-		dueDate: '',
-		file: null,
-	});
+	const [books, setBooks] = useState([]);
+	const [authors, setAuthors] = useState([]);
 
 	const [loginData, setLoginData] = useState({
 		username: '',
@@ -53,7 +48,7 @@ function App() {
 
 			setIsLoggedIn(true);
 
-			fetchTasks();
+			fetchBooks();
 		} catch (error) {
 		}
 	}, []);
@@ -64,7 +59,7 @@ function App() {
 
 			setIsLoggedIn(false);
 
-			fetchTasks();
+			fetchBooks();
 		} catch (error) {
 			alert('Error occurred while trying to delete the cookie.');
 		}
@@ -90,55 +85,20 @@ function App() {
 		}
 	};
 
-	const fetchTasks = async () => {
-		const response = await axios.get('http://localhost:2999/tasks');
-		const tasksMap = new Map(Object.entries(response.data));
-		setTasks(tasksMap);
+	const fetchBooks = async () => {
+		const response1 = await axios.get('http://localhost:2999/books');
+		setBooks(response1.data);
+
+		const response2 = await axios.get('http://localhost:2999/books/authors');
+		setAuthors(response2.data);
 	};
 
-	const clearTasks = async () => {
-		const response = await axios.delete('http://localhost:2999/tasks/clear');
-		const tasksMap = new Map(Object.entries(response.data));
-		setTasks(tasksMap);
-	};
-
-	const filterTasks = async (filter) => {
-		const response = await axios.post('http://localhost:2999/tasks/filter',
+	const filterBooks = async (filter) => {
+		const response = await axios.post('http://localhost:2999/books/filter',
 		{
 			filter: filter
 		});
-		const tasksMap = new Map(Object.entries(response.data));
-		setTasks(tasksMap);
-	};
-
-	const editTask = async (index) => {
-		const taskToEdit = tasks.get(index);
-		const title = prompt("Введите новое название задачи:", taskToEdit.title);
-
-		if (title) {
-			const response = await axios.put('http://localhost:2999/tasks/edit',
-			{
-				index: index, title: title
-			});
-			const tasksMap = new Map(Object.entries(response.data));
-			setTasks(tasksMap);
-		}
-	};
-
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		const form = new FormData();
-		for (const key in formData) {
-			form.append(key, formData[key]);
-		}
-		await axios.post('http://localhost:2999/tasks/add',
-		form,
-		{
-			headers: {
-				'Content-Type': 'multipart/form-data',
-			},
-		});
-		fetchTasks();
+		setBooks(response.data);
 	};
 
 	return (
@@ -155,84 +115,32 @@ function App() {
 								<Route path="/" element={
 									<div>
 										<h1>
-											<span id="lang-enter">Список задач</span>
+											<span id="lang-enter">Галоўная</span>
 										</h1>
-										<form onSubmit={handleSubmit} className="main-fieldset">
-											<legend id="lang-translate">Добавить задачу</legend>
-											<input
-												type="text"
-												name="title"
-												placeholder="Название задачи"
-												required
-												onChange={(e) => {
-													setFormData({
-														...formData,
-														[e.target.name]: e.target.value
-													});
-												}}
-											/>
-											<select name="status"
-												onChange={(e) => {
-													setFormData({
-														...formData,
-														[e.target.name]: e.target.value
-													});
-												}}>
-												<option value="pending">В ожидании</option>
-												<option value="completed">Завершено</option>
-											</select>
-											<input
-												type="date"
-												name="dueDate"
-												required
-												onChange={(e) => {
-													setFormData({
-														...formData,
-														[e.target.name]: e.target.value
-													});
-												}}
-											/>
-											<input
-												type="file"
-												name="file"
-												onChange={(e) => {
-													setFormData({
-														...formData,
-														file: e.target.files[0]
-													});
-												}}
-											/>
-											<button type="submit" className="wds-button">Добавить задачу</button>
-										</form>
 
-										<h2>Фильтровать задачи</h2>
-										<select onChange={(e) => filterTasks(e.target.value)}>
+										<div>
+											Тут вы можаце знайсці вельмі многа розных кніг.
+										</div>
+
+										<br/>
+
+										<select onChange={(e) => filterBooks(e.target.value)}>
 											<option value="all">Все</option>
 											<option value="pending">В ожидании</option>
 											<option value="completed">Завершено</option>
 										</select>
 
 										<ul>
-											{Array.from(tasks).map(([id, task]) => {
-												return (
-													<li key={id}>
-														<strong>{task.title}</strong> - {task.status}
-														{task.file && (
-															<div>
-																<br />
-																Прикрепленный файл: {task.file}
-															</div>
-														)}
-														<span id="fltright">
-															<button onClick={() => editTask(id)}>Редактировать</button>
-														</span>
-														<span id="fltright">Дата: {task.dueDate}</span>
-													</li>
-												);
-											})}
+											{books.map(book => (
+												<li key={book.id}>
+													<strong>{book.title} </strong>
+													<span>Author: {book.author} </span>
+													<span>Description: {book.description} </span>
+													<span>Price: {book.price} </span>
+													<span>Img Path: {book.imgPath} </span>
+												</li>
+											))}
 										</ul>
-
-										<button onClick={clearTasks} className="wds-button">Очистить список задач</button>
 									</div>
 								}/>
 								<Route path="/register" element={
@@ -241,7 +149,7 @@ function App() {
 										setIsLoggedIn = {setIsLoggedIn}
 										registerData = {registerData}
 										setRegisterData = {setRegisterData}
-										fetchTasks = {fetchTasks}
+										fetchBooks = {fetchBooks}
 										fetchUserData = {fetchUserData}
 									/>
 								} />
@@ -251,7 +159,7 @@ function App() {
 										setIsLoggedIn = {setIsLoggedIn}
 										loginData = {loginData}
 										setLoginData = {setLoginData}
-										fetchTasks = {fetchTasks}
+										fetchBooks = {fetchBooks}
 										fetchUserData = {fetchUserData}
 									/>
 								} />
