@@ -91,19 +91,19 @@ function App() {
 	};
 
 	const fetchTasks = async () => {
-		const response = await axios.get('http://localhost:2999/get-tasks');
+		const response = await axios.get('http://localhost:2999/tasks');
 		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
 	};
 
 	const clearTasks = async () => {
-		const response = await axios.delete('http://localhost:2999/clear-tasks');
+		const response = await axios.delete('http://localhost:2999/tasks/clear');
 		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
 	};
 
 	const filterTasks = async (filter) => {
-		const response = await axios.post('http://localhost:2999/filter-tasks',
+		const response = await axios.post('http://localhost:2999/tasks/filter',
 		{
 			filter: filter
 		});
@@ -116,7 +116,7 @@ function App() {
 		const title = prompt("Введите новое название задачи:", taskToEdit.title);
 
 		if (title) {
-			const response = await axios.put('http://localhost:2999/edit-task',
+			const response = await axios.put('http://localhost:2999/tasks/edit',
 			{
 				index: index, title: title
 			});
@@ -131,7 +131,7 @@ function App() {
 		for (const key in formData) {
 			form.append(key, formData[key]);
 		}
-		await axios.post('http://localhost:2999/add-task',
+		await axios.post('http://localhost:2999/tasks/add',
 		form,
 		{
 			headers: {

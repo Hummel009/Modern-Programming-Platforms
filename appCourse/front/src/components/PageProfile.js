@@ -18,7 +18,7 @@ export const Profile = (
 			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
 			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
 
-			await axios.post('http://localhost:2999/change-username',
+			await axios.post('http://localhost:2999/profile/username',
 			{
 				token: token,
 				newUsername: newUsername
@@ -38,7 +38,7 @@ export const Profile = (
 			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
 			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
 
-			await axios.post('http://localhost:2999/change-password',
+			await axios.post('http://localhost:2999/profile/password',
 			{
 				token: token,
 				newPassword: newPassword

@@ -25,6 +25,7 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
+import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import java.io.File
 
@@ -85,149 +86,153 @@ fun Application.configureRouting() {
 			}
 		}
 
-		post("/profile") {
-			val jsonRequest = call.receiveText()
+		route("/profile") {
+			post {
+				val jsonRequest = call.receiveText()
 
-			val request = gson.fromJson(jsonRequest, ProfileRequest::class.java)
-			val token = AuthService.decomposeToken(request.token)
+				val request = gson.fromJson(jsonRequest, ProfileRequest::class.java)
+				val token = AuthService.decomposeToken(request.token)
 
-			val username = token?.username
-			val password = token?.password
+				val username = token?.username
+				val password = token?.password
 
-			if (AuthService.areCredentialsValid(username, password)) {
-				val user = ProfileService.getUserData(username!!)
+				if (AuthService.areCredentialsValid(username, password)) {
+					val user = ProfileService.getUserData(username!!)
 
-				if (user != null) {
-					call.respond(gson.toJson(user))
+					if (user != null) {
+						call.respond(gson.toJson(user))
+					} else {
+						call.respond(HttpStatusCode.Unauthorized)
+					}
 				} else {
 					call.respond(HttpStatusCode.Unauthorized)
 				}
-			} else {
-				call.respond(HttpStatusCode.Unauthorized)
 			}
-		}
 
-		post("/change-username") {
-			val jsonRequest = call.receiveText()
+			post("/username") {
+				val jsonRequest = call.receiveText()
 
-			val request = gson.fromJson(jsonRequest, ChangeUsernameRequest::class.java)
-			val token = AuthService.decomposeToken(request.token)
-			val newUsername = request.newUsername
+				val request = gson.fromJson(jsonRequest, ChangeUsernameRequest::class.java)
+				val token = AuthService.decomposeToken(request.token)
+				val newUsername = request.newUsername
 
-			val username = token?.username
-			val password = token?.password
+				val username = token?.username
+				val password = token?.password
 
-			if (AuthService.areCredentialsValid(username, password)) {
-				if (ProfileService.changeUserUsername(username!!, newUsername)) {
-					call.respond(HttpStatusCode.OK)
-				} else {
-					call.respond(HttpStatusCode.BadRequest)
-				}
-			} else {
-				call.respond(HttpStatusCode.Unauthorized)
-			}
-		}
-
-		post("/change-password") {
-			val jsonRequest = call.receiveText()
-
-			val request = gson.fromJson(jsonRequest, ChangePasswordRequest::class.java)
-			val token = AuthService.decomposeToken(request.token)
-			val newPassword = request.setNewPassword
-
-			val username = token?.username
-			val password = token?.password
-
-			if (AuthService.areCredentialsValid(username, password)) {
-				if (ProfileService.changeUserPassword(username!!, newPassword)) {
-					call.respond(HttpStatusCode.OK)
-				} else {
-					call.respond(HttpStatusCode.BadRequest)
-				}
-			} else {
-				call.respond(HttpStatusCode.Unauthorized)
-			}
-		}
-
-		get("/get-tasks") {
-			val jsonResponse = gson.toJson(tasks)
-
-			call.respond(jsonResponse)
-		}
-
-		delete("/clear-tasks") {
-			tasks.clear()
-
-			val jsonResponse = gson.toJson(tasks)
-
-			call.respond(jsonResponse)
-		}
-
-		post("/filter-tasks") {
-			val jsonRequest = call.receiveText()
-
-			val request = gson.fromJson(jsonRequest, FilterTasksRequest::class.java)
-			val filter = request.filter
-
-			val filteredTasks = tasks.asSequence().filter {
-				it.value.author == filter || filter == "all"
-			}.associate { it.key to it.value }
-
-			val jsonResponse = gson.toJson(filteredTasks)
-
-			call.respond(jsonResponse)
-		}
-
-		put("/edit-task") {
-			val jsonRequest = call.receiveText()
-
-			val request = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
-			val index = request.index
-			val title = request.title
-
-			tasks[index]!!.title = title
-
-			val jsonResponse = gson.toJson(tasks)
-
-			call.respond(jsonResponse)
-		}
-
-		post("/add-task") {
-			val multipart = call.receiveMultipart()
-			var title = ""
-			var status = ""
-			var dueDate = ""
-			var fileName: String? = null
-
-			multipart.forEachPart { part ->
-				when (part) {
-					is PartData.FormItem -> {
-						when (part.name) {
-							"title" -> title = part.value
-							"status" -> status = part.value
-							"dueDate" -> dueDate = part.value
-						}
+				if (AuthService.areCredentialsValid(username, password)) {
+					if (ProfileService.changeUserUsername(username!!, newUsername)) {
+						call.respond(HttpStatusCode.OK)
+					} else {
+						call.respond(HttpStatusCode.BadRequest)
 					}
+				} else {
+					call.respond(HttpStatusCode.Unauthorized)
+				}
+			}
 
-					is PartData.FileItem -> {
-						fileName = part.originalFileName
-						val file = File("uploads/${System.currentTimeMillis()}-$fileName")
-						part.streamProvider().use { input ->
-							file.outputStream().buffered().use { output ->
-								input.copyTo(output)
+			post("/password") {
+				val jsonRequest = call.receiveText()
+
+				val request = gson.fromJson(jsonRequest, ChangePasswordRequest::class.java)
+				val token = AuthService.decomposeToken(request.token)
+				val newPassword = request.setNewPassword
+
+				val username = token?.username
+				val password = token?.password
+
+				if (AuthService.areCredentialsValid(username, password)) {
+					if (ProfileService.changeUserPassword(username!!, newPassword)) {
+						call.respond(HttpStatusCode.OK)
+					} else {
+						call.respond(HttpStatusCode.BadRequest)
+					}
+				} else {
+					call.respond(HttpStatusCode.Unauthorized)
+				}
+			}
+		}
+
+		route("tasks") {
+			get {
+				val jsonResponse = gson.toJson(tasks)
+
+				call.respond(jsonResponse)
+			}
+
+			delete("/clear") {
+				tasks.clear()
+
+				val jsonResponse = gson.toJson(tasks)
+
+				call.respond(jsonResponse)
+			}
+
+			post("/filter") {
+				val jsonRequest = call.receiveText()
+
+				val request = gson.fromJson(jsonRequest, FilterTasksRequest::class.java)
+				val filter = request.filter
+
+				val filteredTasks = tasks.asSequence().filter {
+					it.value.author == filter || filter == "all"
+				}.associate { it.key to it.value }
+
+				val jsonResponse = gson.toJson(filteredTasks)
+
+				call.respond(jsonResponse)
+			}
+
+			put("/edit") {
+				val jsonRequest = call.receiveText()
+
+				val request = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
+				val index = request.index
+				val title = request.title
+
+				tasks[index]!!.title = title
+
+				val jsonResponse = gson.toJson(tasks)
+
+				call.respond(jsonResponse)
+			}
+
+			post("/add") {
+				val multipart = call.receiveMultipart()
+				var title = ""
+				var status = ""
+				var dueDate = ""
+				var fileName: String? = null
+
+				multipart.forEachPart { part ->
+					when (part) {
+						is PartData.FormItem -> {
+							when (part.name) {
+								"title" -> title = part.value
+								"status" -> status = part.value
+								"dueDate" -> dueDate = part.value
 							}
 						}
+
+						is PartData.FileItem -> {
+							fileName = part.originalFileName
+							val file = File("uploads/${System.currentTimeMillis()}-$fileName")
+							part.streamProvider().use { input ->
+								file.outputStream().buffered().use { output ->
+									input.copyTo(output)
+								}
+							}
+						}
+
+						is PartData.BinaryChannelItem -> {}
+						is PartData.BinaryItem -> {}
 					}
-
-					is PartData.BinaryChannelItem -> {}
-					is PartData.BinaryItem -> {}
+					part.dispose()
 				}
-				part.dispose()
+
+				tasks.put(getNextAvailableId(), Order(title, status, dueDate, "fileName"))
+
+				call.respond(HttpStatusCode.OK)
 			}
-
-			tasks.put(getNextAvailableId(), Order(title, status, dueDate, "fileName"))
-
-			call.respond(HttpStatusCode.OK)
 		}
 
 		get("{...}") {
