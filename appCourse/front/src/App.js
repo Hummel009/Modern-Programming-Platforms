@@ -5,12 +5,13 @@ import React, {
 } from 'react';
 import axios from 'axios';
 import './App.css'
+import { RightRail } from './components/RightRail.js'
 import { GlobalNavigation } from './components/NavGlobal.js'
 import { LocalNavigation } from './components/NavLocal.js'
-import { Profile } from './components/PageProfile.js'
-import { Login } from './components/PageLogin.js'
 import { Register } from './components/PageRegister.js'
-import { RightRail } from './components/RightRail.js'
+import { Login } from './components/PageLogin.js'
+import { Profile } from './components/PageProfile.js'
+import { Cart } from './components/PageCart.js'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -212,13 +213,9 @@ function App() {
 	};
 
 	const handleChange = (e) => {
-		const {
-			name,
-			value
-		} = e.target;
 		setFormData({
 			...formData,
-			[name]: value
+			[e.target.name]: e.target.value
 		});
 	};
 
@@ -333,11 +330,8 @@ function App() {
 									/>
 								} />
 								<Route path="/cart" element={
-									<div>
-										<h1>
-											<span id="lang-enter">Кош</span>
-										</h1>
-									</div>
+									<Cart
+									/>
 								} />
 							</Routes>
 						</main>
