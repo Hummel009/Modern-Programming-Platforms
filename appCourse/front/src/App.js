@@ -212,20 +212,6 @@ function App() {
 		fetchTasks();
 	};
 
-	const handleChange = (e) => {
-		setFormData({
-			...formData,
-			[e.target.name]: e.target.value
-		});
-	};
-
-	const handleFileChange = (e) => {
-		setFormData({
-			...formData,
-			file: e.target.files[0]
-		});
-	};
-
 	return (
 		<Router>
 			<div className="page-background"></div>
@@ -251,9 +237,20 @@ function App() {
 												name="title"
 												placeholder="Название задачи"
 												required
-												onChange={handleChange}
+												onChange={(e) => {
+													setFormData({
+														...formData,
+														[e.target.name]: e.target.value
+													});
+												}}
 											/>
-											<select name="status" onChange={handleChange}>
+											<select name="status"
+												onChange={(e) => {
+													setFormData({
+														...formData,
+														[e.target.name]: e.target.value
+													});
+												}}>
 												<option value="pending">В ожидании</option>
 												<option value="completed">Завершено</option>
 											</select>
@@ -261,12 +258,22 @@ function App() {
 												type="date"
 												name="dueDate"
 												required
-												onChange={handleChange}
+												onChange={(e) => {
+													setFormData({
+														...formData,
+														[e.target.name]: e.target.value
+													});
+												}}
 											/>
 											<input
 												type="file"
 												name="file"
-												onChange={handleFileChange}
+												onChange={(e) => {
+													setFormData({
+														...formData,
+														file: e.target.files[0]
+													});
+												}}
 											/>
 											<button type="submit" className="wds-button">Добавить задачу</button>
 										</form>
@@ -303,11 +310,11 @@ function App() {
 								}/>
 								<Route path="/register" element={
 									<Register
-                                        isLoggedIn = {isLoggedIn}
-                                        handleRegisterSubmit = {handleRegisterSubmit}
-                                        setRegisterData = {setRegisterData}
-                                        registerData = {registerData}
-                                    />
+										isLoggedIn = {isLoggedIn}
+										handleRegisterSubmit = {handleRegisterSubmit}
+										setRegisterData = {setRegisterData}
+										registerData = {registerData}
+									/>
 								} />
 								<Route path="/login" element={
 									<Login
