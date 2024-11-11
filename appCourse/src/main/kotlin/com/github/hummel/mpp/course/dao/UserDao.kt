@@ -55,7 +55,7 @@ object UserDao {
 		return null
 	}
 
-	fun changeUserUsername(username: String, newUsername: String): Boolean {
+	fun updateUserUsername(username: String, newUsername: String): Boolean {
 		val sql = "UPDATE users SET username = ? WHERE username = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
@@ -68,7 +68,7 @@ object UserDao {
 		}
 	}
 
-	fun changeUserPassword(username: String, newPassword: String): Boolean {
+	fun updateUserPassword(username: String, newPassword: String): Boolean {
 		val sql = "UPDATE users SET password = ? WHERE username = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)

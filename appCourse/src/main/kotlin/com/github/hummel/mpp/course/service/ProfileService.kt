@@ -1,25 +1,18 @@
 package com.github.hummel.mpp.course.service
 
+import at.favre.lib.crypto.bcrypt.BCrypt
 import com.github.hummel.mpp.course.dao.UserDao
-import com.github.hummel.mpp.course.entity.Token
 import com.github.hummel.mpp.course.entity.User
 
 object ProfileService {
-	fun getUserData(token: Token): User? {
-		val username = token.username
+	fun getUserData(username: String): User? = UserDao.findUserByUsername(username)
 
-		return UserDao.findUserByUsername(username)
-	}
+	fun changeUserUsername(username: String, newUsername: String): Boolean =
+		UserDao.updateUserUsername(username, newUsername)
 
-	fun updateUserUsername(token: Token, newUsername: String): Boolean {
-		val username = token.username
+	fun changeUserPassword(username: String, newPassword: String): Boolean {
+		val hashedPassword = BCrypt.withDefaults().hashToString(12, newPassword.toCharArray())
 
-		return UserDao.changeUserUsername(username, newUsername)
-	}
-
-	fun updateUserPassword(token: Token, newPassword: String): Boolean {
-		val username = token.username
-
-		return UserDao.changeUserPassword(username, newPassword)
+		return UserDao.updateUserPassword(username, hashedPassword)
 	}
 }

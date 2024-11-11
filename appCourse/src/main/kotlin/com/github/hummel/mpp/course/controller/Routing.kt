@@ -34,12 +34,14 @@ fun Application.configureRouting() {
 			val jsonRequest = call.receiveText()
 
 			val request = gson.fromJson(jsonRequest, UserRequest::class.java)
-			val user = request.toEntity()
 
-			val success = AuthService.registerUser(user)
+			val username = request.username
+			val password = request.password
+
+			val success = AuthService.registerUser(username, password)
 
 			if (success) {
-				val textResponse = AuthService.generateToken(user)
+				val textResponse = AuthService.generateToken(username, password)
 
 				call.respond(textResponse)
 			} else {
@@ -51,10 +53,12 @@ fun Application.configureRouting() {
 			val jsonRequest = call.receiveText()
 
 			val request = gson.fromJson(jsonRequest, UserRequest::class.java)
-			val user = request.toEntity()
 
-			if (AuthService.isValidUser(user)) {
-				val textResponse = AuthService.generateToken(user)
+			val username = request.username
+			val password = request.password
+
+			if (AuthService.areCredentialsValid(username, password)) {
+				val textResponse = AuthService.generateToken(username, password)
 
 				call.respond(textResponse)
 			} else {
@@ -68,7 +72,10 @@ fun Application.configureRouting() {
 			val request = gson.fromJson(jsonRequest, TokenRequest::class.java)
 			val token = AuthService.decomposeToken(request.token)
 
-			if (AuthService.isValidUser(token)) {
+			val username = token?.username
+			val password = token?.password
+
+			if (AuthService.areCredentialsValid(username, password)) {
 				call.respond(HttpStatusCode.OK)
 			} else {
 				call.respond(HttpStatusCode.Unauthorized)
@@ -81,12 +88,15 @@ fun Application.configureRouting() {
 			val request = gson.fromJson(jsonRequest, TokenRequest::class.java)
 			val token = AuthService.decomposeToken(request.token)
 
-			if (AuthService.isValidUser(token)) {
-				val user = ProfileService.getUserData(token!!)
+			val username = token?.username
+			val password = token?.password
 
-				user?.let {
-					call.respond(gson.toJson(it))
-				} ?: run {
+			if (AuthService.areCredentialsValid(username, password)) {
+				val user = ProfileService.getUserData(username!!)
+
+				if (user != null) {
+					call.respond(gson.toJson(user))
+				} else {
 					call.respond(HttpStatusCode.Unauthorized)
 				}
 			} else {
@@ -101,8 +111,11 @@ fun Application.configureRouting() {
 			val token = AuthService.decomposeToken(request.token)
 			val newUsername = request.newCredential
 
-			if (AuthService.isValidUser(token)) {
-				if (ProfileService.updateUserUsername(token!!, newUsername)) {
+			val username = token?.username
+			val password = token?.password
+
+			if (AuthService.areCredentialsValid(username, password)) {
+				if (ProfileService.changeUserUsername(username!!, newUsername)) {
 					call.respond(HttpStatusCode.OK)
 				} else {
 					call.respond(HttpStatusCode.BadRequest)
@@ -119,8 +132,11 @@ fun Application.configureRouting() {
 			val token = AuthService.decomposeToken(request.token)
 			val newPassword = request.newCredential
 
-			if (AuthService.isValidUser(token)) {
-				if (ProfileService.updateUserPassword(token!!, newPassword)) {
+			val username = token?.username
+			val password = token?.password
+
+			if (AuthService.areCredentialsValid(username, password)) {
+				if (ProfileService.changeUserPassword(username!!, newPassword)) {
 					call.respond(HttpStatusCode.OK)
 				} else {
 					call.respond(HttpStatusCode.BadRequest)
