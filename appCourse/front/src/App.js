@@ -58,6 +58,22 @@ function App() {
 		}
 	}, []);
 
+	const deleteCookieToken = () => {
+		try {
+			document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+
+			setIsLoggedIn(false);
+
+			fetchTasks();
+		} catch (error) {
+			alert('Error occurred while trying to delete the cookie.');
+		}
+	}
+
+	useEffect(() => {
+		tryUseCookieToken()
+	}, [tryUseCookieToken]);
+
 	const fetchUserData = async () => {
 		try {
 			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
@@ -73,10 +89,6 @@ function App() {
 		} catch (error) {
 		}
 	};
-
-	useEffect(() => {
-		tryUseCookieToken()
-	}, [tryUseCookieToken]);
 
 	const fetchTasks = async () => {
 		const response = await axios.get('http://localhost:2999/get-tasks');
@@ -112,18 +124,6 @@ function App() {
 			setTasks(tasksMap);
 		}
 	};
-
-	const deleteCookieToken = () => {
-		try {
-			document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-
-			setIsLoggedIn(false);
-
-			fetchTasks();
-		} catch (error) {
-			alert('Error occurred while trying to delete the cookie.');
-		}
-	}
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
