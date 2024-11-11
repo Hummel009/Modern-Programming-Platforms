@@ -348,7 +348,7 @@ function App() {
 										</h1>
 										{isLoggedIn && userData.username ? (
 											<>
-												<div>Имя пользователя: {userData.username}</div>
+												<div>Імя ўдзельніка: {userData.username}</div>
 												<div>Баланс: {userData.balance}$</div>
 											</>
 										) : (
