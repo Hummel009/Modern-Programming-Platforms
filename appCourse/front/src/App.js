@@ -25,6 +25,11 @@ function App() {
 		password: ''
 	});
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const [userData, setUserData] = useState({
+		id: null,
+		username: '',
+		balance: 0
+	});
 
 	const tryUseCookieToken = useCallback(async () => {
 		try {
@@ -43,9 +48,30 @@ function App() {
 		}
 	}, []);
 
+	const fetchUserData = useCallback(async () => {
+		try {
+			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+
+			const response = await axios.post('http://localhost:2999/profile', {
+				token: token
+			});
+
+			const userData = response.data;
+			console.log("Данные пользователя:", userData);
+
+			setUserData(userData);
+		} catch (error) {
+			console.error("Ошибка при получении данных пользователя:", error);
+		}
+	}, []);
+
 	useEffect(() => {
+		if (window.location.pathname === '/profile') {
+			fetchUserData();
+		}
 		tryUseCookieToken()
-	}, [tryUseCookieToken]);
+	}, [tryUseCookieToken, fetchUserData]);
 
 	const fetchTasks = async () => {
 		const response = await axios.get('http://localhost:2999/get-tasks');
@@ -320,6 +346,14 @@ function App() {
 										<h1>
 											<span id="lang-enter">Профіль</span>
 										</h1>
+										{isLoggedIn && userData.username ? (
+											<>
+												<div>Имя пользователя: {userData.username}</div>
+												<div>Баланс: {userData.balance}$</div>
+											</>
+										) : (
+											<p>Калі ласка, увайдзіце ў сістэму, каб убачыць свае дадзеныя.</p>
+										)}
 									</div>
 								} />
 								<Route path="/cart" element={

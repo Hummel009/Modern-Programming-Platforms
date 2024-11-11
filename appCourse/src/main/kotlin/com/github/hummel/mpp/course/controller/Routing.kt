@@ -6,6 +6,7 @@ import com.github.hummel.mpp.course.dto.TokenRequest
 import com.github.hummel.mpp.course.dto.UserRequest
 import com.github.hummel.mpp.course.entity.Task
 import com.github.hummel.mpp.course.service.AuthService
+import com.github.hummel.mpp.course.service.ProfileService
 import com.google.gson.Gson
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
@@ -70,6 +71,21 @@ fun Application.configureRouting() {
 				call.respond(HttpStatusCode.OK)
 			} else {
 				call.respond(HttpStatusCode.Unauthorized)
+			}
+		}
+
+		post("/profile") {
+			val jsonRequest = call.receiveText()
+
+			val tokenRequest = gson.fromJson(jsonRequest, TokenRequest::class.java)
+			val token = AuthService.decomposeToken(tokenRequest.token)
+
+			if (AuthService.isValidUser(token)) {
+				val user = ProfileService.getUserData(token!!)
+
+				call.respond(gson.toJson(user))
+			} else {
+				call.respond(HttpStatusCode.BadRequest)
 			}
 		}
 
