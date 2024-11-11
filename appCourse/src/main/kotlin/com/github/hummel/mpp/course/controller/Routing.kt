@@ -34,7 +34,7 @@ fun Application.configureRouting() {
 			val userRequest = gson.fromJson(jsonRequest, UserRequest::class.java)
 			val user = userRequest.toEntity()
 
-			val success = AuthService.addUser(user)
+			val success = AuthService.registerUser(user)
 
 			if (success) {
 				val textResponse = AuthService.generateToken(user)
@@ -64,9 +64,9 @@ fun Application.configureRouting() {
 			val jsonRequest = call.receiveText()
 
 			val tokenRequest = gson.fromJson(jsonRequest, TokenRequest::class.java)
-			val token = tokenRequest.token
+			val token = AuthService.decomposeToken(tokenRequest.token)
 
-			if (AuthService.isValidToken(token)) {
+			if (AuthService.isValidUser(token)) {
 				call.respond(HttpStatusCode.OK)
 			} else {
 				call.respond(HttpStatusCode.Unauthorized)

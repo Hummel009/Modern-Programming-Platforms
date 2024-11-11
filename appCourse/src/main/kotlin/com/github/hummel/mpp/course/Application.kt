@@ -1,7 +1,7 @@
 package com.github.hummel.mpp.course
 
 import com.github.hummel.mpp.course.controller.configureRouting
-import com.github.hummel.mpp.course.dao.AuthDao
+import com.github.hummel.mpp.course.dao.UserDao
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.server.application.*
@@ -38,7 +38,7 @@ fun Application.module() {
 
 	connection = DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "root", "")
 
-	AuthDao.initTable()
+	UserDao.initTable()
 
 	configureRouting()
 }

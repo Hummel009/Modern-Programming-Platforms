@@ -4,14 +4,14 @@ import com.github.hummel.mpp.course.connection
 import com.github.hummel.mpp.course.entity.User
 import java.sql.SQLException
 
-object AuthDao {
+object UserDao {
 	fun initTable() {
 		val sql = """
 		CREATE TABLE IF NOT EXISTS users (
 			`id` INT PRIMARY KEY AUTO_INCREMENT,
 			`username` VARCHAR(255) UNIQUE NOT NULL,
 			`password` VARCHAR(1024) NOT NULL,
-			`balance` DECIMAL(26, 2) NOT NULL DEFAULT 1000
+			`balance` INT NOT NULL DEFAULT 1000
 		);
 		""".trimIndent()
 
@@ -45,7 +45,9 @@ object AuthDao {
 			pstmt.setString(1, username)
 			val rs = pstmt.executeQuery()
 			if (rs.next()) {
-				return User(rs.getString("username"), rs.getString("password"))
+				return User(
+					rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getInt("balance")
+				)
 			}
 		} catch (e: SQLException) {
 			e.printStackTrace()
