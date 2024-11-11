@@ -1,11 +1,14 @@
 package com.github.hummel.mpp.course.controller
 
+import com.github.hummel.mpp.course.dto.ChangePasswordRequest
+import com.github.hummel.mpp.course.dto.ChangeUsernameRequest
 import com.github.hummel.mpp.course.dto.EditTaskRequest
-import com.github.hummel.mpp.course.dto.FilterRequest
-import com.github.hummel.mpp.course.dto.NewCredentialRequest
+import com.github.hummel.mpp.course.dto.FilterTasksRequest
+import com.github.hummel.mpp.course.dto.LoginRequest
+import com.github.hummel.mpp.course.dto.ProfileRequest
+import com.github.hummel.mpp.course.dto.RegisterRequest
 import com.github.hummel.mpp.course.dto.TokenRequest
-import com.github.hummel.mpp.course.dto.UserRequest
-import com.github.hummel.mpp.course.entity.Task
+import com.github.hummel.mpp.course.entity.Order
 import com.github.hummel.mpp.course.service.AuthService
 import com.github.hummel.mpp.course.service.ProfileService
 import com.google.gson.Gson
@@ -25,7 +28,7 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
 import java.io.File
 
-val tasks = mutableMapOf<Int, Task>()
+val tasks = mutableMapOf<Int, Order>()
 val gson = Gson()
 
 fun Application.configureRouting() {
@@ -33,7 +36,7 @@ fun Application.configureRouting() {
 		post("/register") {
 			val jsonRequest = call.receiveText()
 
-			val request = gson.fromJson(jsonRequest, UserRequest::class.java)
+			val request = gson.fromJson(jsonRequest, RegisterRequest::class.java)
 
 			val username = request.username
 			val password = request.password
@@ -52,7 +55,7 @@ fun Application.configureRouting() {
 		post("/login") {
 			val jsonRequest = call.receiveText()
 
-			val request = gson.fromJson(jsonRequest, UserRequest::class.java)
+			val request = gson.fromJson(jsonRequest, LoginRequest::class.java)
 
 			val username = request.username
 			val password = request.password
@@ -85,7 +88,7 @@ fun Application.configureRouting() {
 		post("/profile") {
 			val jsonRequest = call.receiveText()
 
-			val request = gson.fromJson(jsonRequest, TokenRequest::class.java)
+			val request = gson.fromJson(jsonRequest, ProfileRequest::class.java)
 			val token = AuthService.decomposeToken(request.token)
 
 			val username = token?.username
@@ -107,9 +110,9 @@ fun Application.configureRouting() {
 		post("/change-username") {
 			val jsonRequest = call.receiveText()
 
-			val request = gson.fromJson(jsonRequest, NewCredentialRequest::class.java)
+			val request = gson.fromJson(jsonRequest, ChangeUsernameRequest::class.java)
 			val token = AuthService.decomposeToken(request.token)
-			val newUsername = request.newCredential
+			val newUsername = request.username
 
 			val username = token?.username
 			val password = token?.password
@@ -128,9 +131,9 @@ fun Application.configureRouting() {
 		post("/change-password") {
 			val jsonRequest = call.receiveText()
 
-			val request = gson.fromJson(jsonRequest, NewCredentialRequest::class.java)
+			val request = gson.fromJson(jsonRequest, ChangePasswordRequest::class.java)
 			val token = AuthService.decomposeToken(request.token)
-			val newPassword = request.newCredential
+			val newPassword = request.password
 
 			val username = token?.username
 			val password = token?.password
@@ -163,11 +166,11 @@ fun Application.configureRouting() {
 		post("/filter-tasks") {
 			val jsonRequest = call.receiveText()
 
-			val request = gson.fromJson(jsonRequest, FilterRequest::class.java)
+			val request = gson.fromJson(jsonRequest, FilterTasksRequest::class.java)
 			val filter = request.filter
 
 			val filteredTasks = tasks.asSequence().filter {
-				it.value.status == filter || filter == "all"
+				it.value.author == filter || filter == "all"
 			}.associate { it.key to it.value }
 
 			val jsonResponse = gson.toJson(filteredTasks)
@@ -222,7 +225,7 @@ fun Application.configureRouting() {
 				part.dispose()
 			}
 
-			tasks.put(getNextAvailableId(), Task(title, status, dueDate, fileName))
+			tasks.put(getNextAvailableId(), Order(title, status, dueDate, "fileName"))
 
 			call.respond(HttpStatusCode.OK)
 		}

@@ -21,7 +21,7 @@ export const Profile = (
 			await axios.post('http://localhost:2999/change-username',
 			{
 				token: token,
-				newCredential: newUsername
+				username: username
 			});
 
 			deleteCookieToken();
@@ -41,7 +41,7 @@ export const Profile = (
 			await axios.post('http://localhost:2999/change-password',
 			{
 				token: token,
-				newCredential: newPassword
+				password: password
 			});
 
 			deleteCookieToken();
