@@ -8,9 +8,11 @@ object AuthDao {
 	fun initTable() {
 		val sql = """
 		CREATE TABLE IF NOT EXISTS users (
-			username VARCHAR(255) UNIQUE NOT NULL,
-			password VARCHAR(1024) NOT NULL
-		)
+			`id` INT PRIMARY KEY AUTO_INCREMENT,
+			`username` VARCHAR(255) UNIQUE NOT NULL,
+			`password` VARCHAR(1024) NOT NULL,
+			`balance` DECIMAL(26, 2) NOT NULL DEFAULT 1000
+		);
 		""".trimIndent()
 
 		try {

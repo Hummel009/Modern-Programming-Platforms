@@ -315,6 +315,20 @@ function App() {
 										</form>
 									</div>
 								} />
+								<Route path="/profile" element={
+									<div>
+										<h1>
+											<span id="lang-enter">Профіль</span>
+										</h1>
+									</div>
+								} />
+								<Route path="/cart" element={
+									<div>
+										<h1>
+											<span id="lang-enter">Кош</span>
+										</h1>
+									</div>
+								} />
 							</Routes>
 						</main>
 						<aside className='right-rail search'>
