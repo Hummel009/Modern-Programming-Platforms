@@ -47,11 +47,22 @@ function App() {
 			});
 
 			setIsLoggedIn(true);
-
-			fetchBooks();
 		} catch (error) {
 		}
 	}, []);
+
+	const fetchBooks = useCallback(async () => {
+		const response1 = await axios.get('http://localhost:2999/books');
+		setBooks(response1.data);
+
+		const response2 = await axios.get('http://localhost:2999/books/authors');
+		setAuthors(response2.data);
+	}, []);
+
+	useEffect(() => {
+		fetchBooks();
+		tryUseCookieToken()
+	}, [fetchBooks, tryUseCookieToken]);
 
 	const deleteCookieToken = () => {
 		try {
@@ -64,10 +75,6 @@ function App() {
 			alert('Error occurred while trying to delete the cookie.');
 		}
 	}
-
-	useEffect(() => {
-		tryUseCookieToken()
-	}, [tryUseCookieToken]);
 
 	const fetchUserData = async () => {
 		try {
@@ -85,19 +92,14 @@ function App() {
 		}
 	};
 
-	const fetchBooks = async () => {
-		const response1 = await axios.get('http://localhost:2999/books');
-		setBooks(response1.data);
-
-		const response2 = await axios.get('http://localhost:2999/books/authors');
-		setAuthors(response2.data);
-	};
-
-	const filterBooks = async (filter) => {
+	const filterBooks = async (author) => {
 		const response = await axios.post('http://localhost:2999/books/filter',
 		{
-			filter: filter
+			author: author
 		});
+
+		console.log(response.data);
+
 		setBooks(response.data);
 	};
 
@@ -125,9 +127,9 @@ function App() {
 										<br/>
 
 										<select onChange={(e) => filterBooks(e.target.value)}>
-											<option value="all">Все</option>
-											<option value="pending">В ожидании</option>
-											<option value="completed">Завершено</option>
+											{authors.map(author => (
+												<option key={author} value={author}>{author}</option>
+											))}
 										</select>
 
 										<ul>
@@ -149,7 +151,6 @@ function App() {
 										setIsLoggedIn = {setIsLoggedIn}
 										registerData = {registerData}
 										setRegisterData = {setRegisterData}
-										fetchBooks = {fetchBooks}
 										fetchUserData = {fetchUserData}
 									/>
 								} />
@@ -159,7 +160,6 @@ function App() {
 										setIsLoggedIn = {setIsLoggedIn}
 										loginData = {loginData}
 										setLoginData = {setLoginData}
-										fetchBooks = {fetchBooks}
 										fetchUserData = {fetchUserData}
 									/>
 								} />

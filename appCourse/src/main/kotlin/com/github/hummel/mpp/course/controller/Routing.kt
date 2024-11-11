@@ -2,6 +2,7 @@ package com.github.hummel.mpp.course.controller
 
 import com.github.hummel.mpp.course.dto.ChangePasswordRequest
 import com.github.hummel.mpp.course.dto.ChangeUsernameRequest
+import com.github.hummel.mpp.course.dto.FilterBooksRequest
 import com.github.hummel.mpp.course.dto.LoginRequest
 import com.github.hummel.mpp.course.dto.ProfileRequest
 import com.github.hummel.mpp.course.dto.RegisterRequest
@@ -152,9 +153,26 @@ fun Application.configureRouting() {
 			}
 
 			get("/authors") {
-				val authors = MainService.getAllAuthors()
+				val authors = MainService.getAllAuthors() + "all"
 
 				val jsonResponse = gson.toJson(authors)
+
+				call.respond(jsonResponse)
+			}
+
+			post("/filter") {
+				val jsonRequest = call.receiveText()
+
+				val request = gson.fromJson(jsonRequest, FilterBooksRequest::class.java)
+				val author = request.author
+
+				val books = MainService.getAllBooks()
+
+				val filteredBooks = books.asSequence().filter {
+					it.author == author || author == "all"
+				}.toList()
+
+				val jsonResponse = gson.toJson(filteredBooks)
 
 				call.respond(jsonResponse)
 			}
