@@ -54,4 +54,30 @@ object UserDao {
 		}
 		return null
 	}
+
+	fun changeUserUsername(username: String, newUsername: String): Boolean {
+		val sql = "UPDATE users SET username = ? WHERE username = ?"
+		return try {
+			val pstmt = connection.prepareStatement(sql)
+			pstmt.setString(1, newUsername)
+			pstmt.setString(2, username)
+			pstmt.executeUpdate() > 0
+		} catch (e: SQLException) {
+			e.printStackTrace()
+			false
+		}
+	}
+
+	fun changeUserPassword(username: String, newPassword: String): Boolean {
+		val sql = "UPDATE users SET password = ? WHERE username = ?"
+		return try {
+			val pstmt = connection.prepareStatement(sql)
+			pstmt.setString(1, newPassword)
+			pstmt.setString(2, username)
+			pstmt.executeUpdate() > 0
+		} catch (e: SQLException) {
+			e.printStackTrace()
+			false
+		}
+	}
 }

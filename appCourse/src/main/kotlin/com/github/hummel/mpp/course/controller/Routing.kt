@@ -2,6 +2,7 @@ package com.github.hummel.mpp.course.controller
 
 import com.github.hummel.mpp.course.dto.EditTaskRequest
 import com.github.hummel.mpp.course.dto.FilterRequest
+import com.github.hummel.mpp.course.dto.NewCredentialRequest
 import com.github.hummel.mpp.course.dto.TokenRequest
 import com.github.hummel.mpp.course.dto.UserRequest
 import com.github.hummel.mpp.course.entity.Task
@@ -32,8 +33,8 @@ fun Application.configureRouting() {
 		post("/register") {
 			val jsonRequest = call.receiveText()
 
-			val userRequest = gson.fromJson(jsonRequest, UserRequest::class.java)
-			val user = userRequest.toEntity()
+			val request = gson.fromJson(jsonRequest, UserRequest::class.java)
+			val user = request.toEntity()
 
 			val success = AuthService.registerUser(user)
 
@@ -49,8 +50,8 @@ fun Application.configureRouting() {
 		post("/login") {
 			val jsonRequest = call.receiveText()
 
-			val userRequest = gson.fromJson(jsonRequest, UserRequest::class.java)
-			val user = userRequest.toEntity()
+			val request = gson.fromJson(jsonRequest, UserRequest::class.java)
+			val user = request.toEntity()
 
 			if (AuthService.isValidUser(user)) {
 				val textResponse = AuthService.generateToken(user)
@@ -64,8 +65,8 @@ fun Application.configureRouting() {
 		post("/token") {
 			val jsonRequest = call.receiveText()
 
-			val tokenRequest = gson.fromJson(jsonRequest, TokenRequest::class.java)
-			val token = AuthService.decomposeToken(tokenRequest.token)
+			val request = gson.fromJson(jsonRequest, TokenRequest::class.java)
+			val token = AuthService.decomposeToken(request.token)
 
 			if (AuthService.isValidUser(token)) {
 				call.respond(HttpStatusCode.OK)
@@ -77,13 +78,53 @@ fun Application.configureRouting() {
 		post("/profile") {
 			val jsonRequest = call.receiveText()
 
-			val tokenRequest = gson.fromJson(jsonRequest, TokenRequest::class.java)
-			val token = AuthService.decomposeToken(tokenRequest.token)
+			val request = gson.fromJson(jsonRequest, TokenRequest::class.java)
+			val token = AuthService.decomposeToken(request.token)
 
 			if (AuthService.isValidUser(token)) {
 				val user = ProfileService.getUserData(token!!)
 
-				call.respond(gson.toJson(user))
+				user?.let {
+					call.respond(gson.toJson(it))
+				} ?: run {
+					call.respond(HttpStatusCode.BadRequest)
+				}
+			} else {
+				call.respond(HttpStatusCode.BadRequest)
+			}
+		}
+
+		post("/change-username") {
+			val jsonRequest = call.receiveText()
+
+			val request = gson.fromJson(jsonRequest, NewCredentialRequest::class.java)
+			val token = AuthService.decomposeToken(request.token)
+			val newUsername = request.newCredential
+
+			if (AuthService.isValidUser(token)) {
+				if (ProfileService.updateUserUsername(token!!, newUsername)) {
+					call.respond(HttpStatusCode.OK)
+				} else {
+					call.respond(HttpStatusCode.BadRequest)
+				}
+			} else {
+				call.respond(HttpStatusCode.BadRequest)
+			}
+		}
+
+		post("/change-password") {
+			val jsonRequest = call.receiveText()
+
+			val request = gson.fromJson(jsonRequest, NewCredentialRequest::class.java)
+			val token = AuthService.decomposeToken(request.token)
+			val newPassword = request.newCredential
+
+			if (AuthService.isValidUser(token)) {
+				if (ProfileService.updateUserPassword(token!!, newPassword)) {
+					call.respond(HttpStatusCode.OK)
+				} else {
+					call.respond(HttpStatusCode.BadRequest)
+				}
 			} else {
 				call.respond(HttpStatusCode.BadRequest)
 			}
@@ -106,8 +147,8 @@ fun Application.configureRouting() {
 		post("/filter-tasks") {
 			val jsonRequest = call.receiveText()
 
-			val filterRequest = gson.fromJson(jsonRequest, FilterRequest::class.java)
-			val filter = filterRequest.filter
+			val request = gson.fromJson(jsonRequest, FilterRequest::class.java)
+			val filter = request.filter
 
 			val filteredTasks = tasks.asSequence().filter {
 				it.value.status == filter || filter == "all"
@@ -121,9 +162,9 @@ fun Application.configureRouting() {
 		put("/edit-task") {
 			val jsonRequest = call.receiveText()
 
-			val editTaskRequest = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
-			val index = editTaskRequest.index
-			val title = editTaskRequest.title
+			val request = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
+			val index = request.index
+			val title = request.title
 
 			tasks[index]!!.title = title
 

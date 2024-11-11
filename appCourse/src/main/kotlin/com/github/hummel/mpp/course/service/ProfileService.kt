@@ -10,4 +10,16 @@ object ProfileService {
 
 		return UserDao.findUserByUsername(username)
 	}
+
+	fun updateUserUsername(token: Token, newUsername: String): Boolean {
+		val username = token.username
+
+		return UserDao.changeUserUsername(username, newUsername)
+	}
+
+	fun updateUserPassword(token: Token, newPassword: String): Boolean {
+		val username = token.username
+
+		return UserDao.changeUserPassword(username, newPassword)
+	}
 }

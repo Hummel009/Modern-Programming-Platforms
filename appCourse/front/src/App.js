@@ -5,7 +5,12 @@ import React, {
 } from 'react';
 import axios from 'axios';
 import './App.css'
-import { GlobalNavigation, LocalNavigation } from './AppComponents.js'
+import { GlobalNavigation } from './components/NavGlobal.js'
+import { LocalNavigation } from './components/NavLocal.js'
+import { Profile } from './components/PageProfile.js'
+import { Login } from './components/PageLogin.js'
+import { Register } from './components/PageRegister.js'
+import { RightRail } from './components/RightRail.js'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
@@ -16,6 +21,7 @@ function App() {
 		dueDate: '',
 		file: null,
 	});
+
 	const [loginData, setLoginData] = useState({
 		username: '',
 		password: ''
@@ -24,12 +30,16 @@ function App() {
 		username: '',
 		password: ''
 	});
+
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const [userData, setUserData] = useState({
 		id: null,
 		username: '',
 		balance: 0
 	});
+
+	const [newUsername, setNewUsername] = useState('');
+	const [newPassword, setNewPassword] = useState('');
 
 	const tryUseCookieToken = useCallback(async () => {
 		try {
@@ -48,7 +58,7 @@ function App() {
 		}
 	}, []);
 
-	const fetchUserData = useCallback(async () => {
+	const fetchUserData = async () => {
 		try {
 			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
 			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
@@ -64,14 +74,11 @@ function App() {
 		} catch (error) {
 			console.error("Ошибка при получении данных пользователя:", error);
 		}
-	}, []);
+	};
 
 	useEffect(() => {
-		if (window.location.pathname === '/profile') {
-			fetchUserData();
-		}
 		tryUseCookieToken()
-	}, [tryUseCookieToken, fetchUserData]);
+	}, [tryUseCookieToken]);
 
 	const fetchTasks = async () => {
 		const response = await axios.get('http://localhost:2999/get-tasks');
@@ -105,6 +112,38 @@ function App() {
 			});
 			const tasksMap = new Map(Object.entries(response.data));
 			setTasks(tasksMap);
+		}
+	};
+
+	const handleChangeUsername = async (e) => {
+		e.preventDefault();
+		try {
+			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+
+			await axios.post('http://localhost:2999/change-username',
+			{
+				token: token,
+				newCredential: newUsername
+			});
+		} catch (error) {
+			alert('Change username failed. Please check your credentials.');
+		}
+	};
+
+	const handleChangePassword = async (e) => {
+		e.preventDefault();
+		try {
+			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+
+			await axios.post('http://localhost:2999/change-password',
+			{
+				token: token,
+				newCredential: newPassword
+			});
+		} catch (error) {
+			alert('Change password failed. Please check your credentials.');
 		}
 	};
 
@@ -183,28 +222,6 @@ function App() {
 		});
 	};
 
-	const handleLoginChange = (e) => {
-		const {
-			name,
-			value
-		} = e.target;
-		setLoginData({
-			...loginData,
-			[name]: value
-		});
-	};
-
-	const handleRegisterChange = (e) => {
-		const {
-			name,
-			value
-		} = e.target;
-		setRegisterData({
-			...registerData,
-			[name]: value
-		});
-	};
-
 	const handleFileChange = (e) => {
 		setFormData({
 			...formData,
@@ -219,7 +236,9 @@ function App() {
 			<div className="main-container">
 				<div className="page-background"></div>
 				<div className="page-container">
-					<LocalNavigation />
+					<LocalNavigation
+						fetchUserData={fetchUserData}
+					/>
 					<div class="page has-right-rail">
 						<main className="page-main">
 							<Routes>
@@ -286,75 +305,32 @@ function App() {
 									</div>
 								}/>
 								<Route path="/register" element={
-									<div>
-										<h1>
-											<span id="lang-enter">Рэгістрацыя</span>
-										</h1>
-										<form onSubmit={handleRegisterSubmit} className="main-fieldset">
-											<input
-												type="text"
-												name="username"
-												placeholder="Імя ўдзельніка"
-												onChange={handleRegisterChange}
-												required
-											/>
-											<input
-												type="password"
-												name="password"
-												placeholder="Пароль"
-												onChange={handleRegisterChange}
-												required
-											/>
-											{isLoggedIn ? (
-												<button disabled type="submit" className="wds-button">Зарэгістравацца</button>
-											) : (
-												<button type="submit" className="wds-button">Зарэгістравацца</button>
-											)}
-										</form>
-									</div>
+									<Register
+                                        isLoggedIn = {isLoggedIn}
+                                        handleRegisterSubmit = {handleRegisterSubmit}
+                                        setRegisterData = {setRegisterData}
+                                        registerData = {registerData}
+                                    />
 								} />
 								<Route path="/login" element={
-									<div>
-										<h1>
-											<span id="lang-enter">Уваход</span>
-										</h1>
-										<form onSubmit={handleLoginSubmit} className="main-fieldset">
-											<input
-												type="text"
-												name="username"
-												placeholder="Імя ўдзельніка"
-												onChange={handleLoginChange}
-												required
-											/>
-											<input
-												type="password"
-												name="password"
-												placeholder="Пароль"
-												onChange={handleLoginChange}
-												required
-											/>
-											{isLoggedIn ? (
-												<button disabled type="submit" className="wds-button">Увайсці</button>
-											) : (
-												<button type="submit" className="wds-button">Увайсці</button>
-											)}
-										</form>
-									</div>
+									<Login
+										isLoggedIn = {isLoggedIn}
+										handleLoginSubmit = {handleLoginSubmit}
+										setLoginData = {setLoginData}
+										loginData = {loginData}
+									/>
 								} />
 								<Route path="/profile" element={
-									<div>
-										<h1>
-											<span id="lang-enter">Профіль</span>
-										</h1>
-										{isLoggedIn && userData.username ? (
-											<>
-												<div>Імя ўдзельніка: {userData.username}</div>
-												<div>Баланс: {userData.balance}$</div>
-											</>
-										) : (
-											<p>Калі ласка, увайдзіце ў сістэму, каб убачыць свае дадзеныя.</p>
-										)}
-									</div>
+									<Profile
+										isLoggedIn = {isLoggedIn}
+										userData = {userData}
+										newUsername = {newUsername}
+										setNewUsername = {setNewUsername}
+										handleChangeUsername = {handleChangeUsername}
+										newPassword = {newPassword}
+										setNewPassword = {setNewPassword}
+										handleChangePassword = {handleChangePassword}
+									/>
 								} />
 								<Route path="/cart" element={
 									<div>
@@ -365,22 +341,10 @@ function App() {
 								} />
 							</Routes>
 						</main>
-						<aside className='right-rail search'>
-							{isLoggedIn ? (
-								<div>
-									<h1>
-										<span className = "status" style={{ color: 'green' }}>Уваход здзейснены</span>
-									</h1>
-									<button onClick={deleteCookieToken} className="wds-button">Выйсці</button>
-								</div>
-							) : (
-								<div>
-									<h1>
-										<span className = "status" style={{ color: 'red' }}>Уваход не здзейснены</span>
-									</h1>
-								</div>
-							)}
-						</aside>
+						<RightRail
+							isLoggedIn = {isLoggedIn}
+							deleteCookieToken = {deleteCookieToken}
+						/>
 					</div>
 				</div>
 			</div>
