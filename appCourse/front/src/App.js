@@ -55,7 +55,6 @@ function App() {
 
 			fetchTasks();
 		} catch (error) {
-			console.error("Error using cookie token:", error);
 		}
 	}, []);
 
@@ -69,11 +68,9 @@ function App() {
 			});
 
 			const userData = response.data;
-			console.log("Данные пользователя:", userData);
 
 			setUserData(userData);
 		} catch (error) {
-			console.error("Ошибка при получении данных пользователя:", error);
 		}
 	};
 
@@ -116,74 +113,6 @@ function App() {
 		}
 	};
 
-	const handleChangeUsername = async (e) => {
-		e.preventDefault();
-		try {
-			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
-
-			await axios.post('http://localhost:2999/change-username',
-			{
-				token: token,
-				newCredential: newUsername
-			});
-		} catch (error) {
-			alert('Change username failed. Please check your credentials.');
-		}
-	};
-
-	const handleChangePassword = async (e) => {
-		e.preventDefault();
-		try {
-			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
-
-			await axios.post('http://localhost:2999/change-password',
-			{
-				token: token,
-				newCredential: newPassword
-			});
-		} catch (error) {
-			alert('Change password failed. Please check your credentials.');
-		}
-	};
-
-	const handleLoginSubmit = async (e) => {
-		e.preventDefault();
-		try {
-			const response = await axios.post('http://localhost:2999/login',
-			{
-				username: loginData.username,
-				password: loginData.password
-			});
-
-			document.cookie = `jwt=${response.data}; path=/; secure=false; SameSite=Lax`;
-			setIsLoggedIn(true);
-
-			fetchTasks();
-		} catch (error) {
-			alert('Login failed. Please check your credentials.');
-		}
-	};
-
-	const handleRegisterSubmit = async (e) => {
-		e.preventDefault();
-		try {
-			const response = await axios.post('http://localhost:2999/register',
-			{
-				username: registerData.username,
-				password: registerData.password
-			});
-
-			document.cookie = `jwt=${response.data}; path=/; secure=false; SameSite=Lax`;
-			setIsLoggedIn(true);
-
-			fetchTasks();
-		} catch (error) {
-			alert('Register failed. Please check your credentials.');
-		}
-	};
-
 	const deleteCookieToken = () => {
 		try {
 			document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
@@ -219,10 +148,8 @@ function App() {
 			<div className="main-container">
 				<div className="page-background"></div>
 				<div className="page-container">
-					<LocalNavigation
-						fetchUserData={fetchUserData}
-					/>
-					<div class="page has-right-rail">
+					<LocalNavigation/>
+					<div className="page has-right-rail">
 						<main className="page-main">
 							<Routes>
 								<Route path="/" element={
@@ -311,29 +238,33 @@ function App() {
 								<Route path="/register" element={
 									<Register
 										isLoggedIn = {isLoggedIn}
-										handleRegisterSubmit = {handleRegisterSubmit}
-										setRegisterData = {setRegisterData}
+										setIsLoggedIn = {setIsLoggedIn}
 										registerData = {registerData}
+										setRegisterData = {setRegisterData}
+										fetchTasks = {fetchTasks}
+										fetchUserData = {fetchUserData}
 									/>
 								} />
 								<Route path="/login" element={
 									<Login
 										isLoggedIn = {isLoggedIn}
-										handleLoginSubmit = {handleLoginSubmit}
-										setLoginData = {setLoginData}
+										setIsLoggedIn = {setIsLoggedIn}
 										loginData = {loginData}
+										setLoginData = {setLoginData}
+										fetchTasks = {fetchTasks}
+										fetchUserData = {fetchUserData}
 									/>
 								} />
 								<Route path="/profile" element={
 									<Profile
 										isLoggedIn = {isLoggedIn}
+										setIsLoggedIn = {setIsLoggedIn}
 										userData = {userData}
 										newUsername = {newUsername}
 										setNewUsername = {setNewUsername}
-										handleChangeUsername = {handleChangeUsername}
 										newPassword = {newPassword}
 										setNewPassword = {setNewPassword}
-										handleChangePassword = {handleChangePassword}
+										deleteCookieToken = {deleteCookieToken}
 									/>
 								} />
 								<Route path="/cart" element={

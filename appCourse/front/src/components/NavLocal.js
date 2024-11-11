@@ -1,10 +1,6 @@
 import { Link } from 'react-router-dom';
 
-export const LocalNavigation = (
-	{
-		fetchUserData
-	}
-) => (
+export const LocalNavigation = () => (
 	<div className="page-header">
 		<nav className="local-navigation">
 			<Link to="/">
@@ -16,7 +12,7 @@ export const LocalNavigation = (
 			<Link to="/login">
 				<span id="lang-enter">Уваход</span>
 			</Link>
-			<Link to="/profile" onClick={fetchUserData}>
+			<Link to="/profile">
 				<span id="lang-profile">Профіль</span>
 			</Link>
 			<Link to="/cart">

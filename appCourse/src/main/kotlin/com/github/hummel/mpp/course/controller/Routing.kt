@@ -87,10 +87,10 @@ fun Application.configureRouting() {
 				user?.let {
 					call.respond(gson.toJson(it))
 				} ?: run {
-					call.respond(HttpStatusCode.BadRequest)
+					call.respond(HttpStatusCode.Unauthorized)
 				}
 			} else {
-				call.respond(HttpStatusCode.BadRequest)
+				call.respond(HttpStatusCode.Unauthorized)
 			}
 		}
 
@@ -108,7 +108,7 @@ fun Application.configureRouting() {
 					call.respond(HttpStatusCode.BadRequest)
 				}
 			} else {
-				call.respond(HttpStatusCode.BadRequest)
+				call.respond(HttpStatusCode.Unauthorized)
 			}
 		}
 
@@ -126,7 +126,7 @@ fun Application.configureRouting() {
 					call.respond(HttpStatusCode.BadRequest)
 				}
 			} else {
-				call.respond(HttpStatusCode.BadRequest)
+				call.respond(HttpStatusCode.Unauthorized)
 			}
 		}
 

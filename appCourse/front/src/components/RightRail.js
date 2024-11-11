@@ -2,7 +2,7 @@ export const RightRail = (
 	{
 		isLoggedIn,
 		deleteCookieToken
-    }
+	}
 ) => (
 	<aside className='right-rail search'>
 		{isLoggedIn ? (

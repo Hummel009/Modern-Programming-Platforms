@@ -1,44 +1,93 @@
+import axios from 'axios';
+
 export const Profile = (
 	{
 		isLoggedIn,
+		setIsLoggedIn,
 		userData,
 		newUsername,
 		setNewUsername,
-		handleChangeUsername,
-	    newPassword,
-	    setNewPassword,
-	    handleChangePassword
-    }
-) => (
-	<div>
-		<h1>
-			<span id="lang-enter">Профіль</span>
-		</h1>
-		{isLoggedIn ? (
-			<div>
-				<div>Імя ўдзельніка: {userData.username}</div>
-				<div>Баланс: {userData.balance}$</div>
+		newPassword,
+		setNewPassword,
+		deleteCookieToken
+	}
+) => {
+	const handleChangeUsername = async (e) => {
+		e.preventDefault();
+		try {
+			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+
+			await axios.post('http://localhost:2999/change-username',
+			{
+				token: token,
+				newCredential: newUsername
+			});
+
+			deleteCookieToken();
+
+			setIsLoggedIn(false);
+		} catch (error) {
+			alert('Change username failed. Please check your credentials.');
+		}
+	};
+
+	const handleChangePassword = async (e) => {
+		e.preventDefault();
+		try {
+			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+
+			await axios.post('http://localhost:2999/change-password',
+			{
+				token: token,
+				newCredential: newPassword
+			});
+
+			deleteCookieToken();
+
+			setIsLoggedIn(false);
+		} catch (error) {
+			alert('Change password failed. Please check your credentials.');
+		}
+	};
+
+	return (
+		<div>
+			<h1>
+				<span id="lang-enter">Профіль</span>
+			</h1>
+			{isLoggedIn ? (
 				<div>
-					<input
-						type="text"
-						placeholder="Новы логін"
-						value={newUsername}
-						onChange={(e) => setNewUsername(e.target.value)}
-					/>
-					<button className = "wds-button" onClick={handleChangeUsername}>Змяніць логін</button>
+					<div>Імя ўдзельніка: {userData.username}</div>
+					<div>Баланс: {userData.balance}$</div>
+						<form onSubmit={handleChangeUsername}>
+							<input
+								type="text"
+								name="username"
+								placeholder="Нове імя ўдзельніка"
+								value={newUsername}
+								onChange={(e) => setNewUsername(e.target.value)}
+								required
+							/>
+							<button type="submit" className="wds-button">Змяніць логін</button>
+						</form>
+
+						<form onSubmit={handleChangePassword}>
+							<input
+								type="password"
+								name="password"
+								placeholder="Новы пароль"
+								value={newPassword}
+								onChange={(e) => setNewPassword(e.target.value)}
+								required
+							/>
+							<button type="submit" className="wds-button">Змяніць пароль</button>
+						</form>
 				</div>
-				<div>
-					<input
-						type="text"
-						placeholder="Новы пароль"
-						value={newPassword}
-						onChange={(e) => setNewPassword(e.target.value)}
-					/>
-					<button className = "wds-button"  onClick={handleChangePassword}>Змяніць пароль</button>
-				</div>
-			</div>
-		) : (
-			<p>Калі ласка, увайдзіце ў сістэму, каб убачыць свае дадзеныя.</p>
-		)}
-	</div>
-);
+			) : (
+				<p>Калі ласка, увайдзіце ў сістэму, каб убачыць свае даныя.</p>
+			)}
+		</div>
+	)
+}
