@@ -112,7 +112,7 @@ fun Application.configureRouting() {
 
 			val request = gson.fromJson(jsonRequest, ChangeUsernameRequest::class.java)
 			val token = AuthService.decomposeToken(request.token)
-			val newUsername = request.username
+			val newUsername = request.newUsername
 
 			val username = token?.username
 			val password = token?.password
@@ -133,7 +133,7 @@ fun Application.configureRouting() {
 
 			val request = gson.fromJson(jsonRequest, ChangePasswordRequest::class.java)
 			val token = AuthService.decomposeToken(request.token)
-			val newPassword = request.password
+			val newPassword = request.setNewPassword
 
 			val username = token?.username
 			val password = token?.password

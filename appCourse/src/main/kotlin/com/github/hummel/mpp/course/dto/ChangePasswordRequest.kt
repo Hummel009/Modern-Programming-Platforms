@@ -1,3 +1,3 @@
 package com.github.hummel.mpp.course.dto
 
-data class ChangePasswordRequest(val token: String, val password: String)
+data class ChangePasswordRequest(val token: String, val setNewPassword: String)
