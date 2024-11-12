@@ -11,7 +11,7 @@ object UserDao {
 			`id` INT PRIMARY KEY AUTO_INCREMENT,
 			`username` VARCHAR(255) UNIQUE NOT NULL,
 			`password` VARCHAR(1024) NOT NULL,
-			`balance` INT NOT NULL DEFAULT 1000
+			`balance` DECIMAL(24, 2) NOT NULL DEFAULT 1000
 		);
 		""".trimIndent()
 
@@ -46,7 +46,7 @@ object UserDao {
 			val rs = pstmt.executeQuery()
 			if (rs.next()) {
 				return User(
-					rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getInt("balance")
+					rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getDouble("balance")
 				)
 			} else {
 				null
