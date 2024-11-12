@@ -25,7 +25,7 @@ function App() {
 		balance: 0
 	});
 
-	const tryUseCookieToken = useCallback(async () => {
+	const handleUseToken = useCallback(async () => {
 		try {
 			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
 			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
@@ -39,7 +39,7 @@ function App() {
 		}
 	}, []);
 
-	const fetchBooks = useCallback(async () => {
+	const handleFetchBooks = useCallback(async () => {
 		const response1 = await axios.get('http://localhost:2999/books');
 		setBooks(response1.data);
 
@@ -48,23 +48,23 @@ function App() {
 	}, []);
 
 	useEffect(() => {
-		fetchBooks();
-		tryUseCookieToken()
-	}, [fetchBooks, tryUseCookieToken]);
+		handleFetchBooks();
+		handleUseToken()
+	}, [handleFetchBooks, handleUseToken]);
 
-	const deleteCookieToken = () => {
+	const handleDeleteToken = () => {
 		try {
 			document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
 
 			setIsLoggedIn(false);
 
-			fetchBooks();
+			handleFetchBooks();
 		} catch (error) {
 			alert('Error occurred while trying to delete the cookie.');
 		}
 	}
 
-	const fetchUserData = async () => {
+	const handleFetchUserData = async () => {
 		try {
 			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
 			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
@@ -80,7 +80,7 @@ function App() {
 		}
 	};
 
-	const filterBooks = async (author) => {
+	const handleFilterBooks = async (author) => {
 		const response = await axios.post('http://localhost:2999/books/filter',
 		{
 			author: author
@@ -134,7 +134,7 @@ function App() {
 
 										<br/>
 
-										<select onChange={(e) => filterBooks(e.target.value)}>
+										<select onChange={(e) => handleFilterBooks(e.target.value)}>
 											{authors.map(author => (
 												<option key={author} value={author}>{author}</option>
 											))}
@@ -162,14 +162,14 @@ function App() {
 									<Register
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
-										fetchUserData = {fetchUserData}
+										handleFetchUserData = {handleFetchUserData}
 									/>
 								} />
 								<Route path="/login" element={
 									<Login
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
-										fetchUserData = {fetchUserData}
+										handleFetchUserData = {handleFetchUserData}
 									/>
 								} />
 								<Route path="/profile" element={
@@ -177,7 +177,7 @@ function App() {
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
 										userData = {userData}
-										deleteCookieToken = {deleteCookieToken}
+										handleDeleteToken = {handleDeleteToken}
 									/>
 								} />
 								<Route path="/cart" element={
@@ -188,7 +188,7 @@ function App() {
 						</main>
 						<RightRail
 							isLoggedIn = {isLoggedIn}
-							deleteCookieToken = {deleteCookieToken}
+							handleDeleteToken = {handleDeleteToken}
 						/>
 					</div>
 				</div>

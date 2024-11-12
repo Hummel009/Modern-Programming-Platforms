@@ -7,7 +7,7 @@ export const Login = (
 	{
 		isLoggedIn,
 		setIsLoggedIn,
-		fetchUserData
+		handleFetchUserData
 	}
 ) => {
 	const [loginData, setLoginData] = useState({
@@ -27,7 +27,7 @@ export const Login = (
 			document.cookie = `jwt=${response.data}; path=/; secure=false; SameSite=Lax`;
 			setIsLoggedIn(true);
 
-			fetchUserData();
+			handleFetchUserData();
 		} catch (error) {
 			alert('Login failed. Please check your credentials.');
 		}

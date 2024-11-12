@@ -8,7 +8,7 @@ export const Profile = (
 		isLoggedIn,
 		setIsLoggedIn,
 		userData,
-		deleteCookieToken
+		handleDeleteToken
 	}
 ) => {
 	const [newUsername, setNewUsername] = useState('');
@@ -26,7 +26,7 @@ export const Profile = (
 				newUsername: newUsername
 			});
 
-			deleteCookieToken();
+			handleDeleteToken();
 
 			setIsLoggedIn(false);
 		} catch (error) {
@@ -46,7 +46,7 @@ export const Profile = (
 				newPassword: newPassword
 			});
 
-			deleteCookieToken();
+			handleDeleteToken();
 
 			setIsLoggedIn(false);
 		} catch (error) {

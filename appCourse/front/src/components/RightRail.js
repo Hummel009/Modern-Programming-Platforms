@@ -1,7 +1,7 @@
 export const RightRail = (
 	{
 		isLoggedIn,
-		deleteCookieToken
+		handleDeleteToken
 	}
 ) => (
 	<aside className='right-rail search'>
@@ -10,7 +10,7 @@ export const RightRail = (
 				<h1>
 					<span className = "status" style={{ color: 'green' }}>Уваход здзейснены</span>
 				</h1>
-				<button onClick={deleteCookieToken} className="wds-button">Выйсці</button>
+				<button onClick={handleDeleteToken} className="wds-button">Выйсці</button>
 			</div>
 		) : (
 			<div>

@@ -7,7 +7,7 @@ export const Register = (
 	{
 		isLoggedIn,
 		setIsLoggedIn,
-		fetchUserData
+		handleFetchUserData
 	}
 ) => {
 	const [registerData, setRegisterData] = useState({
@@ -27,7 +27,7 @@ export const Register = (
 			document.cookie = `jwt=${response.data}; path=/; secure=false; SameSite=Lax`;
 			setIsLoggedIn(true);
 
-			fetchUserData();
+			handleFetchUserData();
 		} catch (error) {
 			alert('Register failed. Please check your credentials.');
 		}
