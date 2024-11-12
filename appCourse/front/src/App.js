@@ -26,6 +26,8 @@ function App() {
 	});
 	const [cartData, setCartData] = useState([]);
 
+	const [currentPage, setCurrentPage] = useState(1);
+
 	const handleFetchBooks = useCallback(async () => {
 		const response = await axios.get('http://localhost:2999/books');
 		setBooks(response.data);
@@ -108,7 +110,6 @@ function App() {
 	const handleDeleteToken = () => {
 		try {
 			Cookies.remove('jwt');
-			Cookies.remove('cart');
 
 			setIsLoggedIn(false);
 		} catch (error) {
@@ -124,7 +125,8 @@ function App() {
 				cartData: cartData
 			});
 
-			handleClearCart()
+			handleClearCart();
+			handleFetchProfileData();
 		} catch (error) {
 		}
 	};
@@ -133,7 +135,7 @@ function App() {
 		try {
 			Cookies.remove('cart');
 
-			handleFetchCartData();
+			setCartData([]);
 		} catch (error) {
 		}
 	}
@@ -156,7 +158,6 @@ function App() {
 		}
 	};
 
-	const [currentPage, setCurrentPage] = useState(1);
 	const booksPerPage = 4;
 	const indexOfLastBook = currentPage * booksPerPage;
 	const indexOfFirstBook = indexOfLastBook - booksPerPage;
