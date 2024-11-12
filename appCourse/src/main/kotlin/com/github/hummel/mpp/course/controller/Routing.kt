@@ -153,7 +153,7 @@ fun Application.configureRouting() {
 			}
 
 			get("/authors") {
-				val authors = MainService.getAllAuthors() + "all"
+				val authors = listOf("all") + MainService.getAllAuthors()
 
 				val jsonResponse = gson.toJson(authors)
 

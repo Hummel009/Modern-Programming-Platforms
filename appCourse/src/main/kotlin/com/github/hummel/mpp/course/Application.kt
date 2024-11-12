@@ -40,5 +40,4 @@ fun Application.configureDatabase() {
 
 	UserDao.initTable()
 	BookDao.initTable()
-	BookDao.populateRandomBooks(10)
 }

@@ -101,7 +101,27 @@ function App() {
 		console.log(response.data);
 
 		setBooks(response.data);
+		setCurrentPage(1);
 	};
+
+	const [currentPage, setCurrentPage] = useState(1);
+	const booksPerPage = 4;
+	const indexOfLastBook = currentPage * booksPerPage;
+	const indexOfFirstBook = indexOfLastBook - booksPerPage;
+	const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
+	const totalPages = Math.ceil(books.length / booksPerPage);
+
+	const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
 
 	return (
 		<Router>
@@ -132,17 +152,20 @@ function App() {
 											))}
 										</select>
 
-										<ul>
-											{books.map(book => (
-												<li key={book.id}>
-													<strong>{book.title} </strong>
-													<span>Author: {book.author} </span>
-													<span>Description: {book.description} </span>
-													<span>Price: {book.price} </span>
-													<span>Img Path: {book.imgPath} </span>
-												</li>
+										<div className = "navi">
+											{currentBooks.map(book => (
+												<div key={book.id}>
+													<div className="title">«{book.title}»</div>
+													<div className="author">{book.author}</div>
+													<div className="description">{book.description}</div>
+													<button className="wds-button price" onClick={handlePrevPage}>Дадаць у кош ({book.price}$)</button>
+                                                    <img src={book.imgPath} width="100%" height="auto" alt=""/>
+												</div>
 											))}
-										</ul>
+										</div>
+
+								        <button className="wds-button prev" onClick={handlePrevPage} disabled={currentPage === 1}>Папярэдняя</button>
+								        <button className="wds-button next" onClick={handleNextPage} disabled={currentPage === totalPages}>Наступная</button>
 									</div>
 								}/>
 								<Route path="/register" element={
