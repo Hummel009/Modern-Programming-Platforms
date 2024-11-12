@@ -155,9 +155,11 @@ function App() {
 										<div className = "navi">
 											{currentBooks.map(book => (
 												<div key={book.id}>
-													<div className="title">«{book.title}»</div>
-													<div className="author">{book.author}</div>
-													<div className="description">{book.description}</div>
+													<div className="preamble">
+														<div className="title">«{book.title}»</div>
+														<div className="author">{book.author}</div>
+														<div className="description">{book.description}</div>
+													</div>
 													<button className="wds-button price" onClick={handlePrevPage}>Дадаць у кош ({book.price}$)</button>
                                                     <img src={book.imgPath} width="100%" height="auto" alt=""/>
 												</div>

@@ -322,6 +322,10 @@ select {
     text-align: center;
 }
 
+.navi>div .preamble {
+	height: 170px;
+}
+
 .navi>div .title {
 	font-weight: bold;
 }
