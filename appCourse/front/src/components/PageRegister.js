@@ -7,7 +7,8 @@ import Cookies from 'js-cookie';
 export const Register = (
 	{
 		isLoggedIn,
-		setIsLoggedIn
+		setIsLoggedIn,
+		handleFetchProfileData
 	}
 ) => {
 	const [registerData, setRegisterData] = useState({
@@ -27,6 +28,7 @@ export const Register = (
 			Cookies.set('jwt', response.data, { path: '/', secure: false, sameSite: 'Lax' });
 
 			setIsLoggedIn(true);
+			handleFetchProfileData();
 		} catch (error) {
 			alert('Register failed. Please check your credentials.');
 		}

@@ -48,7 +48,6 @@ function App() {
 
 			setIsLoggedIn(true);
 		} catch (error) {
-			handleClearCart();
 		}
 	}, []);
 
@@ -228,12 +227,14 @@ function App() {
 									<Register
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
+										handleFetchProfileData = {handleFetchProfileData}
 									/>
 								} />
 								<Route path="/login" element={
 									<Login
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
+										handleFetchProfileData = {handleFetchProfileData}
 									/>
 								} />
 								<Route path="/profile" element={
