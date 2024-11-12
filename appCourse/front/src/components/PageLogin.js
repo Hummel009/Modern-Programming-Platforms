@@ -7,8 +7,7 @@ import Cookies from 'js-cookie';
 export const Login = (
 	{
 		isLoggedIn,
-		setIsLoggedIn,
-		handleFetchUserData
+		setIsLoggedIn
 	}
 ) => {
 	const [loginData, setLoginData] = useState({
@@ -28,8 +27,6 @@ export const Login = (
 			Cookies.set('jwt', response.data, { path: '/', secure: false, sameSite: 'Lax' });
 
 			setIsLoggedIn(true);
-
-			handleFetchUserData();
 		} catch (error) {
 			alert('Login failed. Please check your credentials.');
 		}

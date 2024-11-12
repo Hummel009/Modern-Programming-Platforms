@@ -47,10 +47,24 @@ function App() {
 		setAuthors(response2.data);
 	}, []);
 
+	const handleFetchUserData = useCallback(async () => {
+		try {
+			const token = Cookies.get('jwt');
+
+			const response = await axios.post('http://localhost:2999/profile', {
+				token: token
+			});
+
+			setUserData(response.data);
+		} catch (error) {
+		}
+	}, []);
+
 	useEffect(() => {
+		handleFetchUserData();
 		handleFetchBooks();
 		handleUseToken()
-	}, [handleFetchBooks, handleUseToken]);
+	}, [handleFetchBooks, handleFetchUserData, handleUseToken]);
 
 	const handleDeleteToken = () => {
 		try {
@@ -63,21 +77,6 @@ function App() {
 		}
 	}
 
-	const handleFetchUserData = async () => {
-		try {
-			const token = Cookies.get('jwt');
-
-			const response = await axios.post('http://localhost:2999/profile', {
-				token: token
-			});
-
-			const userData = response.data;
-
-			setUserData(userData);
-		} catch (error) {
-		}
-	};
-
 	const handleFilterBooks = async (author) => {
 		const response = await axios.post('http://localhost:2999/books/filter',
 		{
@@ -89,7 +88,10 @@ function App() {
 	};
 
 	const handleAddToCart = async (book) => {
-		console.log(book.id);
+		let cart = Cookies.get('cart') ? JSON.parse(Cookies.get('cart')) : [];
+        cart.push(book);
+        Cookies.set('cart', JSON.stringify(cart), { expires: 7 });
+		console.log(cart);
 	};
 
 	const [currentPage, setCurrentPage] = useState(1);
@@ -162,14 +164,12 @@ function App() {
 									<Register
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
-										handleFetchUserData = {handleFetchUserData}
 									/>
 								} />
 								<Route path="/login" element={
 									<Login
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
-										handleFetchUserData = {handleFetchUserData}
 									/>
 								} />
 								<Route path="/profile" element={
