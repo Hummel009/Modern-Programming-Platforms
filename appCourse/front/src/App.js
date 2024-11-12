@@ -11,7 +11,6 @@ import { LocalNavigation } from './components/NavLocal.js'
 import { Register } from './components/PageRegister.js'
 import { Login } from './components/PageLogin.js'
 import { Profile } from './components/PageProfile.js'
-import { Cart } from './components/PageCart.js'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
@@ -20,11 +19,12 @@ function App() {
 	const [authors, setAuthors] = useState([]);
 
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
-	const [userData, setUserData] = useState({
+	const [profileData, setProfileData] = useState({
 		id: null,
 		username: '',
 		balance: 0
 	});
+	const [cartData, setCartData] = useState([]);
 
 	const handleUseToken = useCallback(async () => {
 		try {
@@ -47,7 +47,7 @@ function App() {
 		setAuthors(response2.data);
 	}, []);
 
-	const handleFetchUserData = useCallback(async () => {
+	const handleFetchProfileData = useCallback(async () => {
 		try {
 			const token = Cookies.get('jwt');
 
@@ -55,16 +55,39 @@ function App() {
 				token: token
 			});
 
-			setUserData(response.data);
+			setProfileData(response.data);
 		} catch (error) {
 		}
 	}, []);
 
+	const handleFetchCartData = useCallback(async () => {
+		try {
+			const cartCookie = Cookies.get('cart');
+			let cart = cartCookie ? JSON.parse(cartCookie) : [];
+
+			let chosenBooks = books.filter(book =>
+				cart.some(item => item.id === book.id)
+			);
+
+			const cartDataWithQuantities = chosenBooks.map(book => {
+				const itemInCart = cart.find(item => item.id === book.id);
+				return {
+					...book,
+					quantity: itemInCart ? itemInCart.quantity : 0
+				};
+			});
+
+			setCartData(cartDataWithQuantities);
+		} catch (error) {
+		}
+	}, [books]);
+
 	useEffect(() => {
-		handleFetchUserData();
+		handleFetchCartData();
+		handleFetchProfileData();
 		handleFetchBooks();
 		handleUseToken()
-	}, [handleFetchBooks, handleFetchUserData, handleUseToken]);
+	}, [handleFetchCartData, handleFetchProfileData, handleFetchBooks, handleUseToken]);
 
 	const handleDeleteToken = () => {
 		try {
@@ -88,10 +111,19 @@ function App() {
 	};
 
 	const handleAddToCart = async (book) => {
-		let cart = Cookies.get('cart') ? JSON.parse(Cookies.get('cart')) : [];
-        cart.push(book);
-        Cookies.set('cart', JSON.stringify(cart), { expires: 7 });
-		console.log(cart);
+		try {
+			let cart = Cookies.get('cart') ? JSON.parse(Cookies.get('cart')) : [];
+			const existingBook = cart.find(item => item.id === book.id);
+
+			if (existingBook) {
+				existingBook.quantity += 1;
+			} else {
+				cart.push({ id: book.id, quantity: 1 });
+			}
+
+			Cookies.set('cart', JSON.stringify(cart), { expires: 7 });
+		} catch (error) {
+		}
 	};
 
 	const [currentPage, setCurrentPage] = useState(1);
@@ -176,13 +208,29 @@ function App() {
 									<Profile
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
-										userData = {userData}
+										profileData = {profileData}
 										handleDeleteToken = {handleDeleteToken}
 									/>
 								} />
 								<Route path="/cart" element={
-									<Cart
-									/>
+									<div>
+										<h1>
+											<span id="lang-enter">Кош</span>
+										</h1>
+										<div className = "navi">
+											{cartData.map(book => (
+												<div key={book.id}>
+													<div className="preamble">
+														<div className="title">«{book.title}»</div>
+														<div className="author">{book.author}</div>
+														<div className="description">{book.description}</div>
+													</div>
+													<div className="title">Количество: {book.quantity}</div>
+													<img src={book.imgPath} width="100%" height="auto" alt=""/>
+												</div>
+											))}
+										</div>
+									</div>
 								} />
 							</Routes>
 						</main>

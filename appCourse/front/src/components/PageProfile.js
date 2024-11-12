@@ -8,7 +8,7 @@ export const Profile = (
 	{
 		isLoggedIn,
 		setIsLoggedIn,
-		userData,
+		profileData,
 		handleDeleteToken
 	}
 ) => {
@@ -60,8 +60,8 @@ export const Profile = (
 			</h1>
 			{isLoggedIn ? (
 				<div>
-					<div>Імя ўдзельніка: {userData.username}</div>
-					<div>Баланс: {userData.balance}$</div>
+					<div>Імя ўдзельніка: {profileData.username}</div>
+					<div>Баланс: {profileData.balance}$</div>
 						<form onSubmit={handleChangeUsername}>
 							<input
 								type="text"
