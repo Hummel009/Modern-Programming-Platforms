@@ -86,10 +86,12 @@ function App() {
 			author: author
 		});
 
-		console.log(response.data);
-
 		setBooks(response.data);
 		setCurrentPage(1);
+	};
+
+	const handleAddToCart = async (bookId) => {
+		console.log(bookId);
 	};
 
 	const [currentPage, setCurrentPage] = useState(1);
@@ -148,7 +150,7 @@ function App() {
 														<div className="author">{book.author}</div>
 														<div className="description">{book.description}</div>
 													</div>
-													<button className="wds-button price" onClick={handlePrevPage}>Дадаць у кош ({book.price}$)</button>
+													<button className="wds-button price" onClick={(e) => handleAddToCart(book.id)}>Дадаць у кош ({book.price}$)</button>
                                                     <img src={book.imgPath} width="100%" height="auto" alt=""/>
 												</div>
 											))}
