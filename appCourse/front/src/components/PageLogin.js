@@ -1,14 +1,20 @@
 import axios from 'axios';
+import React, {
+	useState
+} from 'react';
 
 export const Login = (
 	{
 		isLoggedIn,
 		setIsLoggedIn,
-		loginData,
-		setLoginData,
 		fetchUserData
 	}
 ) => {
+	const [loginData, setLoginData] = useState({
+		username: '',
+		password: ''
+	});
+
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
 		try {

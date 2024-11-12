@@ -1,17 +1,19 @@
 import axios from 'axios';
+import React, {
+	useState
+} from 'react';
 
 export const Profile = (
 	{
 		isLoggedIn,
 		setIsLoggedIn,
 		userData,
-		newUsername,
-		setNewUsername,
-		newPassword,
-		setNewPassword,
 		deleteCookieToken
 	}
 ) => {
+	const [newUsername, setNewUsername] = useState('');
+	const [newPassword, setNewPassword] = useState('');
+
 	const handleChangeUsername = async (e) => {
 		e.preventDefault();
 		try {

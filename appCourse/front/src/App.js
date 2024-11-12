@@ -18,24 +18,12 @@ function App() {
 	const [books, setBooks] = useState([]);
 	const [authors, setAuthors] = useState([]);
 
-	const [loginData, setLoginData] = useState({
-		username: '',
-		password: ''
-	});
-	const [registerData, setRegisterData] = useState({
-		username: '',
-		password: ''
-	});
-
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const [userData, setUserData] = useState({
 		id: null,
 		username: '',
 		balance: 0
 	});
-
-	const [newUsername, setNewUsername] = useState('');
-	const [newPassword, setNewPassword] = useState('');
 
 	const tryUseCookieToken = useCallback(async () => {
 		try {
@@ -174,8 +162,6 @@ function App() {
 									<Register
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
-										registerData = {registerData}
-										setRegisterData = {setRegisterData}
 										fetchUserData = {fetchUserData}
 									/>
 								} />
@@ -183,8 +169,6 @@ function App() {
 									<Login
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
-										loginData = {loginData}
-										setLoginData = {setLoginData}
 										fetchUserData = {fetchUserData}
 									/>
 								} />
@@ -193,10 +177,6 @@ function App() {
 										isLoggedIn = {isLoggedIn}
 										setIsLoggedIn = {setIsLoggedIn}
 										userData = {userData}
-										newUsername = {newUsername}
-										setNewUsername = {setNewUsername}
-										newPassword = {newPassword}
-										setNewPassword = {setNewPassword}
 										deleteCookieToken = {deleteCookieToken}
 									/>
 								} />

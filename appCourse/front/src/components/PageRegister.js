@@ -1,14 +1,20 @@
 import axios from 'axios';
+import React, {
+	useState
+} from 'react';
 
 export const Register = (
 	{
 		isLoggedIn,
 		setIsLoggedIn,
-		registerData,
-		setRegisterData,
 		fetchUserData
 	}
 ) => {
+	const [registerData, setRegisterData] = useState({
+		username: '',
+		password: ''
+	});
+
 	const handleRegisterSubmit = async (e) => {
 		e.preventDefault();
 		try {
