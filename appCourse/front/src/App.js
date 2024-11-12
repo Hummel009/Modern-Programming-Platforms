@@ -36,6 +36,7 @@ function App() {
 
 			setIsLoggedIn(true);
 		} catch (error) {
+			handleClearCart();
 		}
 	}, []);
 
@@ -92,6 +93,7 @@ function App() {
 	const handleDeleteToken = () => {
 		try {
 			Cookies.remove('jwt');
+			Cookies.remove('cart');
 
 			setIsLoggedIn(false);
 		} catch (error) {
