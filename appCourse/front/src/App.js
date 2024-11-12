@@ -39,11 +39,11 @@ function App() {
 		}
 	}, []);
 
-	const handleFetchBooks = useCallback(async () => {
+	const handleFetchBooksAuthors = useCallback(async () => {
 		const response1 = await axios.get('http://localhost:2999/books');
 		setBooks(response1.data);
 
-		const response2 = await axios.get('http://localhost:2999/books/authors');
+		const response2 = await axios.get('http://localhost:2999/authors');
 		setAuthors(response2.data);
 	}, []);
 
@@ -85,20 +85,34 @@ function App() {
 	useEffect(() => {
 		handleFetchCartData();
 		handleFetchProfileData();
-		handleFetchBooks();
+		handleFetchBooksAuthors();
 		handleUseToken()
-	}, [handleFetchCartData, handleFetchProfileData, handleFetchBooks, handleUseToken]);
+	}, [handleFetchCartData, handleFetchProfileData, handleFetchBooksAuthors, handleUseToken]);
 
 	const handleDeleteToken = () => {
 		try {
 			Cookies.remove('jwt');
 
 			setIsLoggedIn(false);
-
-			handleFetchBooks();
 		} catch (error) {
 		}
 	}
+
+	const handleClearCart = () => {
+		try {
+			Cookies.remove('cart');
+		} catch (error) {
+		}
+	}
+
+	const handleBuyBooks = async () => {
+		await axios.post('http://localhost:2999/buy',
+		{
+			cartData: cartData
+		});
+
+		handleClearCart()
+	};
 
 	const handleFilterBooks = async (author) => {
 		const response = await axios.post('http://localhost:2999/books/filter',
@@ -217,6 +231,18 @@ function App() {
 										<h1>
 											<span id="lang-enter">Кош</span>
 										</h1>
+										<div className="total-price">
+											{cartData.length > 0 ? (
+												<span>Сумарны кошт: {cartData.reduce((total, book) => total + (book.price * book.quantity), 0).toFixed(2)}$</span>
+											) : (
+												<span>Кош пусты.</span>
+											)}
+										</div>
+										<br/>
+										<button className="wds-button prev" onClick={handleBuyBooks} disabled={cartData.length <= 0}>Купіць</button>
+										<button className="wds-button next" onClick={handleClearCart} disabled={cartData.length <= 0}>Ачысціць кош</button>
+										<br/>
+										<br/>
 										<div className = "navi">
 											{cartData.map(book => (
 												<div key={book.id}>

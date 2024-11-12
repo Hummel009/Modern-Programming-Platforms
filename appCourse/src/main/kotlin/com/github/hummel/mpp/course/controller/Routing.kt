@@ -143,19 +143,19 @@ fun Application.configureRouting() {
 			}
 		}
 
-		route("books") {
+		get("/authors") {
+			val authors = listOf("all") + MainService.getAllAuthors()
+
+			val jsonResponse = gson.toJson(authors)
+
+			call.respond(jsonResponse)
+		}
+
+		route("/books") {
 			get {
 				val books = MainService.getAllBooks()
 
 				val jsonResponse = gson.toJson(books)
-
-				call.respond(jsonResponse)
-			}
-
-			get("/authors") {
-				val authors = listOf("all") + MainService.getAllAuthors()
-
-				val jsonResponse = gson.toJson(authors)
 
 				call.respond(jsonResponse)
 			}
