@@ -128,6 +128,7 @@ function App() {
 			handleClearCart();
 			handleFetchProfileData();
 		} catch (error) {
+			alert('Buy failed. Please check your credentials.');
 		}
 	};
 
