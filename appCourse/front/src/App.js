@@ -13,6 +13,7 @@ import { Login } from './components/PageLogin.js'
 import { Profile } from './components/PageProfile.js'
 import { Cart } from './components/PageCart.js'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 function App() {
 	const [books, setBooks] = useState([]);
@@ -27,8 +28,7 @@ function App() {
 
 	const handleUseToken = useCallback(async () => {
 		try {
-			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+			const token = Cookies.get('jwt');
 
 			await axios.post('http://localhost:2999/token', {
 				token: token
@@ -54,20 +54,18 @@ function App() {
 
 	const handleDeleteToken = () => {
 		try {
-			document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+			Cookies.remove('jwt');
 
 			setIsLoggedIn(false);
 
 			handleFetchBooks();
 		} catch (error) {
-			alert('Error occurred while trying to delete the cookie.');
 		}
 	}
 
 	const handleFetchUserData = async () => {
 		try {
-			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+			const token = Cookies.get('jwt');
 
 			const response = await axios.post('http://localhost:2999/profile', {
 				token: token
@@ -102,16 +100,16 @@ function App() {
 	const totalPages = Math.ceil(books.length / booksPerPage);
 
 	const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
-        }
-    };
+		if (currentPage < totalPages) {
+			setCurrentPage(currentPage + 1);
+		}
+	};
 
-    const handlePrevPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
-    };
+	const handlePrevPage = () => {
+		if (currentPage > 1) {
+			setCurrentPage(currentPage - 1);
+		}
+	};
 
 	return (
 		<Router>
@@ -151,13 +149,13 @@ function App() {
 														<div className="description">{book.description}</div>
 													</div>
 													<button className="wds-button price" onClick={(e) => handleAddToCart(book)}>Дадаць у кош ({book.price}$)</button>
-                                                    <img src={book.imgPath} width="100%" height="auto" alt=""/>
+													<img src={book.imgPath} width="100%" height="auto" alt=""/>
 												</div>
 											))}
 										</div>
 
-								        <button className="wds-button prev" onClick={handlePrevPage} disabled={currentPage === 1}>Папярэдняя</button>
-								        <button className="wds-button next" onClick={handleNextPage} disabled={currentPage === totalPages}>Наступная</button>
+										<button className="wds-button prev" onClick={handlePrevPage} disabled={currentPage === 1}>Папярэдняя</button>
+										<button className="wds-button next" onClick={handleNextPage} disabled={currentPage === totalPages}>Наступная</button>
 									</div>
 								}/>
 								<Route path="/register" element={

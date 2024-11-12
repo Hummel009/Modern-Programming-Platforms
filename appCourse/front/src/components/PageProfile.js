@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, {
 	useState
 } from 'react';
+import Cookies from 'js-cookie';
 
 export const Profile = (
 	{
@@ -17,8 +18,7 @@ export const Profile = (
 	const handleChangeUsername = async (e) => {
 		e.preventDefault();
 		try {
-			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+			const token = Cookies.get('jwt');
 
 			await axios.post('http://localhost:2999/profile/username',
 			{
@@ -37,8 +37,7 @@ export const Profile = (
 	const handleChangePassword = async (e) => {
 		e.preventDefault();
 		try {
-			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+			const token = Cookies.get('jwt');
 
 			await axios.post('http://localhost:2999/profile/password',
 			{

@@ -313,13 +313,13 @@ select {
 	width: 40%;
 	margin-right: 20px;
 	margin-bottom: 20px;
-    border: 2px solid;
-    padding: 20px;
+	border: 2px solid;
+	padding: 20px;
 	border-radius: 3px;
 }
 
 .navi>div>* {
-    text-align: center;
+	text-align: center;
 }
 
 .navi>div .preamble {
@@ -350,5 +350,5 @@ select {
 }
 
 .wds-button.prev {
-    margin-right: 20px;
+	margin-right: 20px;
 }

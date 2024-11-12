@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, {
 	useState
 } from 'react';
+import Cookies from 'js-cookie';
 
 export const Login = (
 	{
@@ -24,7 +25,8 @@ export const Login = (
 				password: loginData.password
 			});
 
-			document.cookie = `jwt=${response.data}; path=/; secure=false; SameSite=Lax`;
+			Cookies.set('jwt', response.data, { path: '/', secure: false, sameSite: 'Lax' });
+
 			setIsLoggedIn(true);
 
 			handleFetchUserData();
