@@ -354,8 +354,8 @@ select {
 }
 
 .total-price {
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-    font-weight: bold;
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	font-weight: bold;
 }

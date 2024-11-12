@@ -26,6 +26,16 @@ function App() {
 	});
 	const [cartData, setCartData] = useState([]);
 
+	const handleFetchBooks = useCallback(async () => {
+		const response = await axios.get('http://localhost:2999/books');
+		setBooks(response.data);
+	}, []);
+
+	const handleFetchAuthors = useCallback(async () => {
+		const response = await axios.get('http://localhost:2999/authors');
+		setAuthors(response.data);
+	}, []);
+
 	const handleUseToken = useCallback(async () => {
 		try {
 			const token = Cookies.get('jwt');
@@ -38,14 +48,6 @@ function App() {
 		} catch (error) {
 			handleClearCart();
 		}
-	}, []);
-
-	const handleFetchBooksAuthors = useCallback(async () => {
-		const response1 = await axios.get('http://localhost:2999/books');
-		setBooks(response1.data);
-
-		const response2 = await axios.get('http://localhost:2999/authors');
-		setAuthors(response2.data);
 	}, []);
 
 	const handleFetchProfileData = useCallback(async () => {
@@ -66,7 +68,9 @@ function App() {
 			const cartCookie = Cookies.get('cart');
 			let cart = cartCookie ? JSON.parse(cartCookie) : [];
 
-			let chosenBooks = books.filter(book =>
+			const response = await axios.get('http://localhost:2999/books');
+
+			let chosenBooks = response.data.filter(book =>
 				cart.some(item => item.id === book.id)
 			);
 
@@ -81,14 +85,25 @@ function App() {
 			setCartData(cartDataWithQuantities);
 		} catch (error) {
 		}
-	}, [books]);
+	}, []);
 
 	useEffect(() => {
+		handleFetchBooks();
+		handleFetchAuthors();
+		handleUseToken()
 		handleFetchCartData();
 		handleFetchProfileData();
-		handleFetchBooksAuthors();
-		handleUseToken()
-	}, [handleFetchCartData, handleFetchProfileData, handleFetchBooksAuthors, handleUseToken]);
+	}, [handleFetchBooks, handleFetchAuthors, handleUseToken, handleFetchCartData, handleFetchProfileData]);
+
+	const handleFilterBooks = async (author) => {
+		const response = await axios.post('http://localhost:2999/books/filter',
+		{
+			author: author
+		});
+
+		setBooks(response.data);
+		setCurrentPage(1);
+	};
 
 	const handleDeleteToken = () => {
 		try {
@@ -100,31 +115,28 @@ function App() {
 		}
 	}
 
+	const handleBuyBooks = async () => {
+		try {
+			const token = Cookies.get('jwt');
+
+			await axios.post('http://localhost:2999/buy', {
+				token: token,
+				cartData: cartData
+			});
+
+			handleClearCart()
+		} catch (error) {
+		}
+	};
+
 	const handleClearCart = () => {
 		try {
 			Cookies.remove('cart');
+
+			handleFetchCartData();
 		} catch (error) {
 		}
 	}
-
-	const handleBuyBooks = async () => {
-		await axios.post('http://localhost:2999/buy',
-		{
-			cartData: cartData
-		});
-
-		handleClearCart()
-	};
-
-	const handleFilterBooks = async (author) => {
-		const response = await axios.post('http://localhost:2999/books/filter',
-		{
-			author: author
-		});
-
-		setBooks(response.data);
-		setCurrentPage(1);
-	};
 
 	const handleAddToCart = async (book) => {
 		try {
@@ -138,6 +150,8 @@ function App() {
 			}
 
 			Cookies.set('cart', JSON.stringify(cart), { expires: 7 });
+
+			handleFetchCartData();
 		} catch (error) {
 		}
 	};

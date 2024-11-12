@@ -1,5 +1,6 @@
 package com.github.hummel.mpp.course.controller
 
+import com.github.hummel.mpp.course.dto.BuyRequest
 import com.github.hummel.mpp.course.dto.ChangePasswordRequest
 import com.github.hummel.mpp.course.dto.ChangeUsernameRequest
 import com.github.hummel.mpp.course.dto.FilterBooksRequest
@@ -8,6 +9,7 @@ import com.github.hummel.mpp.course.dto.ProfileRequest
 import com.github.hummel.mpp.course.dto.RegisterRequest
 import com.github.hummel.mpp.course.dto.TokenRequest
 import com.github.hummel.mpp.course.service.AuthService
+import com.github.hummel.mpp.course.service.CartService
 import com.github.hummel.mpp.course.service.MainService
 import com.github.hummel.mpp.course.service.ProfileService
 import com.google.gson.Gson
@@ -48,15 +50,35 @@ fun Application.configureRouting() {
 				val request = gson.fromJson(jsonRequest, FilterBooksRequest::class.java)
 				val author = request.author
 
-				val books = MainService.getAllBooks()
+				val booksToShow = MainService.getBooksOfAuthor(author)
 
-				val filteredBooks = books.asSequence().filter {
-					it.author == author || author == "all"
-				}.toList()
-
-				val jsonResponse = gson.toJson(filteredBooks)
+				val jsonResponse = gson.toJson(booksToShow)
 
 				call.respond(jsonResponse)
+			}
+		}
+
+		post("/buy") {
+			val jsonRequest = call.receiveText()
+
+			val request = gson.fromJson(jsonRequest, BuyRequest::class.java)
+
+			val token = AuthService.decomposeToken(request.token)
+
+			val username = token?.username
+			val password = token?.password
+
+			if (AuthService.areCredentialsValid(username, password)) {
+				val idsToBuy = request.cartData.map { it.id }
+				val booksToBuy = MainService.getBooksWithIds(idsToBuy)
+
+				if (CartService.buyBooks(username!!, booksToBuy)) {
+					call.respond(HttpStatusCode.OK)
+				} else {
+					call.respond(HttpStatusCode.BadRequest)
+				}
+			} else {
+				call.respond(HttpStatusCode.Unauthorized)
 			}
 		}
 
@@ -90,11 +112,7 @@ fun Application.configureRouting() {
 				if (AuthService.areCredentialsValid(username, password)) {
 					val user = ProfileService.getUserData(username!!)
 
-					if (user != null) {
-						call.respond(gson.toJson(user))
-					} else {
-						call.respond(HttpStatusCode.Unauthorized)
-					}
+					call.respond(gson.toJson(user))
 				} else {
 					call.respond(HttpStatusCode.Unauthorized)
 				}

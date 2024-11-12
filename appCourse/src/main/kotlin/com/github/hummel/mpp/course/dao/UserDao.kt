@@ -40,7 +40,7 @@ object UserDao {
 
 	fun findUserByUsername(username: String): User? {
 		val sql = "SELECT * FROM users WHERE username = ?"
-		try {
+		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setString(1, username)
 			val rs = pstmt.executeQuery()
@@ -48,11 +48,13 @@ object UserDao {
 				return User(
 					rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getInt("balance")
 				)
+			} else {
+				null
 			}
 		} catch (e: SQLException) {
 			e.printStackTrace()
+			null
 		}
-		return null
 	}
 
 	fun updateUserUsername(username: String, newUsername: String): Boolean {
@@ -73,6 +75,36 @@ object UserDao {
 		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setString(1, newPassword)
+			pstmt.setString(2, username)
+			pstmt.executeUpdate() > 0
+		} catch (e: SQLException) {
+			e.printStackTrace()
+			false
+		}
+	}
+
+	fun findUserBalance(username: String): Double? {
+		val sql = "SELECT balance FROM users WHERE username = ?"
+		return try {
+			val pstmt = connection.prepareStatement(sql)
+			pstmt.setString(1, username)
+			val rs = pstmt.executeQuery()
+			if (rs.next()) {
+				rs.getDouble("balance")
+			} else {
+				null
+			}
+		} catch (e: SQLException) {
+			e.printStackTrace()
+			null
+		}
+	}
+
+	fun updateUserBalance(username: String, newBalance: Double): Boolean {
+		val sql = "UPDATE users SET balance = ? WHERE username = ?"
+		return try {
+			val pstmt = connection.prepareStatement(sql)
+			pstmt.setDouble(1, newBalance)
 			pstmt.setString(2, username)
 			pstmt.executeUpdate() > 0
 		} catch (e: SQLException) {
