@@ -262,7 +262,7 @@ function App() {
 											)}
 										</div>
 										<br />
-										<button className="wds-button prev" onClick={handleBuyBooks} disabled={cartData.length <= 0}>Купіць</button>
+										<button className="wds-button prev" onClick={handleBuyBooks} disabled={cartData.length <= 0 || !isLoggedIn}>Купіць</button>
 										<button className="wds-button next" onClick={handleClearCart} disabled={cartData.length <= 0}>Ачысціць кош</button>
 										<br />
 										<br />
