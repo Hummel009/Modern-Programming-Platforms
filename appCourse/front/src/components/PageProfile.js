@@ -86,17 +86,24 @@ export const Profile = ({
 					</form>
 
 					{orders.map(order => {
-						
 						return (
 							<div>
 								<br />
-								<div className="id0">Пакупка №{order.orderId}</div>
-								{order.orderItems.map(item => (
-									<div>
-										<span className="id1">BOOK ID: {item.bookId}; </span>
-										<span className="id2">BOOK QUANT: {item.quantity}; </span>
-									</div>
-								))}
+								<h2 className="sale">Пакупка №{order.number}</h2>
+								<h2 className="sum">Агульны кошт: {order.totalPrice}$</h2>
+								<div className="navi">
+									{order.books.map((book, index) => (
+										<div key={book.id}>
+										<div className="preamble">
+											<div className="title">«{book.title}»</div>
+											<div className="author">{book.author}</div>
+											<div className="description">{book.description}</div>
+										</div>
+										<div className="quantity">Колькасць: {order.quantities[index]}</div>
+										<img src={book.imgPath} width="100%" height="auto" alt="" />
+										</div>
+									))}
+								</div>
 							</div>
 						)
 					})}

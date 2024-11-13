@@ -2,7 +2,6 @@ package com.github.hummel.mpp.course.dao
 
 import com.github.hummel.mpp.course.connection
 import com.github.hummel.mpp.course.entity.Order
-import com.github.hummel.mpp.course.entity.OrderItem
 import java.sql.SQLException
 import java.sql.Statement
 
@@ -96,7 +95,7 @@ object OrderDao {
 				}
 
 				if (rs.getObject("item_id") != null) {
-					val orderItem = OrderItem(
+					val orderItem = Order.OrderItem(
 						rs.getInt("item_id"), orderId, rs.getInt("book_id"), rs.getInt("quantity")
 					)
 					order.orderItems.add(orderItem)

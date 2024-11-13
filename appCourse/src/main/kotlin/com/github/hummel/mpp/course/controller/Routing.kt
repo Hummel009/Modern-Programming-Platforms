@@ -1,6 +1,7 @@
 package com.github.hummel.mpp.course.controller
 
 import com.github.hummel.mpp.course.dto.*
+import com.github.hummel.mpp.course.entity.OrderFull
 import com.github.hummel.mpp.course.service.AuthService
 import com.github.hummel.mpp.course.service.CartService
 import com.github.hummel.mpp.course.service.MainService
@@ -12,7 +13,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-val gson = Gson()
+val gson: Gson = Gson()
 
 fun Application.configureRouting() {
 	routing {
@@ -114,7 +115,7 @@ fun Application.configureRouting() {
 				if (AuthService.areCredentialsValid(username, password)) {
 					val user = ProfileService.getUserData(username!!)!!
 
-					val jsonResponse = gson.toJson(user.toResponse())
+					val jsonResponse = gson.toJson(user.erasePassword())
 
 					call.respond(jsonResponse)
 				} else {
@@ -135,7 +136,33 @@ fun Application.configureRouting() {
 				if (AuthService.areCredentialsValid(username, password)) {
 					val orders = ProfileService.getUserOrders(userId)
 
-					val jsonResponse = gson.toJson(orders.map { it.toResponse() })
+					val ordersNums = orders.mapIndexed { index, _ -> index + 1 }
+					val ordersBooks = orders.map {
+						MainService.getBooksWithIds(it.orderItems.map {
+							it.bookId
+						})
+					}
+					val ordersBooksQuantities = orders.map {
+						it.orderItems.map {
+							it.quantity
+						}
+					}
+					val orderPrices = orders.mapIndexed { index, order ->
+						order.orderItems.zip(ordersBooks[index]) { orderItem, book ->
+							orderItem.quantity * book.price
+						}.sum()
+					}
+
+					val ordersFull = ordersNums.indices.map { index ->
+						OrderFull(
+							number = ordersNums[index],
+							totalPrice = orderPrices[index],
+							books = ordersBooks[index],
+							quantities = ordersBooksQuantities[index]
+						)
+					}
+
+					val jsonResponse = gson.toJson(ordersFull)
 
 					call.respond(jsonResponse)
 				} else {
