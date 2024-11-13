@@ -5,6 +5,7 @@ import com.github.hummel.mpp.course.dto.ChangePasswordRequest
 import com.github.hummel.mpp.course.dto.ChangeUsernameRequest
 import com.github.hummel.mpp.course.dto.FilterBooksRequest
 import com.github.hummel.mpp.course.dto.LoginRequest
+import com.github.hummel.mpp.course.dto.OrdersRequest
 import com.github.hummel.mpp.course.dto.ProfileRequest
 import com.github.hummel.mpp.course.dto.RegisterRequest
 import com.github.hummel.mpp.course.dto.TokenRequest
@@ -113,9 +114,30 @@ fun Application.configureRouting() {
 				if (AuthService.areCredentialsValid(username, password)) {
 					val user = ProfileService.getUserData(username!!)!!
 
-					val userResponse = user.toResponse()
+					val jsonResponse = gson.toJson(user.toResponse())
 
-					call.respond(gson.toJson(userResponse))
+					call.respond(jsonResponse)
+				} else {
+					call.respond(HttpStatusCode.Unauthorized)
+				}
+			}
+
+			post("/orders") {
+				val jsonRequest = call.receiveText()
+
+				val request = gson.fromJson(jsonRequest, OrdersRequest::class.java)
+				val token = AuthService.decomposeToken(request.token)
+
+				val userId = request.userId
+				val username = token?.username
+				val password = token?.password
+
+				if (AuthService.areCredentialsValid(username, password)) {
+					val orders = ProfileService.getUserOrders(userId)
+
+					val jsonResponse = gson.toJson(orders.map { it.toResponse() })
+
+					call.respond(jsonResponse)
 				} else {
 					call.respond(HttpStatusCode.Unauthorized)
 				}

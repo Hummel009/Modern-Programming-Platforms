@@ -1,7 +1,9 @@
 package com.github.hummel.mpp.course.service
 
 import at.favre.lib.crypto.bcrypt.BCrypt
+import com.github.hummel.mpp.course.dao.OrderDao
 import com.github.hummel.mpp.course.dao.UserDao
+import com.github.hummel.mpp.course.entity.Order
 import com.github.hummel.mpp.course.entity.User
 
 object ProfileService {
@@ -15,4 +17,6 @@ object ProfileService {
 
 		return UserDao.updateUserPassword(userId, hashedPassword)
 	}
+
+	fun getUserOrders(userId: Int): List<Order> = OrderDao.findAllUserOrders(userId)
 }

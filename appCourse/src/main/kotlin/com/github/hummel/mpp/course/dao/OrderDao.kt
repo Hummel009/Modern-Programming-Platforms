@@ -50,7 +50,7 @@ object OrderDao {
 		}
 	}
 
-	fun getUserOrders(userId: Int): List<Order> {
+	fun findAllUserOrders(userId: Int): List<Order> {
 		val sql = "SELECT * FROM orders WHERE user_id = ?"
 
 		val orders = mutableListOf<Order>()

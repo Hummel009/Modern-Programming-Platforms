@@ -90,7 +90,7 @@ object BookDao {
 		}
 	}
 
-	fun getAllBooks(): List<Book> {
+	fun findAllBooks(): List<Book> {
 		val sql = "SELECT * FROM books"
 
 		val books = mutableListOf<Book>()
@@ -117,7 +117,7 @@ object BookDao {
 		}
 	}
 
-	fun getUniqueAuthors(): List<String> {
+	fun findUniqueAuthors(): List<String> {
 		val sql = "SELECT DISTINCT author FROM books"
 
 		val authors = mutableSetOf<String>()

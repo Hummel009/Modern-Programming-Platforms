@@ -8,7 +8,8 @@ export const Profile = ({
 	isLoggedIn,
 	setIsLoggedIn,
 	userData,
-	handleDeleteToken
+	handleDeleteToken,
+	orders
 }) => {
 	const [newUsername, setNewUsername] = useState('');
 	const [newPassword, setNewPassword] = useState('');
@@ -83,6 +84,13 @@ export const Profile = ({
 						/>
 						<button type="submit" className="wds-button">Змяніць пароль</button>
 					</form>
+
+					{orders.map(order => (
+						<div>
+							<span className="id1">«{order.bookId}»</span>
+							<span className="id2">{order.quantity}</span>
+						</div>
+					))}
 				</div>
 			) : (
 				<p>Калі ласка, увайдзіце ў сістэму, каб убачыць свае даныя.</p>

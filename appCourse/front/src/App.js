@@ -27,6 +27,8 @@ function App() {
 	});
 
 	const [cartData, setCartData] = useState([]);
+	
+	const [orders, setOrders] = useState([]);
 
 	const [currentPage, setCurrentPage] = useState(1);
 
@@ -66,6 +68,20 @@ function App() {
 		}
 	}, []);
 
+	const handleFetchOrders = useCallback(async () => {
+		try {
+			const token = Cookies.get('jwt');
+
+			const response = await axios.post('http://localhost:2999/profile/orders', {
+				userId: userData.id,
+				token: token
+			});
+
+			setOrders(response.data);
+		} catch (error) {
+		}
+	}, [userData.id]);
+
 	const handleFetchCartData = useCallback(async () => {
 		try {
 			const cartCookie = Cookies.get('cart');
@@ -96,7 +112,8 @@ function App() {
 		handleUseToken()
 		handleFetchCartData();
 		handleFetchUserData();
-	}, [handleFetchBooks, handleFetchAuthors, handleUseToken, handleFetchCartData, handleFetchUserData]);
+		handleFetchOrders();
+	}, [handleFetchBooks, handleFetchAuthors, handleUseToken, handleFetchCartData, handleFetchUserData, handleFetchOrders]);
 
 	const handleFilterBooks = async (author) => {
 		const response = await axios.post('http://localhost:2999/books/filter', {
@@ -130,6 +147,7 @@ function App() {
 
 			handleClearCart();
 			handleFetchUserData();
+			handleFetchOrders();
 		} catch (error) {
 			alert('Buy failed. Please check your credentials.');
 		}
@@ -247,6 +265,7 @@ function App() {
 										setIsLoggedIn={setIsLoggedIn}
 										userData={userData}
 										handleDeleteToken={handleDeleteToken}
+										orders={orders}
 									/>
 								} />
 								<Route path="/cart" element={
