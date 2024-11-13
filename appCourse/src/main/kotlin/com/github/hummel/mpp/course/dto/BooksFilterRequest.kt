@@ -1,5 +1,5 @@
 package com.github.hummel.mpp.course.dto
 
-data class FilterBooksRequest(
+data class BooksFilterRequest(
 	val author: String
 )

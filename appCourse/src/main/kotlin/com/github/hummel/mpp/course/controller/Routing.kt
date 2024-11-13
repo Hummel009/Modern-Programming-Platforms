@@ -1,28 +1,16 @@
 package com.github.hummel.mpp.course.controller
 
-import com.github.hummel.mpp.course.dto.BuyRequest
-import com.github.hummel.mpp.course.dto.ChangePasswordRequest
-import com.github.hummel.mpp.course.dto.ChangeUsernameRequest
-import com.github.hummel.mpp.course.dto.FilterBooksRequest
-import com.github.hummel.mpp.course.dto.LoginRequest
-import com.github.hummel.mpp.course.dto.OrdersRequest
-import com.github.hummel.mpp.course.dto.ProfileRequest
-import com.github.hummel.mpp.course.dto.RegisterRequest
-import com.github.hummel.mpp.course.dto.TokenRequest
+import com.github.hummel.mpp.course.dto.*
 import com.github.hummel.mpp.course.service.AuthService
 import com.github.hummel.mpp.course.service.CartService
 import com.github.hummel.mpp.course.service.MainService
 import com.github.hummel.mpp.course.service.ProfileService
 import com.google.gson.Gson
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.Application
-import io.ktor.server.application.call
-import io.ktor.server.request.receiveText
-import io.ktor.server.response.respond
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 
 val gson = Gson()
 
@@ -48,12 +36,24 @@ fun Application.configureRouting() {
 			post("/filter") {
 				val jsonRequest = call.receiveText()
 
-				val request = gson.fromJson(jsonRequest, FilterBooksRequest::class.java)
+				val request = gson.fromJson(jsonRequest, BooksFilterRequest::class.java)
 				val author = request.author
 
 				val booksToShow = MainService.getBooksOfAuthor(author)
 
 				val jsonResponse = gson.toJson(booksToShow)
+
+				call.respond(jsonResponse)
+			}
+
+			post("/ids") {
+				val jsonRequest = call.receiveText()
+				val request = gson.fromJson(jsonRequest, BooksIdsRequest::class.java)
+
+				val ids = request.bookIds
+				val booksByIds = MainService.getBooksWithIds(ids)
+
+				val jsonResponse = gson.toJson(booksByIds)
 
 				call.respond(jsonResponse)
 			}
@@ -146,7 +146,7 @@ fun Application.configureRouting() {
 			post("/password") {
 				val jsonRequest = call.receiveText()
 
-				val request = gson.fromJson(jsonRequest, ChangePasswordRequest::class.java)
+				val request = gson.fromJson(jsonRequest, ProfilePasswordRequest::class.java)
 				val token = AuthService.decomposeToken(request.token)
 
 				val userId = request.userId
@@ -168,7 +168,7 @@ fun Application.configureRouting() {
 			post("/username") {
 				val jsonRequest = call.receiveText()
 
-				val request = gson.fromJson(jsonRequest, ChangeUsernameRequest::class.java)
+				val request = gson.fromJson(jsonRequest, ProfileUsernameRequest::class.java)
 				val token = AuthService.decomposeToken(request.token)
 
 				val userId = request.userId

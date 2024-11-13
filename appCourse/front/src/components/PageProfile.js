@@ -85,17 +85,21 @@ export const Profile = ({
 						<button type="submit" className="wds-button">Змяніць пароль</button>
 					</form>
 
-					{orders.map(order => (
-						<div>
-							<span className="id0">ORDER ID: {order.orderId}; </span>
-							{order.orderItems.map(item => (
-								<div>
-									<span className="id1">BOOK ID: {item.bookId}; </span>
-									<span className="id2">BOOK QUANT: {item.quantity}; </span>
-								</div>
-							))}
-						</div>
-					))}
+					{orders.map(order => {
+						
+						return (
+							<div>
+								<br />
+								<div className="id0">Пакупка №{order.orderId}</div>
+								{order.orderItems.map(item => (
+									<div>
+										<span className="id1">BOOK ID: {item.bookId}; </span>
+										<span className="id2">BOOK QUANT: {item.quantity}; </span>
+									</div>
+								))}
+							</div>
+						)
+					})}
 				</div>
 			) : (
 				<p>Калі ласка, увайдзіце ў сістэму, каб убачыць свае даныя.</p>
