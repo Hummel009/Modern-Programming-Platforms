@@ -59,39 +59,39 @@ export const Main = ({
 	};
 
 	return (
-        <div>
-            <h1>
-                <span id="lang-enter">Галоўная</span>
-            </h1>
+		<div>
+			<h1>
+				<span id="lang-enter">Галоўная</span>
+			</h1>
 
-            <div>
-                Тут вы можаце знайсці вельмі многа розных кніг.
-            </div>
+			<div>
+				Тут вы можаце знайсці вельмі многа розных кніг.
+			</div>
 
-            <br />
+			<br />
 
-            <select onChange={(e) => handleFilterBooks(e.target.value)}>
-                {authors.map(author => (
-                    <option key={author} value={author}>{author}</option>
-                ))}
-            </select>
+			<select onChange={(e) => handleFilterBooks(e.target.value)}>
+				{authors.map(author => (
+					<option key={author} value={author}>{author}</option>
+				))}
+			</select>
 
-            <div className="navi">
-                {currentBooks.map(book => (
-                    <div key={book.id}>
-                        <div className="preamble">
-                            <div className="title">«{book.title}»</div>
-                            <div className="author">{book.author}</div>
-                            <div className="description">{book.description}</div>
-                        </div>
-                        <button className="wds-button price" onClick={(e) => handleAddToCart(book)}>Дадаць у кош ({book.price}$)</button>
-                        <img src={book.imgPath} width="100%" height="auto" alt="" />
-                    </div>
-                ))}
-            </div>
+			<div className="navi">
+				{currentBooks.map(book => (
+					<div key={book.id}>
+						<div className="preamble">
+							<div className="title">«{book.title}»</div>
+							<div className="author">{book.author}</div>
+							<div className="description">{book.description}</div>
+						</div>
+						<button className="wds-button price" onClick={(e) => handleAddToCart(book)}>Дадаць у кош ({book.price}$)</button>
+						<img src={book.imgPath} width="100%" height="auto" alt="" />
+					</div>
+				))}
+			</div>
 
-            <button className="wds-button prev" onClick={handlePrevPage} disabled={currentPage === 1}>Папярэдняя</button>
-            <button className="wds-button next" onClick={handleNextPage} disabled={currentPage === totalPages}>Наступная</button>
-        </div>
-    )
+			<button className="wds-button prev" onClick={handlePrevPage} disabled={currentPage === 1}>Папярэдняя</button>
+			<button className="wds-button next" onClick={handleNextPage} disabled={currentPage === totalPages}>Наступная</button>
+		</div>
+	)
 }
