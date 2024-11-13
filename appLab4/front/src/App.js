@@ -30,7 +30,7 @@ function App() {
 
 	useEffect(() => {
 		loginWsRef.current = new WebSocket('ws://localhost:2999/login');
-		loginWsRef.current.onmessage = function(event) {
+		loginWsRef.current.onmessage = function (event) {
 			const response = event.data;
 			if (response !== "Unauthorized") {
 				document.cookie = `jwt=${response}; path=/; secure=false; SameSite=Lax`;
@@ -42,7 +42,7 @@ function App() {
 		};
 
 		tokenWsRef.current = new WebSocket('ws://localhost:2999/token');
-		tokenWsRef.current.onmessage = function(event) {
+		tokenWsRef.current.onmessage = function (event) {
 			const response = event.data;
 			if (response !== "Unauthorized") {
 				setIsLoggedIn(true);
@@ -53,25 +53,25 @@ function App() {
 		};
 
 		getTasksWsRef.current = new WebSocket('ws://localhost:2999/get_tasks');
-		getTasksWsRef.current.onmessage = function(event) {
+		getTasksWsRef.current.onmessage = function (event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
 
 		clearTasksWsRef.current = new WebSocket('ws://localhost:2999/clear_tasks');
-		clearTasksWsRef.current.onmessage = function(event) {
+		clearTasksWsRef.current.onmessage = function (event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
 
 		filterTasksWsRef.current = new WebSocket('ws://localhost:2999/filter_tasks');
-		filterTasksWsRef.current.onmessage = function(event) {
+		filterTasksWsRef.current.onmessage = function (event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
 
 		editTaskWsRef.current = new WebSocket('ws://localhost:2999/edit_task');
-		editTaskWsRef.current.onmessage = function(event) {
+		editTaskWsRef.current.onmessage = function (event) {
 			const tasksMap = new Map(Object.entries(JSON.parse(event.data)));
 			setTasks(tasksMap);
 		};
@@ -85,8 +85,8 @@ function App() {
 
 	const clearTasks = async () => {
 		if (clearTasksWsRef.current) {
-    		clearTasksWsRef.current.send("");
-    	}
+			clearTasksWsRef.current.send("");
+		}
 	};
 
 	const filterTasks = async (filter) => {
@@ -94,7 +94,7 @@ function App() {
 			filterTasksWsRef.current.send(JSON.stringify({
 				filter: filter
 			}));
-    	}
+		}
 	};
 
 	const editTask = async (index) => {
@@ -103,9 +103,11 @@ function App() {
 			const title = prompt("Введите новое название задачи:", taskToEdit.title);
 
 			if (title) {
-				editTaskWsRef.current.send(JSON.stringify({ index: index, title: title }));
+				editTaskWsRef.current.send(JSON.stringify({
+					index: index, title: title
+				}));
 			}
-    	}
+		}
 	};
 
 	const makeError = async () => {
@@ -148,9 +150,7 @@ function App() {
 		for (const key in formData) {
 			form.append(key, formData[key]);
 		}
-		await axios.post('http://localhost:2999/add-task',
-		form,
-		{
+		await axios.post('http://localhost:2999/add-task', form, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
@@ -215,7 +215,10 @@ function App() {
 				<div>
 					{errorCode ? (
 						<div>
-							<ErrorPage message={errorCode} returnBack={returnBack} />
+							<ErrorPage
+								message={errorCode}
+								returnBack={returnBack}
+							/>
 						</div>
 					) : (
 						<div>
@@ -256,23 +259,23 @@ function App() {
 								<ul>
 									{Array.from(tasks).map(([id, task]) => {
 										return (
-										<li key={id}>
-											<strong>{task.title}</strong> - {task.status}
-											{task.file && (
-												<div>
-													<br />
-													Прикрепленный файл: {task.file}
-												</div>
-											)}
-											<span id="fltright"><button onClick={() => editTask(id)}>Редактировать</button></span>
-											<span id="fltright">Дата: {task.dueDate}</span>
-										</li>
+											<li key={id}>
+												<strong>{task.title}</strong> - {task.status}
+												{task.file && (
+													<div>
+														<br />
+														Прикрепленный файл: {task.file}
+													</div>
+												)}
+												<span id="fltright"><button onClick={() => editTask(id)}>Редактировать</button></span>
+												<span id="fltright">Дата: {task.dueDate}</span>
+											</li>
 										)
 									})}
 								</ul>
 							</div>
 							<button onClick={clearTasks}>Очистить список задач</button>
-							<button id = "redfont" onClick={makeError}>Совершить ошибку</button>
+							<button id="redfont" onClick={makeError}>Совершить ошибку</button>
 						</div>
 					)}
 				</div>
@@ -281,7 +284,10 @@ function App() {
 	);
 }
 
-function ErrorPage({ message, returnBack }) {
+function ErrorPage({
+	message,
+	returnBack
+}) {
 	return (
 		<div>
 			<h1>Произошла ошибка</h1>

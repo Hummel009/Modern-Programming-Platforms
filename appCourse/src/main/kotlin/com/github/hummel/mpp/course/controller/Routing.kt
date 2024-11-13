@@ -49,9 +49,10 @@ fun Application.configureRouting() {
 
 			post("/ids") {
 				val jsonRequest = call.receiveText()
-				val request = gson.fromJson(jsonRequest, BooksIdsRequest::class.java)
 
+				val request = gson.fromJson(jsonRequest, BooksIdsRequest::class.java)
 				val ids = request.bookIds
+
 				val booksByIds = MainService.getBooksWithIds(ids)
 
 				val jsonResponse = gson.toJson(booksByIds)
@@ -170,7 +171,7 @@ fun Application.configureRouting() {
 				}
 			}
 
-			post("/password") {
+			put("/password") {
 				val jsonRequest = call.receiveText()
 
 				val request = gson.fromJson(jsonRequest, ProfilePasswordRequest::class.java)
@@ -192,7 +193,7 @@ fun Application.configureRouting() {
 				}
 			}
 
-			post("/username") {
+			put("/username") {
 				val jsonRequest = call.receiveText()
 
 				val request = gson.fromJson(jsonRequest, ProfileUsernameRequest::class.java)

@@ -31,13 +31,12 @@ function App() {
 
 	const clearTasks = async () => {
 		const response = await axios.delete('http://localhost:2999/clear-tasks');
-        const tasksMap = new Map(Object.entries(response.data));
-        setTasks(tasksMap);
+		const tasksMap = new Map(Object.entries(response.data));
+		setTasks(tasksMap);
 	};
 
 	const filterTasks = async (filter) => {
-		const response = await axios.post('http://localhost:2999/filter-tasks',
-		{
+		const response = await axios.post('http://localhost:2999/filter-tasks', {
 			filter: filter
 		});
 		const tasksMap = new Map(Object.entries(response.data));
@@ -49,8 +48,7 @@ function App() {
 		const title = prompt("Введите новое название задачи:", taskToEdit.title);
 
 		if (title) {
-			const response = await axios.put('http://localhost:2999/edit-task',
-			{
+			const response = await axios.put('http://localhost:2999/edit-task', {
 				index: index, title: title
 			});
 			const tasksMap = new Map(Object.entries(response.data));
@@ -74,8 +72,7 @@ function App() {
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post('http://localhost:2999/login',
-			{
+			const response = await axios.post('http://localhost:2999/login', {
 				username: loginData.username,
 				password: loginData.password
 			});
@@ -112,9 +109,7 @@ function App() {
 		for (const key in formData) {
 			form.append(key, formData[key]);
 		}
-		await axios.post('http://localhost:2999/add-task',
-		form,
-		{
+		await axios.post('http://localhost:2999/add-task', form, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
@@ -179,7 +174,10 @@ function App() {
 				<div>
 					{errorCode ? (
 						<div>
-							<ErrorPage message={errorCode} returnBack={returnBack} />
+							<ErrorPage
+								message={errorCode}
+								returnBack={returnBack}
+							/>
 						</div>
 					) : (
 						<div>
@@ -220,23 +218,23 @@ function App() {
 								<ul>
 									{Array.from(tasks).map(([id, task]) => {
 										return (
-										<li key={id}>
-											<strong>{task.title}</strong> - {task.status}
-											{task.file && (
-												<div>
-													<br />
-													Прикрепленный файл: {task.file}
-												</div>
-											)}
-											<span id="fltright"><button onClick={() => editTask(id)}>Редактировать</button></span>
-											<span id="fltright">Дата: {task.dueDate}</span>
-										</li>
+											<li key={id}>
+												<strong>{task.title}</strong> - {task.status}
+												{task.file && (
+													<div>
+														<br />
+														Прикрепленный файл: {task.file}
+													</div>
+												)}
+												<span id="fltright"><button onClick={() => editTask(id)}>Редактировать</button></span>
+												<span id="fltright">Дата: {task.dueDate}</span>
+											</li>
 										)
 									})}
 								</ul>
 							</div>
 							<button onClick={clearTasks}>Очистить список задач</button>
-							<button id = "redfont" onClick={makeError}>Совершить ошибку</button>
+							<button id="redfont" onClick={makeError}>Совершить ошибку</button>
 						</div>
 					)}
 				</div>
@@ -245,7 +243,10 @@ function App() {
 	);
 }
 
-function ErrorPage({ message, returnBack }) {
+function ErrorPage({
+	message,
+	returnBack
+}) {
 	return (
 		<div>
 			<h1>Произошла ошибка</h1>

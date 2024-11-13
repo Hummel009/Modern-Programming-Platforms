@@ -52,28 +52,28 @@ form * {
 }
 
 #fltright {
-    float: right;
+	float: right;
 }
 
 li {
-    height: 25px;
+	height: 25px;
 }
 
 #fltright:last-of-type {
-    margin-right: 10px;
+	margin-right: 10px;
 }
 
 #redfont {
-    margin-left: 10px;
-    color: Red;
-    font-weight: Bold;
+	margin-left: 10px;
+	color: Red;
+	font-weight: Bold;
 }
 
 #greenfont {
-    color: Green;
-    font-weight: Bold;
+	color: Green;
+	font-weight: Bold;
 }
 
 h1 {
-    margin-top: 5px;
+	margin-top: 5px;
 }

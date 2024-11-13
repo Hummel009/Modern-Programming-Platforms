@@ -27,7 +27,7 @@ function App() {
 	});
 
 	const [cartData, setCartData] = useState([]);
-	
+
 	const [orders, setOrders] = useState([]);
 
 	const [currentPage, setCurrentPage] = useState(1);

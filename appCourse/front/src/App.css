@@ -360,3 +360,7 @@ select {
 	display: block;
 	font-weight: bold;
 }
+
+.page {
+	min-height: 600px;
+}
