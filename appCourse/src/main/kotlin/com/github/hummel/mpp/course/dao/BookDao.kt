@@ -91,12 +91,13 @@ object BookDao {
 	}
 
 	fun getAllBooks(): List<Book> {
-		val books = mutableListOf<Book>()
 		val sql = "SELECT * FROM books"
 
+		val books = mutableListOf<Book>()
 		try {
 			val stmt = connection.createStatement()
 			val rs = stmt.executeQuery(sql)
+
 			while (rs.next()) {
 				books.add(
 					Book(
@@ -111,25 +112,26 @@ object BookDao {
 			}
 		} catch (e: SQLException) {
 			e.printStackTrace()
+		} finally {
+			return books
 		}
-
-		return books
 	}
 
 	fun getUniqueAuthors(): List<String> {
-		val authors = mutableSetOf<String>()
 		val sql = "SELECT DISTINCT author FROM books"
 
+		val authors = mutableSetOf<String>()
 		try {
 			val stmt = connection.createStatement()
 			val rs = stmt.executeQuery(sql)
+
 			while (rs.next()) {
 				authors.add(rs.getString("author"))
 			}
 		} catch (e: SQLException) {
 			e.printStackTrace()
+		} finally {
+			return authors.toList()
 		}
-
-		return authors.toList()
 	}
 }

@@ -51,9 +51,9 @@ object OrderDao {
 	}
 
 	fun getUserOrders(userId: Int): List<Order> {
-		val orders = mutableListOf<Order>()
 		val sql = "SELECT * FROM orders WHERE user_id = ?"
 
+		val orders = mutableListOf<Order>()
 		try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setInt(1, userId)
@@ -68,8 +68,8 @@ object OrderDao {
 			}
 		} catch (e: SQLException) {
 			e.printStackTrace()
+		} finally {
+			return orders
 		}
-
-		return orders
 	}
 }

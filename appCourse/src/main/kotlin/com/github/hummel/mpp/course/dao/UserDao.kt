@@ -28,9 +28,7 @@ object UserDao {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setString(1, username)
 			pstmt.setString(2, hashedPassword)
-			pstmt.executeUpdate()
-
-			true
+			pstmt.executeUpdate() > 0
 		} catch (e: SQLException) {
 			e.printStackTrace()
 
@@ -45,7 +43,7 @@ object UserDao {
 			pstmt.setString(1, username)
 			val rs = pstmt.executeQuery()
 			if (rs.next()) {
-				return User(
+				User(
 					rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getDouble("balance")
 				)
 			} else {
@@ -53,6 +51,7 @@ object UserDao {
 			}
 		} catch (e: SQLException) {
 			e.printStackTrace()
+
 			null
 		}
 	}
@@ -66,6 +65,7 @@ object UserDao {
 			pstmt.executeUpdate() > 0
 		} catch (e: SQLException) {
 			e.printStackTrace()
+
 			false
 		}
 	}
@@ -79,6 +79,7 @@ object UserDao {
 			pstmt.executeUpdate() > 0
 		} catch (e: SQLException) {
 			e.printStackTrace()
+
 			false
 		}
 	}
@@ -96,6 +97,7 @@ object UserDao {
 			}
 		} catch (e: SQLException) {
 			e.printStackTrace()
+
 			null
 		}
 	}
@@ -109,6 +111,7 @@ object UserDao {
 			pstmt.executeUpdate() > 0
 		} catch (e: SQLException) {
 			e.printStackTrace()
+
 			false
 		}
 	}
