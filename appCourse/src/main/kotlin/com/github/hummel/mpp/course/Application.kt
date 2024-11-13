@@ -2,6 +2,7 @@ package com.github.hummel.mpp.course
 
 import com.github.hummel.mpp.course.controller.configureRouting
 import com.github.hummel.mpp.course.dao.BookDao
+import com.github.hummel.mpp.course.dao.OrderDao
 import com.github.hummel.mpp.course.dao.UserDao
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -40,4 +41,5 @@ fun Application.configureDatabase() {
 
 	UserDao.initTable()
 	BookDao.initTable()
+	OrderDao.initTable()
 }

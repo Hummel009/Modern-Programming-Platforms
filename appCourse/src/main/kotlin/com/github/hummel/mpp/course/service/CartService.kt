@@ -1,5 +1,6 @@
 package com.github.hummel.mpp.course.service
 
+import com.github.hummel.mpp.course.dao.OrderDao
 import com.github.hummel.mpp.course.dao.UserDao
 import com.github.hummel.mpp.course.entity.Book
 
@@ -12,6 +13,10 @@ object CartService {
 		val newBalance = userBalance - price
 
 		if (newBalance <= 0) {
+			return false
+		}
+
+		if (!OrderDao.addOrdersBatch(userId, booksToBuy.map { it.id }.toList(), quantities)) {
 			return false
 		}
 
