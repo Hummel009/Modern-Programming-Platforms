@@ -19,11 +19,13 @@ function App() {
 	const [authors, setAuthors] = useState([]);
 
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
+
 	const [profileData, setProfileData] = useState({
 		id: null,
 		username: '',
 		balance: 0
 	});
+
 	const [cartData, setCartData] = useState([]);
 
 	const [currentPage, setCurrentPage] = useState(1);
@@ -97,8 +99,7 @@ function App() {
 	}, [handleFetchBooks, handleFetchAuthors, handleUseToken, handleFetchCartData, handleFetchProfileData]);
 
 	const handleFilterBooks = async (author) => {
-		const response = await axios.post('http://localhost:2999/books/filter',
-		{
+		const response = await axios.post('http://localhost:2999/books/filter', {
 			author: author
 		});
 
@@ -183,7 +184,7 @@ function App() {
 			<div className="main-container">
 				<div className="page-background"></div>
 				<div className="page-container">
-					<LocalNavigation/>
+					<LocalNavigation />
 					<div className="page has-right-rail">
 						<main className="page-main">
 							<Routes>
@@ -197,7 +198,7 @@ function App() {
 											Тут вы можаце знайсці вельмі многа розных кніг.
 										</div>
 
-										<br/>
+										<br />
 
 										<select onChange={(e) => handleFilterBooks(e.target.value)}>
 											{authors.map(author => (
@@ -205,7 +206,7 @@ function App() {
 											))}
 										</select>
 
-										<div className = "navi">
+										<div className="navi">
 											{currentBooks.map(book => (
 												<div key={book.id}>
 													<div className="preamble">
@@ -214,7 +215,7 @@ function App() {
 														<div className="description">{book.description}</div>
 													</div>
 													<button className="wds-button price" onClick={(e) => handleAddToCart(book)}>Дадаць у кош ({book.price}$)</button>
-													<img src={book.imgPath} width="100%" height="auto" alt=""/>
+													<img src={book.imgPath} width="100%" height="auto" alt="" />
 												</div>
 											))}
 										</div>
@@ -222,27 +223,27 @@ function App() {
 										<button className="wds-button prev" onClick={handlePrevPage} disabled={currentPage === 1}>Папярэдняя</button>
 										<button className="wds-button next" onClick={handleNextPage} disabled={currentPage === totalPages}>Наступная</button>
 									</div>
-								}/>
+								} />
 								<Route path="/register" element={
 									<Register
-										isLoggedIn = {isLoggedIn}
-										setIsLoggedIn = {setIsLoggedIn}
-										handleFetchProfileData = {handleFetchProfileData}
+										isLoggedIn={isLoggedIn}
+										setIsLoggedIn={setIsLoggedIn}
+										handleFetchProfileData={handleFetchProfileData}
 									/>
 								} />
 								<Route path="/login" element={
 									<Login
-										isLoggedIn = {isLoggedIn}
-										setIsLoggedIn = {setIsLoggedIn}
-										handleFetchProfileData = {handleFetchProfileData}
+										isLoggedIn={isLoggedIn}
+										setIsLoggedIn={setIsLoggedIn}
+										handleFetchProfileData={handleFetchProfileData}
 									/>
 								} />
 								<Route path="/profile" element={
 									<Profile
-										isLoggedIn = {isLoggedIn}
-										setIsLoggedIn = {setIsLoggedIn}
-										profileData = {profileData}
-										handleDeleteToken = {handleDeleteToken}
+										isLoggedIn={isLoggedIn}
+										setIsLoggedIn={setIsLoggedIn}
+										profileData={profileData}
+										handleDeleteToken={handleDeleteToken}
 									/>
 								} />
 								<Route path="/cart" element={
@@ -257,12 +258,12 @@ function App() {
 												<span>Кош пусты.</span>
 											)}
 										</div>
-										<br/>
+										<br />
 										<button className="wds-button prev" onClick={handleBuyBooks} disabled={cartData.length <= 0}>Купіць</button>
 										<button className="wds-button next" onClick={handleClearCart} disabled={cartData.length <= 0}>Ачысціць кош</button>
-										<br/>
-										<br/>
-										<div className = "navi">
+										<br />
+										<br />
+										<div className="navi">
 											{cartData.map(book => (
 												<div key={book.id}>
 													<div className="preamble">
@@ -270,8 +271,8 @@ function App() {
 														<div className="author">{book.author}</div>
 														<div className="description">{book.description}</div>
 													</div>
-													<div className="title">Количество: {book.quantity}</div>
-													<img src={book.imgPath} width="100%" height="auto" alt=""/>
+													<div className="title">Колькасць: {book.quantity}</div>
+													<img src={book.imgPath} width="100%" height="auto" alt="" />
 												</div>
 											))}
 										</div>
@@ -280,8 +281,8 @@ function App() {
 							</Routes>
 						</main>
 						<RightRail
-							isLoggedIn = {isLoggedIn}
-							handleDeleteToken = {handleDeleteToken}
+							isLoggedIn={isLoggedIn}
+							handleDeleteToken={handleDeleteToken}
 						/>
 					</div>
 				</div>

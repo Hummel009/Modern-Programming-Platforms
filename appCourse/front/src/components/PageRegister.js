@@ -4,13 +4,11 @@ import React, {
 } from 'react';
 import Cookies from 'js-cookie';
 
-export const Register = (
-	{
-		isLoggedIn,
-		setIsLoggedIn,
-		handleFetchProfileData
-	}
-) => {
+export const Register = ({
+	isLoggedIn,
+	setIsLoggedIn,
+	handleFetchProfileData
+}) => {
 	const [registerData, setRegisterData] = useState({
 		username: '',
 		password: ''
@@ -19,8 +17,7 @@ export const Register = (
 	const handleRegisterSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post('http://localhost:2999/register',
-			{
+			const response = await axios.post('http://localhost:2999/register', {
 				username: registerData.username,
 				password: registerData.password
 			});

@@ -4,14 +4,12 @@ import React, {
 } from 'react';
 import Cookies from 'js-cookie';
 
-export const Profile = (
-	{
-		isLoggedIn,
-		setIsLoggedIn,
-		profileData,
-		handleDeleteToken
-	}
-) => {
+export const Profile = ({
+	isLoggedIn,
+	setIsLoggedIn,
+	profileData,
+	handleDeleteToken
+}) => {
 	const [newUsername, setNewUsername] = useState('');
 	const [newPassword, setNewPassword] = useState('');
 
@@ -20,8 +18,7 @@ export const Profile = (
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.post('http://localhost:2999/profile/username',
-			{
+			await axios.post('http://localhost:2999/profile/username', {
 				token: token,
 				newUsername: newUsername
 			});
@@ -39,8 +36,7 @@ export const Profile = (
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.post('http://localhost:2999/profile/password',
-			{
+			await axios.post('http://localhost:2999/profile/password', {
 				token: token,
 				newPassword: newPassword
 			});
@@ -62,29 +58,29 @@ export const Profile = (
 				<div>
 					<div>Імя ўдзельніка: {profileData.username}</div>
 					<div>Баланс: {profileData.balance}$</div>
-						<form onSubmit={handleChangeUsername}>
-							<input
-								type="text"
-								name="username"
-								placeholder="Нове імя ўдзельніка"
-								value={newUsername}
-								onChange={(e) => setNewUsername(e.target.value)}
-								required
-							/>
-							<button type="submit" className="wds-button">Змяніць логін</button>
-						</form>
+					<form onSubmit={handleChangeUsername}>
+						<input
+							type="text"
+							name="username"
+							placeholder="Нове імя ўдзельніка"
+							value={newUsername}
+							onChange={(e) => setNewUsername(e.target.value)}
+							required
+						/>
+						<button type="submit" className="wds-button">Змяніць логін</button>
+					</form>
 
-						<form onSubmit={handleChangePassword}>
-							<input
-								type="password"
-								name="password"
-								placeholder="Новы пароль"
-								value={newPassword}
-								onChange={(e) => setNewPassword(e.target.value)}
-								required
-							/>
-							<button type="submit" className="wds-button">Змяніць пароль</button>
-						</form>
+					<form onSubmit={handleChangePassword}>
+						<input
+							type="password"
+							name="password"
+							placeholder="Новы пароль"
+							value={newPassword}
+							onChange={(e) => setNewPassword(e.target.value)}
+							required
+						/>
+						<button type="submit" className="wds-button">Змяніць пароль</button>
+					</form>
 				</div>
 			) : (
 				<p>Калі ласка, увайдзіце ў сістэму, каб убачыць свае даныя.</p>
