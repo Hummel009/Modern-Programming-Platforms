@@ -1,3 +1,7 @@
 package com.github.hummel.mpp.course.entity
 
-data class User(val id: Int, val username: String, var password: String, val balance: Double)
+import com.github.hummel.mpp.course.dto.UserResponse
+
+data class User(val id: Int, val username: String, val hashedPassword: String, val balance: Double) {
+	fun toResponse(): UserResponse = UserResponse(id, username, balance)
+}

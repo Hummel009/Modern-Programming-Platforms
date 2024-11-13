@@ -111,10 +111,11 @@ fun Application.configureRouting() {
 				val password = token?.password
 
 				if (AuthService.areCredentialsValid(username, password)) {
-					val user = ProfileService.getUserData(username!!)
-					user!!.password = password!!
+					val user = ProfileService.getUserData(username!!)!!
 
-					call.respond(gson.toJson(user))
+					val userResponse = user.toResponse()
+
+					call.respond(gson.toJson(userResponse))
 				} else {
 					call.respond(HttpStatusCode.Unauthorized)
 				}

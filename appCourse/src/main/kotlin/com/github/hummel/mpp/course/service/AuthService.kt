@@ -34,7 +34,7 @@ object AuthService {
 		password ?: return false
 
 		val user = UserDao.findUserByUsername(username) ?: return false
-		val hashedPassword = user.password
+		val hashedPassword = user.hashedPassword
 
 		return BCrypt.verifyer().verify(password.toCharArray(), hashedPassword).verified
 	}
