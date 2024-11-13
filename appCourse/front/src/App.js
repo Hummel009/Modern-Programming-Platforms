@@ -126,15 +126,6 @@ function App() {
 		}
 	}
 
-	const handleClearCart = () => {
-		try {
-			Cookies.remove('cart');
-
-			setCartData([]);
-		} catch (error) {
-		}
-	}
-
 	return (
 		<Router>
 			<div className="page-background"></div>
@@ -173,16 +164,16 @@ function App() {
 										isLoggedIn={isLoggedIn}
 										setIsLoggedIn={setIsLoggedIn}
 										userData={userData}
-										handleDeleteToken={handleDeleteToken}
 										orders={orders}
+										handleDeleteToken={handleDeleteToken}
 									/>
 								} />
 								<Route path="/cart" element={
 									<Cart
 										isLoggedIn={isLoggedIn}
 										cartData={cartData}
+										setCartData={setCartData}
 										userData={userData}
-										handleClearCart={handleClearCart}
 										handleFetchOrders={handleFetchOrders}
 										handleFetchUserData={handleFetchUserData}
 									/>

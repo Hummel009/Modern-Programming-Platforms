@@ -4,8 +4,8 @@ import Cookies from 'js-cookie';
 export const Cart = ({
     isLoggedIn,
 	cartData,
+    setCartData,
     userData,
-	handleClearCart,
     handleFetchOrders,
     handleFetchUserData
 }) => {
@@ -26,6 +26,15 @@ export const Cart = ({
 			alert('Buy failed. Please check your credentials.');
 		}
 	};
+
+	const handleClearCart = () => {
+		try {
+			Cookies.remove('cart');
+
+			setCartData([]);
+		} catch (error) {
+		}
+	}
 
 	return (
         <div>

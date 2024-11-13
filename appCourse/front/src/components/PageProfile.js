@@ -8,8 +8,8 @@ export const Profile = ({
 	isLoggedIn,
 	setIsLoggedIn,
 	userData,
-	handleDeleteToken,
-	orders
+	orders,
+	handleDeleteToken
 }) => {
 	const [newUsername, setNewUsername] = useState('');
 	const [newPassword, setNewPassword] = useState('');
