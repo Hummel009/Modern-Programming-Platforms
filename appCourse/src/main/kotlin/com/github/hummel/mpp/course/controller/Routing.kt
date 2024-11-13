@@ -28,7 +28,7 @@ val gson = Gson()
 fun Application.configureRouting() {
 	routing {
 		get("/authors") {
-			val authors = listOf("all") + MainService.getAllAuthors()
+			val authors = listOf("all") + MainService.getUniqueAuthors()
 
 			val jsonResponse = gson.toJson(authors)
 
@@ -62,9 +62,9 @@ fun Application.configureRouting() {
 			val jsonRequest = call.receiveText()
 
 			val request = gson.fromJson(jsonRequest, BuyRequest::class.java)
-
 			val token = AuthService.decomposeToken(request.token)
 
+			val userId = request.userId
 			val username = token?.username
 			val password = token?.password
 
@@ -73,7 +73,7 @@ fun Application.configureRouting() {
 				val quantities = request.cartData.map { it.quantity }
 				val booksToBuy = MainService.getBooksWithIds(ids)
 
-				if (CartService.buyBooks(username!!, booksToBuy, quantities)) {
+				if (CartService.buyBooks(userId, booksToBuy, quantities)) {
 					call.respond(HttpStatusCode.OK)
 				} else {
 					call.respond(HttpStatusCode.BadRequest)
@@ -112,6 +112,7 @@ fun Application.configureRouting() {
 
 				if (AuthService.areCredentialsValid(username, password)) {
 					val user = ProfileService.getUserData(username!!)
+					user!!.password = password!!
 
 					call.respond(gson.toJson(user))
 				} else {
@@ -124,13 +125,14 @@ fun Application.configureRouting() {
 
 				val request = gson.fromJson(jsonRequest, ChangePasswordRequest::class.java)
 				val token = AuthService.decomposeToken(request.token)
-				val newPassword = request.newPassword
 
+				val userId = request.userId
 				val username = token?.username
 				val password = token?.password
+				val newPassword = request.newPassword
 
 				if (AuthService.areCredentialsValid(username, password)) {
-					if (ProfileService.changeUserPassword(username!!, newPassword)) {
+					if (ProfileService.changeUserPassword(userId, newPassword)) {
 						call.respond(HttpStatusCode.OK)
 					} else {
 						call.respond(HttpStatusCode.BadRequest)
@@ -145,13 +147,14 @@ fun Application.configureRouting() {
 
 				val request = gson.fromJson(jsonRequest, ChangeUsernameRequest::class.java)
 				val token = AuthService.decomposeToken(request.token)
-				val newUsername = request.newUsername
 
+				val userId = request.userId
 				val username = token?.username
 				val password = token?.password
+				val newUsername = request.newUsername
 
 				if (AuthService.areCredentialsValid(username, password)) {
-					if (ProfileService.changeUserUsername(username!!, newUsername)) {
+					if (ProfileService.changeUserUsername(userId, newUsername)) {
 						call.respond(HttpStatusCode.OK)
 					} else {
 						call.respond(HttpStatusCode.BadRequest)

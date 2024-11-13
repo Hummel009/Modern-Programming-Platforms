@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 export const Profile = ({
 	isLoggedIn,
 	setIsLoggedIn,
-	profileData,
+	userData,
 	handleDeleteToken
 }) => {
 	const [newUsername, setNewUsername] = useState('');
@@ -19,6 +19,7 @@ export const Profile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.post('http://localhost:2999/profile/username', {
+				userId: userData.id,
 				token: token,
 				newUsername: newUsername
 			});
@@ -37,6 +38,7 @@ export const Profile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.post('http://localhost:2999/profile/password', {
+				userId: userData.id,
 				token: token,
 				newPassword: newPassword
 			});
@@ -56,8 +58,8 @@ export const Profile = ({
 			</h1>
 			{isLoggedIn ? (
 				<div>
-					<div>Імя ўдзельніка: {profileData.username}</div>
-					<div>Баланс: {profileData.balance}$</div>
+					<div>Імя ўдзельніка: {userData.username}</div>
+					<div>Баланс: {userData.balance}$</div>
 					<form onSubmit={handleChangeUsername}>
 						<input
 							type="text"

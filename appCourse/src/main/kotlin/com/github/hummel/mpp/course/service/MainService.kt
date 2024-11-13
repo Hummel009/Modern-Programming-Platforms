@@ -6,7 +6,7 @@ import com.github.hummel.mpp.course.entity.Book
 object MainService {
 	fun getAllBooks(): List<Book> = BookDao.getAllBooks()
 
-	fun getAllAuthors(): List<String> = BookDao.getAllAuthors()
+	fun getUniqueAuthors(): List<String> = BookDao.getUniqueAuthors()
 
 	fun getBooksWithIds(ids: List<Int>): List<Book> {
 		val books = BookDao.getAllBooks()

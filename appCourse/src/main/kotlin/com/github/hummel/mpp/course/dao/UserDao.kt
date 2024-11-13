@@ -57,12 +57,12 @@ object UserDao {
 		}
 	}
 
-	fun updateUserUsername(username: String, newUsername: String): Boolean {
-		val sql = "UPDATE users SET username = ? WHERE username = ?"
+	fun updateUserUsername(userId: Int, newUsername: String): Boolean {
+		val sql = "UPDATE users SET username = ? WHERE id = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setString(1, newUsername)
-			pstmt.setString(2, username)
+			pstmt.setInt(2, userId)
 			pstmt.executeUpdate() > 0
 		} catch (e: SQLException) {
 			e.printStackTrace()
@@ -70,12 +70,12 @@ object UserDao {
 		}
 	}
 
-	fun updateUserPassword(username: String, newPassword: String): Boolean {
-		val sql = "UPDATE users SET password = ? WHERE username = ?"
+	fun updateUserPassword(userId: Int, newPassword: String): Boolean {
+		val sql = "UPDATE users SET password = ? WHERE id = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setString(1, newPassword)
-			pstmt.setString(2, username)
+			pstmt.setInt(2, userId)
 			pstmt.executeUpdate() > 0
 		} catch (e: SQLException) {
 			e.printStackTrace()
@@ -83,11 +83,11 @@ object UserDao {
 		}
 	}
 
-	fun findUserBalance(username: String): Double? {
-		val sql = "SELECT balance FROM users WHERE username = ?"
+	fun findUserBalance(userId: Int): Double? {
+		val sql = "SELECT balance FROM users WHERE id = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
-			pstmt.setString(1, username)
+			pstmt.setInt(1, userId)
 			val rs = pstmt.executeQuery()
 			if (rs.next()) {
 				rs.getDouble("balance")
@@ -100,12 +100,12 @@ object UserDao {
 		}
 	}
 
-	fun updateUserBalance(username: String, newBalance: Double): Boolean {
-		val sql = "UPDATE users SET balance = ? WHERE username = ?"
+	fun updateUserBalance(userId: Int, newBalance: Double): Boolean {
+		val sql = "UPDATE users SET balance = ? WHERE id = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setDouble(1, newBalance)
-			pstmt.setString(2, username)
+			pstmt.setInt(2, userId)
 			pstmt.executeUpdate() > 0
 		} catch (e: SQLException) {
 			e.printStackTrace()

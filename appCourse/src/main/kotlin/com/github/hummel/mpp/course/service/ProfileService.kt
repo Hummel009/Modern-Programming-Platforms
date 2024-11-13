@@ -7,12 +7,12 @@ import com.github.hummel.mpp.course.entity.User
 object ProfileService {
 	fun getUserData(username: String): User? = UserDao.findUserByUsername(username)
 
-	fun changeUserUsername(username: String, newUsername: String): Boolean =
-		UserDao.updateUserUsername(username, newUsername)
+	fun changeUserUsername(userId: Int, newUsername: String): Boolean =
+		UserDao.updateUserUsername(userId, newUsername)
 
-	fun changeUserPassword(username: String, newPassword: String): Boolean {
+	fun changeUserPassword(userId: Int, newPassword: String): Boolean {
 		val hashedPassword = BCrypt.withDefaults().hashToString(12, newPassword.toCharArray())
 
-		return UserDao.updateUserPassword(username, hashedPassword)
+		return UserDao.updateUserPassword(userId, hashedPassword)
 	}
 }

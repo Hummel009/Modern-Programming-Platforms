@@ -20,7 +20,7 @@ function App() {
 
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-	const [profileData, setProfileData] = useState({
+	const [userData, setUserData] = useState({
 		id: null,
 		username: '',
 		balance: 0
@@ -53,7 +53,7 @@ function App() {
 		}
 	}, []);
 
-	const handleFetchProfileData = useCallback(async () => {
+	const handleFetchUserData = useCallback(async () => {
 		try {
 			const token = Cookies.get('jwt');
 
@@ -61,7 +61,7 @@ function App() {
 				token: token
 			});
 
-			setProfileData(response.data);
+			setUserData(response.data);
 		} catch (error) {
 		}
 	}, []);
@@ -95,8 +95,8 @@ function App() {
 		handleFetchAuthors();
 		handleUseToken()
 		handleFetchCartData();
-		handleFetchProfileData();
-	}, [handleFetchBooks, handleFetchAuthors, handleUseToken, handleFetchCartData, handleFetchProfileData]);
+		handleFetchUserData();
+	}, [handleFetchBooks, handleFetchAuthors, handleUseToken, handleFetchCartData, handleFetchUserData]);
 
 	const handleFilterBooks = async (author) => {
 		const response = await axios.post('http://localhost:2999/books/filter', {
@@ -111,6 +111,8 @@ function App() {
 		try {
 			Cookies.remove('jwt');
 
+			setUserData([]);
+
 			setIsLoggedIn(false);
 		} catch (error) {
 		}
@@ -121,12 +123,13 @@ function App() {
 			const token = Cookies.get('jwt');
 
 			await axios.post('http://localhost:2999/buy', {
+				userId: userData.id,
 				token: token,
 				cartData: cartData
 			});
 
 			handleClearCart();
-			handleFetchProfileData();
+			handleFetchUserData();
 		} catch (error) {
 			alert('Buy failed. Please check your credentials.');
 		}
@@ -228,21 +231,21 @@ function App() {
 									<Register
 										isLoggedIn={isLoggedIn}
 										setIsLoggedIn={setIsLoggedIn}
-										handleFetchProfileData={handleFetchProfileData}
+										handleFetchUserData={handleFetchUserData}
 									/>
 								} />
 								<Route path="/login" element={
 									<Login
 										isLoggedIn={isLoggedIn}
 										setIsLoggedIn={setIsLoggedIn}
-										handleFetchProfileData={handleFetchProfileData}
+										handleFetchUserData={handleFetchUserData}
 									/>
 								} />
 								<Route path="/profile" element={
 									<Profile
 										isLoggedIn={isLoggedIn}
 										setIsLoggedIn={setIsLoggedIn}
-										profileData={profileData}
+										userData={userData}
 										handleDeleteToken={handleDeleteToken}
 									/>
 								} />

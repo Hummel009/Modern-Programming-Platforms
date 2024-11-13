@@ -116,7 +116,7 @@ object BookDao {
 		return books
 	}
 
-	fun getAllAuthors(): List<String> {
+	fun getUniqueAuthors(): List<String> {
 		val authors = mutableSetOf<String>()
 		val sql = "SELECT DISTINCT author FROM books"
 
