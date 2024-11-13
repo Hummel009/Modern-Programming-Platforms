@@ -16,7 +16,7 @@ object CartService {
 			return false
 		}
 
-		if (!OrderDao.addOrdersBatch(userId, booksToBuy.map { it.id }.toList(), quantities)) {
+		if (!OrderDao.addOrder(userId, booksToBuy.map { it.id }.toList(), quantities)) {
 			return false
 		}
 

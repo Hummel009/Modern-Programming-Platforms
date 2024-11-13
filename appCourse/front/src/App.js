@@ -21,7 +21,7 @@ function App() {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	const [userData, setUserData] = useState({
-		id: null,
+		userId: null,
 		username: '',
 		balance: 0
 	});
@@ -73,14 +73,14 @@ function App() {
 			const token = Cookies.get('jwt');
 
 			const response = await axios.post('http://localhost:2999/profile/orders', {
-				userId: userData.id,
+				userId: userData.userId,
 				token: token
 			});
 
 			setOrders(response.data);
 		} catch (error) {
 		}
-	}, [userData.id]);
+	}, [userData.userId]);
 
 	const handleFetchCartData = useCallback(async () => {
 		try {
@@ -140,7 +140,7 @@ function App() {
 			const token = Cookies.get('jwt');
 
 			await axios.post('http://localhost:2999/buy', {
-				userId: userData.id,
+				userId: userData.userId,
 				token: token,
 				cartData: cartData
 			});

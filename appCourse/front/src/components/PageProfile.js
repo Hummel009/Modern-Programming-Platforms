@@ -20,7 +20,7 @@ export const Profile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.post('http://localhost:2999/profile/username', {
-				userId: userData.id,
+				userId: userData.userId,
 				token: token,
 				newUsername: newUsername
 			});
@@ -39,7 +39,7 @@ export const Profile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.post('http://localhost:2999/profile/password', {
-				userId: userData.id,
+				userId: userData.userId,
 				token: token,
 				newPassword: newPassword
 			});
@@ -87,8 +87,13 @@ export const Profile = ({
 
 					{orders.map(order => (
 						<div>
-							<span className="id1">«{order.bookId}»</span>
-							<span className="id2">{order.quantity}</span>
+							<span className="id0">ORDER ID: {order.orderId}; </span>
+							{order.orderItems.map(item => (
+								<div>
+									<span className="id1">BOOK ID: {item.bookId}; </span>
+									<span className="id2">BOOK QUANT: {item.quantity}; </span>
+								</div>
+							))}
 						</div>
 					))}
 				</div>
