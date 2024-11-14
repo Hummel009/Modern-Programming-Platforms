@@ -4,7 +4,7 @@ import React, {
 } from 'react';
 import Cookies from 'js-cookie';
 
-export const Login = ({
+export const PageLogin = ({
 	isLoggedIn,
 	setIsLoggedIn,
 	handleFetchUserData

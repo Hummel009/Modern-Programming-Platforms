@@ -4,11 +4,11 @@ import React, {
 } from 'react';
 import Cookies from 'js-cookie';
 
-export const Profile = ({
+export const PageProfile = ({
 	isLoggedIn,
-	setIsLoggedIn,
 	userData,
 	orders,
+	setIsLoggedIn,
 	handleDeleteToken
 }) => {
 	const [newUsername, setNewUsername] = useState('');

@@ -6,22 +6,17 @@ import React, {
 import axios from 'axios';
 import './App.css'
 import { RightRail } from './components/RightRail.js'
-import { GlobalNavigation } from './components/NavGlobal.js'
-import { LocalNavigation } from './components/NavLocal.js'
-import { Main } from './components/PageMain.js'
-import { Register } from './components/PageRegister.js'
-import { Login } from './components/PageLogin.js'
-import { Profile } from './components/PageProfile.js'
-import { Cart } from './components/PageCart.js'
+import { NavGlobal } from './components/NavGlobal.js'
+import { NavLocal } from './components/NavLocal.js'
+import { PageMain } from './components/PageMain.js'
+import { PageRegister } from './components/PageRegister.js'
+import { PageLogin } from './components/PageLogin.js'
+import { PageProfile } from './components/PageProfile.js'
+import { PageCart } from './components/PageCart.js'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 function App() {
-	const [books, setBooks] = useState([]);
-	const [authors, setAuthors] = useState([]);
-
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
-
 	const [userData, setUserData] = useState({
 		userId: null,
 		username: '',
@@ -29,8 +24,12 @@ function App() {
 	});
 
 	const [cartData, setCartData] = useState([]);
-
 	const [orders, setOrders] = useState([]);
+
+	const [books, setBooks] = useState([]);
+	const [authors, setAuthors] = useState([]);
+
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	const handleFetchBooks = useCallback(async () => {
 		const response = await axios.get('http://localhost:2999/books');
@@ -129,51 +128,51 @@ function App() {
 	return (
 		<Router>
 			<div className="page-background"></div>
-			<GlobalNavigation />
+			<NavGlobal />
 			<div className="main-container">
 				<div className="page-background"></div>
 				<div className="page-container">
-					<LocalNavigation />
+					<NavLocal />
 					<div className="page has-right-rail">
 						<main className="page-main">
 							<Routes>
 								<Route path="/" element={
-									<Main
+									<PageMain
 										books={books}
-										setBooks={setBooks}
 										authors={authors}
+										setBooks={setBooks}
 										handleFetchCartData={handleFetchCartData}
 									/>
 								} />
 								<Route path="/register" element={
-									<Register
+									<PageRegister
 										isLoggedIn={isLoggedIn}
 										setIsLoggedIn={setIsLoggedIn}
 										handleFetchUserData={handleFetchUserData}
 									/>
 								} />
 								<Route path="/login" element={
-									<Login
+									<PageLogin
 										isLoggedIn={isLoggedIn}
 										setIsLoggedIn={setIsLoggedIn}
 										handleFetchUserData={handleFetchUserData}
 									/>
 								} />
 								<Route path="/profile" element={
-									<Profile
+									<PageProfile
 										isLoggedIn={isLoggedIn}
-										setIsLoggedIn={setIsLoggedIn}
 										userData={userData}
 										orders={orders}
+										setIsLoggedIn={setIsLoggedIn}
 										handleDeleteToken={handleDeleteToken}
 									/>
 								} />
 								<Route path="/cart" element={
-									<Cart
+									<PageCart
 										isLoggedIn={isLoggedIn}
 										cartData={cartData}
-										setCartData={setCartData}
 										userData={userData}
+										setCartData={setCartData}
 										handleFetchOrders={handleFetchOrders}
 										handleFetchUserData={handleFetchUserData}
 									/>

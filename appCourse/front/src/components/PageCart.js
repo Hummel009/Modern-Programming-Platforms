@@ -1,14 +1,23 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-export const Cart = ({
+export const PageCart = ({
 	isLoggedIn,
 	cartData,
-	setCartData,
 	userData,
+	setCartData,
 	handleFetchOrders,
 	handleFetchUserData
 }) => {
+	const handleClearCart = () => {
+		try {
+			Cookies.remove('cart');
+
+			setCartData([]);
+		} catch (error) {
+		}
+	}
+
 	const handleBuyBooks = async () => {
 		try {
 			const token = Cookies.get('jwt');
@@ -26,15 +35,6 @@ export const Cart = ({
 			alert('Buy failed. Please check your credentials.');
 		}
 	};
-
-	const handleClearCart = () => {
-		try {
-			Cookies.remove('cart');
-
-			setCartData([]);
-		} catch (error) {
-		}
-	}
 
 	return (
 		<div>

@@ -4,7 +4,7 @@ import React, {
 } from 'react';
 import Cookies from 'js-cookie';
 
-export const Register = ({
+export const PageRegister = ({
 	isLoggedIn,
 	setIsLoggedIn,
 	handleFetchUserData

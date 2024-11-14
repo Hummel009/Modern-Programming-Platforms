@@ -4,13 +4,12 @@ import React, {
 } from 'react';
 import Cookies from 'js-cookie';
 
-export const Main = ({
+export const PageMain = ({
 	books,
-	setBooks,
 	authors,
+	setBooks,
 	handleFetchCartData
 }) => {
-
 	const [currentPage, setCurrentPage] = useState(1);
 
 	const booksPerPage = 4;
@@ -31,6 +30,15 @@ export const Main = ({
 		}
 	};
 
+	const handleFilterBooks = async (author) => {
+		const response = await axios.post('http://localhost:2999/books/filter', {
+			author: author
+		});
+
+		setBooks(response.data);
+		setCurrentPage(1);
+	};
+
 	const handleAddToCart = async (book) => {
 		try {
 			let cart = Cookies.get('cart') ? JSON.parse(Cookies.get('cart')) : [];
@@ -47,15 +55,6 @@ export const Main = ({
 			handleFetchCartData();
 		} catch (error) {
 		}
-	};
-
-	const handleFilterBooks = async (author) => {
-		const response = await axios.post('http://localhost:2999/books/filter', {
-			author: author
-		});
-
-		setBooks(response.data);
-		setCurrentPage(1);
 	};
 
 	return (
