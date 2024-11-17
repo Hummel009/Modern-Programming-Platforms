@@ -3,26 +3,16 @@ package com.github.hummel.mpp.lab6.controller
 import com.github.hummel.mpp.lab6.grpc.AddRequest
 import com.github.hummel.mpp.lab6.grpc.ServerGrpc
 import com.github.hummel.mpp.lab6.grpc.StringRequest
-import com.google.gson.Gson
 import io.grpc.Grpc
 import io.grpc.InsecureChannelCredentials
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.PartData
-import io.ktor.http.content.forEachPart
-import io.ktor.http.content.streamProvider
-import io.ktor.server.application.Application
-import io.ktor.server.application.call
-import io.ktor.server.request.receiveMultipart
-import io.ktor.server.request.receiveText
-import io.ktor.server.response.respond
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.put
-import io.ktor.server.routing.routing
+import io.ktor.http.*
+import io.ktor.http.content.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.utils.io.jvm.javaio.*
 import java.io.File
-
-val gson = Gson()
 
 fun Application.configureRouting() {
 	val channel = Grpc.newChannelBuilder("localhost:2998", InsecureChannelCredentials.create()).build()
@@ -107,7 +97,7 @@ fun Application.configureRouting() {
 					is PartData.FileItem -> {
 						fileName = part.originalFileName
 						val file = File("uploads/${System.currentTimeMillis()}-$fileName")
-						part.streamProvider().use { input ->
+						part.provider().toInputStream().use { input ->
 							file.outputStream().buffered().use { output ->
 								input.copyTo(output)
 							}

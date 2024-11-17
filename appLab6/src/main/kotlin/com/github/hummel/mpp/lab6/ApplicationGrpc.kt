@@ -1,6 +1,5 @@
 package com.github.hummel.mpp.lab6
 
-import com.github.hummel.mpp.lab6.controller.gson
 import com.github.hummel.mpp.lab6.dto.EditTaskRequest
 import com.github.hummel.mpp.lab6.dto.FilterRequest
 import com.github.hummel.mpp.lab6.dto.TokenRequest
@@ -10,14 +9,17 @@ import com.github.hummel.mpp.lab6.grpc.AddRequest
 import com.github.hummel.mpp.lab6.grpc.ServerGrpc.ServerImplBase
 import com.github.hummel.mpp.lab6.grpc.StringReply
 import com.github.hummel.mpp.lab6.grpc.StringRequest
+import com.google.gson.Gson
 import io.grpc.Grpc
 import io.grpc.InsecureServerCredentials
 import io.grpc.stub.StreamObserver
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.*
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-val tasks = mutableMapOf<Int, Task>()
+val tasks: MutableMap<Int, Task> = mutableMapOf<Int, Task>()
+
+private val gson: Gson = Gson()
 
 fun main() {
 	for (i in 0..9) {

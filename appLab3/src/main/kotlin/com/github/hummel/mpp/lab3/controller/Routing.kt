@@ -9,24 +9,18 @@ import com.github.hummel.mpp.lab3.generateToken
 import com.github.hummel.mpp.lab3.isValidToken
 import com.github.hummel.mpp.lab3.isValidUser
 import com.google.gson.Gson
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.PartData
-import io.ktor.http.content.forEachPart
-import io.ktor.http.content.streamProvider
-import io.ktor.server.application.Application
-import io.ktor.server.application.call
-import io.ktor.server.request.receiveMultipart
-import io.ktor.server.request.receiveText
-import io.ktor.server.response.respond
-import io.ktor.server.routing.delete
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.put
-import io.ktor.server.routing.routing
+import io.ktor.http.*
+import io.ktor.http.content.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.utils.io.jvm.javaio.*
 import java.io.File
 
-val tasks = mutableMapOf<Int, Task>()
-val gson = Gson()
+val tasks: MutableMap<Int, Task> = mutableMapOf<Int, Task>()
+
+private val gson: Gson = Gson()
 
 fun Application.configureRouting() {
 	routing {
@@ -121,7 +115,7 @@ fun Application.configureRouting() {
 					is PartData.FileItem -> {
 						fileName = part.originalFileName
 						val file = File("uploads/${System.currentTimeMillis()}-$fileName")
-						part.streamProvider().use { input ->
+						part.provider().toInputStream().use { input ->
 							file.outputStream().buffered().use { output ->
 								input.copyTo(output)
 							}

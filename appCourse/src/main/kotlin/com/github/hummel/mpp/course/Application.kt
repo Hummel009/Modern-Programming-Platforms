@@ -4,12 +4,11 @@ import com.github.hummel.mpp.course.controller.configureRouting
 import com.github.hummel.mpp.course.dao.BookDao
 import com.github.hummel.mpp.course.dao.OrderDao
 import com.github.hummel.mpp.course.dao.UserDao
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.cors.routing.*
 import java.sql.Connection
 import java.sql.DriverManager
 
