@@ -81,13 +81,12 @@ object OrderDao {
 			WHERE o.user_id = ?
 		"""
 
-		val ordersMap = mutableMapOf<Int, Order>()
-
 		try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setInt(1, userId)
 			val rs = pstmt.executeQuery()
 
+			val ordersMap = mutableMapOf<Int, Order>()
 			while (rs.next()) {
 				val orderId = rs.getInt("order_id")
 				val order = ordersMap.getOrPut(orderId) {
@@ -101,10 +100,11 @@ object OrderDao {
 					order.orderItems.add(orderItem)
 				}
 			}
+			return ordersMap.values.toList()
 		} catch (e: SQLException) {
 			e.printStackTrace()
-		} finally {
-			return ordersMap.values.toList()
+
+			return emptyList()
 		}
 	}
 }
