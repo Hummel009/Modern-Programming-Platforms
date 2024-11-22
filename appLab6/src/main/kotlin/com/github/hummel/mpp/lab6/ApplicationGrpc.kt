@@ -17,7 +17,7 @@ import io.ktor.http.*
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
-val tasks: MutableMap<Int, Task> = mutableMapOf<Int, Task>()
+val tasks: MutableMap<Int, Task> = mutableMapOf()
 
 private val gson: Gson = Gson()
 
@@ -33,17 +33,17 @@ fun main() {
 
 	val port = 2998
 
-	var server = Grpc.newServerBuilderForPort(
+	val server = Grpc.newServerBuilderForPort(
 		port, InsecureServerCredentials.create()
 	).addService(ServerImpl()).build().start()
 
-	Runtime.getRuntime().addShutdownHook(Thread(Runnable {
+	Runtime.getRuntime().addShutdownHook(Thread {
 		try {
 			server.shutdown().awaitTermination(30, TimeUnit.SECONDS)
 		} catch (e: Exception) {
 			e.printStackTrace()
 		}
-	}))
+	})
 
 	server.awaitTermination()
 }
@@ -114,7 +114,7 @@ class ServerImpl : ServerImplBase() {
 		val index = editTaskRequest.index
 		val title = editTaskRequest.title
 
-		tasks[index]!!.title = title
+		tasks.getValue(index).title = title
 
 		val reply = StringReply.newBuilder().setValue(gson.toJson(tasks)).build()
 
@@ -123,7 +123,7 @@ class ServerImpl : ServerImplBase() {
 	}
 
 	override fun addTask(task: AddRequest, responseObserver: StreamObserver<StringReply>) {
-		tasks.put(getNextAvailableId(), Task(task.title, task.status, task.dueDate, null))
+		tasks[getNextAvailableId()] = Task(task.title, task.status, task.dueDate, null)
 
 		val reply = StringReply.newBuilder().setValue(gson.toJson(tasks)).build()
 

@@ -23,7 +23,7 @@ fun Application.configureRouting() {
 			val jsonRequest = call.receiveText()
 
 			val request = StringRequest.newBuilder().setValue(jsonRequest).build()
-			var response = grpcServer.login(request)
+			val response = grpcServer.login(request)
 
 			if (response.getValue() == HttpStatusCode.Unauthorized.toString()) {
 				call.respond(HttpStatusCode.Unauthorized)
@@ -36,7 +36,7 @@ fun Application.configureRouting() {
 			val jsonRequest = call.receiveText()
 
 			val request = StringRequest.newBuilder().setValue(jsonRequest).build()
-			var response = grpcServer.token(request)
+			val response = grpcServer.token(request)
 
 			if (response.getValue() == HttpStatusCode.Unauthorized.toString()) {
 				call.respond(HttpStatusCode.Unauthorized)
@@ -47,14 +47,14 @@ fun Application.configureRouting() {
 
 		get("/get-tasks") {
 			val request = StringRequest.newBuilder().setValue("").build()
-			var response = grpcServer.getTasks(request)
+			val response = grpcServer.getTasks(request)
 
 			call.respond(response.getValue())
 		}
 
 		delete("/clear-tasks") {
 			val request = StringRequest.newBuilder().setValue("").build()
-			var response = grpcServer.clearTasks(request)
+			val response = grpcServer.clearTasks(request)
 
 			call.respond(response.getValue())
 		}
@@ -63,7 +63,7 @@ fun Application.configureRouting() {
 			val jsonRequest = call.receiveText()
 
 			val request = StringRequest.newBuilder().setValue(jsonRequest).build()
-			var response = grpcServer.filterTasks(request)
+			val response = grpcServer.filterTasks(request)
 
 			call.respond(response.getValue())
 		}
@@ -72,7 +72,7 @@ fun Application.configureRouting() {
 			val jsonRequest = call.receiveText()
 
 			val request = StringRequest.newBuilder().setValue(jsonRequest).build()
-			var response = grpcServer.editTask(request)
+			val response = grpcServer.editTask(request)
 
 			call.respond(response.getValue())
 		}
@@ -82,7 +82,7 @@ fun Application.configureRouting() {
 			var title = ""
 			var status = ""
 			var dueDate = ""
-			var fileName: String? = null
+			var fileName: String?
 
 			multipart.forEachPart { part ->
 				when (part) {

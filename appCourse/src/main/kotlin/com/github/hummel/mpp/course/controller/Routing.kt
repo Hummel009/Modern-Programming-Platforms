@@ -114,7 +114,9 @@ fun Application.configureRouting() {
 				val password = token?.password
 
 				if (AuthService.areCredentialsValid(username, password)) {
-					val user = ProfileService.getUserData(username!!)!!
+					username ?: throw Exception()
+
+					val user = ProfileService.getUserData(username) ?: throw Exception()
 
 					val jsonResponse = gson.toJson(user.erasePassword())
 
@@ -137,15 +139,15 @@ fun Application.configureRouting() {
 				if (AuthService.areCredentialsValid(username, password)) {
 					val orders = ProfileService.getUserOrders(userId)
 
-					val ordersNums = orders.mapIndexed { index, _ -> index + 1 }
+					val ordersNums = List(orders.size) { it + 1 }
 					val ordersBooks = orders.map {
-						MainService.getBooksWithIds(it.orderItems.map {
-							it.bookId
+						MainService.getBooksWithIds(it.orderItems.map { item ->
+							item.bookId
 						})
 					}
 					val ordersBooksQuantities = orders.map {
-						it.orderItems.map {
-							it.quantity
+						it.orderItems.map { item ->
+							item.quantity
 						}
 					}
 					val orderPrices = orders.mapIndexed { index, order ->

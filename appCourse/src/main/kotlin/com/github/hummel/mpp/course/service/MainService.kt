@@ -10,8 +10,8 @@ object MainService {
 
 	fun getBooksWithIds(ids: List<Int>): List<Book> {
 		val books = BookDao.findAllBooks()
-		val filteredBooks = books.filter { book ->
-			ids.contains(book.id)
+		val filteredBooks = books.filter { (id, _, _, _, _, _) ->
+			ids.contains(id)
 		}.toList()
 		return filteredBooks
 	}

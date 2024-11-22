@@ -21,7 +21,7 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.channels.consumeEach
 import java.io.File
 
-val tasks: MutableMap<Int, Task> = mutableMapOf<Int, Task>()
+val tasks: MutableMap<Int, Task> = mutableMapOf()
 
 private val gson: Gson = Gson()
 
@@ -161,7 +161,7 @@ fun Application.configureWebSocket() {
 						val index = editTaskRequest.index
 						val title = editTaskRequest.title
 
-						tasks[index]!!.title = title
+						tasks.getValue(index).title = title
 
 						val jsonResponse = gson.toJson(tasks)
 
@@ -212,7 +212,7 @@ fun Application.configureRouting() {
 				part.dispose()
 			}
 
-			tasks.put(getNextAvailableId(), Task(title, status, dueDate, fileName))
+			tasks[getNextAvailableId()] = Task(title, status, dueDate, fileName)
 
 			call.respond(HttpStatusCode.OK)
 		}

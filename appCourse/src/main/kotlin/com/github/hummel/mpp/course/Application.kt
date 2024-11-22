@@ -33,7 +33,7 @@ fun Application.module() {
 	configureRouting()
 }
 
-fun Application.configureDatabase() {
+fun configureDatabase() {
 	Class.forName("org.postgresql.Driver")
 
 	connection = DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "root", "")

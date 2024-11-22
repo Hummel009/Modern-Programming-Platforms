@@ -15,7 +15,7 @@ import io.ktor.server.routing.*
 import io.ktor.utils.io.jvm.javaio.*
 import java.io.File
 
-val tasks: MutableMap<Int, Task> = mutableMapOf<Int, Task>()
+val tasks: MutableMap<Int, Task> = mutableMapOf()
 
 private val gson: Gson = Gson()
 
@@ -66,7 +66,7 @@ fun SchemaBuilder.configureSchema() {
 
 	mutation("edit_task") {
 		resolver { index: Int, title: String ->
-			tasks[index]!!.title = title
+			tasks.getValue(index).title = title
 
 			gson.toJson(tasks)
 		}
@@ -108,7 +108,7 @@ fun Application.configureRouting() {
 				part.dispose()
 			}
 
-			tasks.put(getNextAvailableId(), Task(title, status, dueDate, fileName))
+			tasks[getNextAvailableId()] = Task(title, status, dueDate, fileName)
 
 			call.respond(HttpStatusCode.OK)
 		}
