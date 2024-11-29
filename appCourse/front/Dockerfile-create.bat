@@ -1,1 +1,1 @@
-docker build -t rebounder-chain-frontend .
+docker build -t course-frontend .
