@@ -61,12 +61,17 @@ object OrderDao {
 			}
 
 			val results = pstmtOrderItem.executeBatch()
+
+			if (results.any { it > 0 }) throw Exception()
+
 			connection.commit()
 
-			results.all { it > 0 }
+			true
 		} catch (e: SQLException) {
 			e.printStackTrace()
+
 			connection.rollback()
+
 			false
 		} finally {
 			connection.autoCommit = true
