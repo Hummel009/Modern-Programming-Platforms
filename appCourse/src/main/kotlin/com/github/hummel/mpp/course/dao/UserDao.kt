@@ -10,7 +10,7 @@ object UserDao {
 		CREATE TABLE IF NOT EXISTS users (
 			`id` INT PRIMARY KEY AUTO_INCREMENT,
 			`username` VARCHAR(255) UNIQUE NOT NULL,
-			`password` VARCHAR(1024) NOT NULL,
+			`password` VARCHAR(255) NOT NULL,
 			`balance` DECIMAL(24, 2) NOT NULL DEFAULT 0
 		);
 		""".trimIndent()
@@ -56,6 +56,26 @@ object UserDao {
 		}
 	}
 
+	fun findUserById(userId: Int): User? {
+		val sql = "SELECT * FROM users WHERE `id` = ?"
+		return try {
+			val pstmt = connection.prepareStatement(sql)
+			pstmt.setInt(1, userId)
+			val rs = pstmt.executeQuery()
+			if (rs.next()) {
+				User(
+					rs.getInt("id"), rs.getString("username"), rs.getString("password"), rs.getDouble("balance")
+				)
+			} else {
+				null
+			}
+		} catch (e: SQLException) {
+			e.printStackTrace()
+
+			null
+		}
+	}
+
 	fun updateUserUsername(userId: Int, newUsername: String): Boolean {
 		val sql = "UPDATE users SET `username` = ? WHERE `id` = ?"
 		return try {
@@ -81,24 +101,6 @@ object UserDao {
 			e.printStackTrace()
 
 			false
-		}
-	}
-
-	fun findUserBalance(userId: Int): Double? {
-		val sql = "SELECT `balance` FROM users WHERE `id` = ?"
-		return try {
-			val pstmt = connection.prepareStatement(sql)
-			pstmt.setInt(1, userId)
-			val rs = pstmt.executeQuery()
-			if (rs.next()) {
-				rs.getDouble("balance")
-			} else {
-				null
-			}
-		} catch (e: SQLException) {
-			e.printStackTrace()
-
-			null
 		}
 	}
 

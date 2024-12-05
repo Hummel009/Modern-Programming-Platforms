@@ -323,10 +323,6 @@ select {
 	text-align: center;
 }
 
-.navi>div .preamble {
-	height: 180px;
-}
-
 .navi>div .title {
 	font-weight: bold;
 }
@@ -371,4 +367,19 @@ select {
 
 .change>* {
     margin-right: 1em;
+}
+
+.navi>div .preamble {
+	height: 160px;
+}
+
+.author-img {
+    width: 300px;
+    float: right;
+    margin-left: 1em;
+    border-radius: 10px;
+}
+
+p {
+    margin-bottom: 1em;
 }

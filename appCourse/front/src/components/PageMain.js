@@ -35,18 +35,18 @@ export const PageMain = ({
 		}
 	};
 
-	const handleFilterBooksAuthors = async (author) => {
-		const response = await axios.post('http://localhost:2999/books/filter/authors', {
-			filterValue: author
+	const handleFilterBooksAuthors = async (authorName) => {
+		const response = await axios.post('http://localhost:2999/main/authors', {
+			filterValue: authorName
 		});
 
 		setBooks(response.data);
 		setCurrentPage(1);
 	};
 
-	const handleFilterBooksTypes = async (type) => {
-		const response = await axios.post('http://localhost:2999/books/filter/types', {
-			filterValue: type
+	const handleFilterBooksTypes = async (typeName) => {
+		const response = await axios.post('http://localhost:2999/main/types', {
+			filterValue: typeName
 		});
 
 		setBooks(response.data);
@@ -54,7 +54,7 @@ export const PageMain = ({
 	};
 
 	const handleFilterBooksYears = async (year) => {
-		const response = await axios.post('http://localhost:2999/books/filter/years', {
+		const response = await axios.post('http://localhost:2999/main/years', {
 			filterValue: year
 		});
 
@@ -99,13 +99,13 @@ export const PageMain = ({
 				<select onChange={(e) => handleFilterBooksAuthors(e.target.value)}>
 					<option value="all">Усе аўтары</option>
 					{authors.map(author => (
-						<option key={author} value={author}>{author}</option>
+						<option key={author.id} value={author.id}>{author.name}</option>
 					))}
 				</select>
 				<select onChange={(e) => handleFilterBooksTypes(e.target.value)}>
 					<option value="all">Усе тыпы</option>
 					{types.map(type => (
-						<option key={type} value={type}>{type}</option>
+						<option key={type.id} value={type.id}>{type.name}</option>
 					))}
 				</select>
 				<select onChange={(e) => handleFilterBooksYears(e.target.value)}>
@@ -120,15 +120,15 @@ export const PageMain = ({
 				{currentBooks.map(book => (
 					<div key={book.id}>
 						<div className="preamble">
-							<div className="title">«{book.title}»</div>
+							<div className="title">«{book.name}»</div>
 							<div className="author">
-								<Link to={book.author}>{book.author}</Link>
+								<Link to={book.authorName}>{book.authorName}</Link>
 							</div>
-							<div className="other">{book.type}, {book.year}</div>
-							<div className="description">{book.description}</div>
+							<div className="other">{book.typeName}, {book.year}</div>
+							<div className="description">{book.desc}</div>
 						</div>
 						<button className="wds-button price" onClick={(e) => handleAddToCart(book)}>Дадаць у кош ({book.price}$)</button>
-						<img src={book.imgPath} width="100%" height="auto" alt="" />
+						<img src={book.image} width="100%" height="auto" alt="" />
 					</div>
 				))}
 			</div>

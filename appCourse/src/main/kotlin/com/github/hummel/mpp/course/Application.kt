@@ -4,6 +4,7 @@ import com.github.hummel.mpp.course.controller.configureRouting
 import com.github.hummel.mpp.course.dao.AuthorDao
 import com.github.hummel.mpp.course.dao.BookDao
 import com.github.hummel.mpp.course.dao.OrderDao
+import com.github.hummel.mpp.course.dao.TypeDao
 import com.github.hummel.mpp.course.dao.UserDao
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -39,8 +40,9 @@ fun configureDatabase() {
 
 	connection = DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "root", "")
 
-	UserDao.initTable()
-	BookDao.initTable()
-	OrderDao.initTable()
 	AuthorDao.initTable()
+	TypeDao.initTable()
+	BookDao.initTable()
+	UserDao.initTable()
+	OrderDao.initTable()
 }

@@ -7,7 +7,7 @@ import com.github.hummel.mpp.course.entity.Order
 import com.github.hummel.mpp.course.entity.User
 
 object ProfileService {
-	fun getUserData(username: String): User? = UserDao.findUserByUsername(username)
+	fun getUserData(username: String): User = UserDao.findUserByUsername(username) ?: throw Exception()
 
 	fun changeUserUsername(userId: Int, newUsername: String): Boolean =
 		UserDao.updateUserUsername(userId, newUsername)
@@ -22,7 +22,7 @@ object ProfileService {
 
 
 	fun rechargeUserBalance(userId: Int, rechargeBalance: Double): Boolean {
-		val userBalance = UserDao.findUserBalance(userId) ?: return false
+		val userBalance = UserDao.findUserById(userId)?.balance ?: return false
 
 		val newBalance = userBalance + rechargeBalance
 

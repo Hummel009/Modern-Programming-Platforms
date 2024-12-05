@@ -17,22 +17,21 @@ export const PageProfile = ({
 	const [newPassword, setNewPassword] = useState('');
 	const [rechargeBalance, setRechargeBalance] = useState('');
 
-	const handleChangeUsername = async (e) => {
+	const handleRechargeBalance = async (e) => {
 		e.preventDefault();
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.put('http://localhost:2999/profile/username', {
-				userId: userData.userId,
+			await axios.put('http://localhost:2999/profile/balance', {
+				userId: userData.id,
 				token: token,
-				newUsername: newUsername
+				rechargeBalance: rechargeBalance
 			});
 
-			handleDeleteToken();
 
-			setIsLoggedIn(false);
+			handleFetchUserData();
 
-			toast.success('Логін зменены!');
+			toast.success('Баланс папоўнены!');
 		} catch (error) {
 			toast.error('Памылка!');
 		}
@@ -44,7 +43,7 @@ export const PageProfile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.put('http://localhost:2999/profile/password', {
-				userId: userData.userId,
+				userId: userData.id,
 				token: token,
 				newPassword: newPassword
 			});
@@ -59,21 +58,22 @@ export const PageProfile = ({
 		}
 	};
 
-	const handleRechargeBalance = async (e) => {
+	const handleChangeUsername = async (e) => {
 		e.preventDefault();
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.put('http://localhost:2999/profile/balance', {
-				userId: userData.userId,
+			await axios.put('http://localhost:2999/profile/username', {
+				userId: userData.id,
 				token: token,
-				rechargeBalance: rechargeBalance
+				newUsername: newUsername
 			});
 
+			handleDeleteToken();
 
-			handleFetchUserData();
+			setIsLoggedIn(false);
 
-			toast.success('Баланс папоўнены!');
+			toast.success('Логін зменены!');
 		} catch (error) {
 			toast.error('Памылка!');
 		}
@@ -137,12 +137,12 @@ export const PageProfile = ({
 									{order.books.map((book, index) => (
 										<div key={book.id}>
 											<div className="preamble">
-												<div className="title">«{book.title}»</div>
-												<div className="author">{book.author}</div>
-												<div className="description">{book.description}</div>
+												<div className="title">«{book.name}»</div>
+												<div className="author">{book.authorName}</div>
+												<div className="description">{book.desc}</div>
 											</div>
 											<div className="quantity">Колькасць: {order.quantities[index]}</div>
-											<img src={book.imgPath} width="100%" height="auto" alt="" />
+											<img src={book.image} width="100%" height="auto" alt="" />
 										</div>
 									))}
 								</div>

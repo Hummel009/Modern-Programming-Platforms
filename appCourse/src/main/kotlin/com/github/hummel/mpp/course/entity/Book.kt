@@ -1,12 +1,27 @@
 package com.github.hummel.mpp.course.entity
 
+import com.github.hummel.mpp.course.dao.AuthorDao
+import com.github.hummel.mpp.course.dao.TypeDao
+import com.github.hummel.mpp.course.dto.response.BookResponse
+
 data class Book(
 	val id: Int,
-	var title: String,
-	val description: String,
+	var name: String,
+	val desc: String,
+	val image: String,
 	val authorId: Int,
-	val imgPath: String,
-	val price: Double,
-	val type: String,
-	val year: String
-)
+	val typeId: Int,
+	val year: Int,
+	val price: Double
+) {
+	fun toResponse(): BookResponse = BookResponse(
+		id = id,
+		name = name,
+		desc = desc,
+		image = image,
+		authorName = AuthorDao.findAuthorById(authorId)?.name ?: throw Exception(),
+		typeName = TypeDao.findTypeById(typeId)?.name ?: throw Exception(),
+		year = year,
+		price = price
+	)
+}

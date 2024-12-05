@@ -1,5 +1,9 @@
 package com.github.hummel.mpp.course.entity
 
+import com.github.hummel.mpp.course.dto.response.UserResponse
+
 data class User(val id: Int, val username: String, val hashedPassword: String, val balance: Double) {
-	fun erasePassword(): UserSafe = UserSafe(id, username, balance)
+	fun toResponse(): UserResponse = UserResponse(
+		id = id, username = username, balance = balance
+	)
 }

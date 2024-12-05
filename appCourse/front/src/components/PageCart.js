@@ -26,8 +26,8 @@ export const PageCart = ({
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.post('http://localhost:2999/buy', {
-				userId: userData.userId,
+			await axios.post('http://localhost:2999/cart/buy', {
+				userId: userData.id,
 				token: token,
 				cartData: cartData
 			});
@@ -63,12 +63,12 @@ export const PageCart = ({
 				{cartData.map(book => (
 					<div key={book.id}>
 						<div className="preamble">
-							<div className="title">«{book.title}»</div>
-							<div className="author">{book.author}</div>
-							<div className="description">{book.description}</div>
+							<div className="title">«{book.name}»</div>
+							<div className="author">{book.authorName}</div>
+							<div className="description">{book.desc}</div>
 						</div>
 						<div className="title">Колькасць: {book.quantity}</div>
-						<img src={book.imgPath} width="100%" height="auto" alt="" />
+						<img src={book.image} width="100%" height="auto" alt="" />
 					</div>
 				))}
 			</div>

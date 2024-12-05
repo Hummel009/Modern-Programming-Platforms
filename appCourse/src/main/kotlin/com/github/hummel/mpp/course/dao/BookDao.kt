@@ -9,14 +9,15 @@ object BookDao {
 		val sql = """
 		CREATE TABLE IF NOT EXISTS books (
 			`id` INT PRIMARY KEY AUTO_INCREMENT,
-			`title` VARCHAR(255) NOT NULL,
-			`description` TEXT NOT NULL,
+			`name` VARCHAR(255) NOT NULL,
+			`desc` VARCHAR(255) NOT NULL,
+			`image` VARCHAR(255) NOT NULL,
 			`author_id` INT NOT NULL,
-			`imgPath` VARCHAR(255) NOT NULL,
+			`type_id` INT NOT NULL,
+			`year` INT NOT NULL,
 			`price` DECIMAL(24, 2) NOT NULL,
-			`type` VARCHAR(100) NOT NULL,
-			`year` VARCHAR(100) NOT NULL,
-			FOREIGN KEY (`author_id`) REFERENCES authors(`id`)
+			FOREIGN KEY (`author_id`) REFERENCES authors(`id`),
+			FOREIGN KEY (`type_id`) REFERENCES types(`id`)
 		);
 		""".trimIndent()
 
@@ -27,7 +28,7 @@ object BookDao {
 		}
 
 		val sqlFill = """INSERT
-			INTO books (`title`, `description`, `author`, `imgPath`, `price`, `type`, `year`)
+			INTO books (`name`, `desc`, `image`, `author_id`, `type_id`, `year`, `price`)
 			VALUES (?, ?, ?, ?, ?, ?, ?)
 		""".trimIndent()
 
@@ -40,65 +41,79 @@ object BookDao {
 			"Шыпшына",
 			"Вянок",
 			"Зорка Венера",
-			"Каласы пад сярпом тваім"
+			"Каласы пад сярпом тваім",
 		)
-		val descriptions = listOf(
-			"Твор вялікага паэта Адама Міцкевіча, які адзначаецца глыбокім і лірычным падыходам да развіцця паэтычнага мастацтва. У гэтай кнізе вы адкрываеце для сябе крыніцу непаўторнага беларускага культурнага асяроддзя.",
-			"Твор вялікага беларускага паэта Янкі Купалы, у якім адлюстроўваецца яго глыбокае пачуццё нацыянальнай ідэнтычнасці і любові да прыроды. Кніга перадае той непаўторны дух, які ляжыць у аснове беларускай літаратуры.",
-			"Зборнік твораў выдаючага беларускага паэта Якуба Коласа. У гэтым зборніку адлюстроўваецца шматгадовая творчасць паэта.",
-			"Твор Максіма Багдановіча, прадстаўніка выдаючайся групы «Маладосць». У гэтай кнізе вы знойдзеце глыбокія пачуцці любові да роднай зямлі, грамадства і прыроды.",
-			"Твор Максіма Багдановіча, у якім адлюстроўваецца аўтабіяграфічныя моманты з жыцця паэта, які развіваў сваю творчасць у школьныя гады. Кніга звартае ўвагу на важнасць асвятлення тэмы адукацыі і выхавання ў мастацтве.",
-			"Твор Максіма Багдановіча, у якім адлюстроўваецца яго ўзровень да праблемы чалавечага стасунку да прыроды. Кніга - асалода для тых, каму падабаецца экалагічная тэма ў літаратуры.",
-			"Зборнік твораў Максіма Багдановіча, у якім яго лірычнасць і філасофская глыбіня пераплітаюцца ў вянку паэтычных абразаў. Кніга адкрые для вас светлы і глыбокі свет літаратурнага мастацтва.",
-			"Твор Максіма Багдановіча, у якім адлюстроўваецца яго бачанне прыроды як галоўнага элемента чалавечага існавання. Кніга - нумар адзін для тых, каму падабаецца лірыка і эстэтыка прыроды.",
-			"Твор Уладзіміра Караткевіча, выдатнага паэта і культуртворца. У гэтай кнізе вы адчуеце эмоцыі і пачуцці беларускай нацыі, якія былі актуальнымі для часоў, у якіх жыў паэт."
+
+		val descs = listOf(
+			"Гістарычны раман Адама Міцкевіча, які апісвае падзеі, што адбываюцца ў Літве ў пачатку XIX стагоддзя. Галоўныя героі — шляхцічы, якія спрабуюць вырашыць свае канфлікты.",
+			"Раман Янкі Купалы, які раскрывае жыццё і любоў простага беларуса. У цэнтры сюжэта — гісторыя кахання паміж Паўлінай і яе абраннікам, якая адлюстроўвае традыцыі і звычаі.",
+			"Твор Максіма Багдановіча, які адлюстроўвае цяжкасці жыцця беларусаў у перыяд пасля рэвалюцыі. Раман даследуе тэмы ідэнтычнасці і пошуку новага месца ў свеце. Вельмі рэкамендуецца!",
+			"Кніга, якая даследуе чалавечыя адносіны праз прызму кахання і страты. Галоўны герой перажывае драматычныя падзеі, якія змяняюць яго жыццё назаўсёды. Чытайце ўсе!",
+			"Аповесць, якая апісвае школьнае жыццё і праблемы падлеткаў. У цэнтры сюжэта — сяброўства, канфлікты і першыя каханні. Вельмі духоўная і памяркоўная кніга, рэкамендавана.",
+			"Літаратурны твор, які даследуе тэмы прыроды і чалавечых эмоцый. Галоўны герой знаходзіць сябе ў свеце шыпшыны, дзе кожны крок адкрывае новыя магчымасці. Вельмі рэкамендуецца!",
+			"Кніга, якая складаецца з розных гісторый пра каханне і сямейныя каштоўнасці. Кожная гісторыя падкрэслівае важнасць традыцый у жыцці беларусаў. Абавязкова прачытайце!",
+			"Раман, які даследуе тэму кахання ў складаных умовах. Галоўныя героі спрабуюць знайсці шлях адзін да аднаго на фоне сацыяльных праблем. Рэкамендацыя для вас. Вельмі рэкамендуецца!",
+			"Твор Якуба Коласа, які адлюстроўвае жыццё беларусаў у часе цяжкіх выпрабаванняў. Кніга паказвае іх мужнасць і стойкасць у барацьбе за сваё месца ў свеце. Вельмі рэкамендуецца!",
 		)
-		val authors = listOf(
-			1,
-			2,
-			3,
-			4,
-			4,
-			4,
-			4,
-			4,
-			5
-		)
-		val imgPaths = listOf(
+
+		val images = listOf(
 			"books/am_tadewusz.jpg",
-			"books/jk_paulinka.jpg",
-			"books/jk_ziamlia.jpg",
 			"books/mb_piarscionak.jpg",
 			"books/mb_szkola.jpg",
 			"books/mb_szypszyna.jpg",
 			"books/mb_wianok.jpg",
 			"books/mb_wieniera.jpg",
-			"books/uk_kalasy.jpg"
+			"books/uk_kalasy.jpg",
+			"books/jk_ziamlia.jpg",
+			"books/jk_paulinka.jpg",
 		)
-		val prices = listOf(
-			1.19, 1.29, 1.39, 1.49, 1.59, 1.69, 1.79, 1.89, 1.99
+
+		val authorIds = listOf(
+			1, // Пан Тадэвуш
+			2, // Пярсцёнак
+			2, // У школе
+			2, // Шыпшына
+			2, // Вянок
+			2, // Зорка Венера
+			3, // Каласы пад сярпом тваім
+			4, // Новая зямля
+			5, // Паўлінка
 		)
-		val types = listOf(
-			"Паэзія", // Пан Тадэвуш
-			"Паэзія", // Паўлінка
-			"Проза", // Новая зямля
-			"Паэзія", // Пярсцёнак
-			"Проза", // У школе
-			"Паэзія", // Шыпшына
-			"Паэзія", // Вянок
-			"Проза", // Зорка Венера
-			"Проза"  // Каласы пад сярпом тваім
+
+		val typeIds = listOf(
+			1, // Пан Тадэвуш
+			2, // Пярсцёнак
+			1, // У школе
+			2, // Шыпшына
+			2, // Вянок
+			1, // Зорка Венера
+			2, // Каласы пад сярпом тваім
+			1, // Новая зямля
+			3, // Паўлінка
 		)
+
 		val years = listOf(
-			"1834", // Пан Тадэвуш
-			"1913", // Паўлінка
-			"1948", // Новая зямля
-			"1913", // Пярсцёнак
-			"1924", // У школе
-			"1924", // Шыпшына
-			"1930", // Вянок
-			"1967", // Зорка Венера
-			"1967"  // Каласы пад сярпом тваім
+			1834, // Пан Тадэвуш
+			1958, // Пярсцёнак
+			1949, // У школе
+			1970, // Шыпшына
+			1965, // Вянок
+			1980, // Зорка Венера
+			1965, // Каласы пад сярпом тваім
+			1959, // Новая зямля
+			1959, // Паўлінка
+		)
+
+		val prices = listOf(
+			1.19, // Пан Тадэвуш
+			1.29, // Пярсцёнак
+			1.39, // У школе
+			1.49, // Шыпшына
+			1.59, // Вянок
+			1.69, // Зорка Венера
+			1.79, // Каласы пад сярпом тваім
+			1.89, // Новая зямля
+			1.99, // Паўлінка
 		)
 
 		try {
@@ -106,12 +121,12 @@ object BookDao {
 
 			for (i in names.indices) {
 				pstmt.setString(1, names[i])
-				pstmt.setString(2, descriptions[i])
-				pstmt.setInt(3, authors[i])
-				pstmt.setString(4, imgPaths[i])
-				pstmt.setDouble(5, prices[i])
-				pstmt.setString(6, types[i])
-				pstmt.setString(7, years[i])
+				pstmt.setString(2, descs[i])
+				pstmt.setString(3, images[i])
+				pstmt.setInt(4, authorIds[i])
+				pstmt.setInt(5, typeIds[i])
+				pstmt.setInt(6, years[i])
+				pstmt.setDouble(7, prices[i])
 				pstmt.addBatch()
 			}
 
@@ -132,14 +147,14 @@ object BookDao {
 			while (rs.next()) {
 				books.add(
 					Book(
-						rs.getInt("id"),
-						rs.getString("title"),
-						rs.getString("description"),
-						rs.getInt("author_id"),
-						rs.getString("imgPath"),
-						rs.getDouble("price"),
-						rs.getString("type"),
-						rs.getString("year")
+						id = rs.getInt("id"),
+						name = rs.getString("name"),
+						desc = rs.getString("desc"),
+						image = rs.getString("image"),
+						authorId = rs.getInt("author_id"),
+						typeId = rs.getInt("type_id"),
+						year = rs.getInt("year"),
+						price = rs.getDouble("price"),
 					)
 				)
 			}
@@ -151,35 +166,16 @@ object BookDao {
 		}
 	}
 
-	fun findUniqueTypes(): List<String> {
-		val sql = "SELECT DISTINCT `type` FROM books"
-
-		try {
-			val stmt = connection.createStatement()
-			val rs = stmt.executeQuery(sql)
-
-			val types = mutableSetOf<String>()
-			while (rs.next()) {
-				types.add(rs.getString("type"))
-			}
-			return types.toList()
-		} catch (e: SQLException) {
-			e.printStackTrace()
-
-			return emptyList()
-		}
-	}
-
-	fun findUniqueYears(): List<String> {
+	fun findUniqueYears(): List<Int> {
 		val sql = "SELECT DISTINCT `year` FROM books"
 
 		try {
 			val stmt = connection.createStatement()
 			val rs = stmt.executeQuery(sql)
 
-			val years = mutableSetOf<String>()
+			val years = mutableSetOf<Int>()
 			while (rs.next()) {
-				years.add(rs.getString("year"))
+				years.add(rs.getInt("year"))
 			}
 			return years.toList()
 		} catch (e: SQLException) {

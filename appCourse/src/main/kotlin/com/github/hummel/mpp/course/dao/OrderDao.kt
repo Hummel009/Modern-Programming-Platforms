@@ -34,7 +34,7 @@ object OrderDao {
 		}
 	}
 
-	fun addOrder(userId: Int, booksIds: List<Int>, quantities: List<Int>): Boolean {
+	fun addUserOrder(userId: Int, booksIds: List<Int>, quantities: List<Int>): Boolean {
 		val sqlOrder = "INSERT INTO orders (`user_id`) VALUES (?)"
 		val sqlOrderItem = "INSERT INTO order_items (`order_id`, `book_id`, `quantity`) VALUES (?, ?, ?)"
 

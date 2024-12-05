@@ -8,7 +8,7 @@ object CartService {
 	fun buyBooks(userId: Int, booksToBuy: List<Book>, quantities: List<Int>): Boolean {
 		val price = booksToBuy.zip(quantities) { book, quantity -> book.price * quantity }.sum()
 
-		val userBalance = UserDao.findUserBalance(userId) ?: return false
+		val userBalance = UserDao.findUserById(userId)?.balance ?: return false
 
 		val newBalance = userBalance - price
 
@@ -16,7 +16,7 @@ object CartService {
 			return false
 		}
 
-		if (!OrderDao.addOrder(userId, booksToBuy.map { it.id }.toList(), quantities)) {
+		if (!OrderDao.addUserOrder(userId, booksToBuy.map { it.id }.toList(), quantities)) {
 			return false
 		}
 

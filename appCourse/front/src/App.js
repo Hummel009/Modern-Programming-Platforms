@@ -28,34 +28,23 @@ function App() {
 
 	const [books, setBooks] = useState([]);
 	const [authors, setAuthors] = useState([]);
-	const [years, setYears] = useState([]);
 	const [types, setTypes] = useState([]);
+	const [years, setYears] = useState([]);
 
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-	const handleFetchAuthorsBiographies = useCallback(async () => {
-		const response = await axios.get('http://localhost:2999/authors');
-		setAuthorsBiographies(response.data);
-	}, []);
+	const handleFetchStorageData = useCallback(async () => {
+		const responseBooks = await axios.get('http://localhost:2999/books');
+		setBooks(responseBooks.data);
 
-	const handleFetchBooks = useCallback(async () => {
-		const response = await axios.get('http://localhost:2999/books');
-		setBooks(response.data);
-	}, []);
+		const responseAuthors = await axios.get('http://localhost:2999/authors');
+		setAuthors(responseAuthors.data);
 
-	const handleFetchAuthors = useCallback(async () => {
-		const response = await axios.get('http://localhost:2999/authors');
-		setAuthors(response.data);
-	}, []);
+		const responseTypes = await axios.get('http://localhost:2999/types');
+		setTypes(responseTypes.data);
 
-	const handleFetchTypes = useCallback(async () => {
-		const response = await axios.get('http://localhost:2999/types');
-		setTypes(response.data);
-	}, []);
-
-	const handleFetchYears = useCallback(async () => {
-		const response = await axios.get('http://localhost:2999/years');
-		setYears(response.data);
+		const responseYears = await axios.get('http://localhost:2999/years');
+		setYears(responseYears.data);
 	}, []);
 
 	const handleUseToken = useCallback(async () => {
@@ -67,19 +56,6 @@ function App() {
 			});
 
 			setIsLoggedIn(true);
-		} catch (error) {
-		}
-	}, []);
-
-	const handleFetchUserData = useCallback(async () => {
-		try {
-			const token = Cookies.get('jwt');
-
-			const response = await axios.post('http://localhost:2999/profile', {
-				token: token
-			});
-
-			setUserData(response.data);
 		} catch (error) {
 		}
 	}, []);
@@ -108,11 +84,24 @@ function App() {
 		}
 	}, []);
 
+	const handleFetchUserData = useCallback(async () => {
+		try {
+			const token = Cookies.get('jwt');
+
+			const response = await axios.post('http://localhost:2999/user', {
+				token: token
+			});
+
+			setUserData(response.data);
+		} catch (error) {
+		}
+	}, []);
+
 	const handleFetchOrders = useCallback(async () => {
 		try {
 			const token = Cookies.get('jwt');
 
-			const response = await axios.post('http://localhost:2999/profile/orders', {
+			const response = await axios.post('http://localhost:2999/user/orders', {
 				userId: userData.userId,
 				token: token
 			});
@@ -123,15 +112,12 @@ function App() {
 	}, [userData.userId]);
 
 	useEffect(() => {
-		handleFetchBooks();
-		handleFetchAuthors();
-		handleFetchTypes();
-		handleFetchYears();
+		handleFetchStorageData();
 		handleUseToken()
 		handleFetchCartData();
 		handleFetchUserData();
 		handleFetchOrders();
-	}, [handleFetchBooks, handleFetchAuthors, handleFetchTypes, handleFetchYears, handleUseToken, handleFetchCartData, handleFetchUserData, handleFetchOrders]);
+	}, [handleFetchStorageData, handleUseToken, handleFetchCartData, handleFetchUserData, handleFetchOrders]);
 
 	const handleDeleteToken = () => {
 		try {
@@ -199,11 +185,19 @@ function App() {
 										handleFetchUserData={handleFetchUserData}
 									/>
 								} />
-								{authors.map(author => (
-									<Route path={author} element={
-										<h1>
-											<span>{author}</span>
-										</h1>
+								{authors.map((author, index) => (
+									<Route key={index} path={author.name} element={
+										<div key={index}>
+											<h1>
+												<span>{author.name}</span>
+											</h1>
+											<img className="author-img" src={author.image} width="100%" height="auto" alt="" />
+											<div className="author-desc">
+												{author.desc.split('\n').map((line, index) => (
+													<p key={index}>{line}</p>
+												))}
+											</div>
+										</div>
 									} />
 								))}
 							</Routes>
