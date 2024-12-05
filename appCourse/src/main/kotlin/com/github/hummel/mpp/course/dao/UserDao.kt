@@ -23,7 +23,7 @@ object UserDao {
 	}
 
 	fun addUser(username: String, hashedPassword: String): Boolean {
-		val sql = "INSERT INTO users (username, password) VALUES (?, ?)"
+		val sql = "INSERT INTO users (`username`, `password`) VALUES (?, ?)"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setString(1, username)
@@ -37,7 +37,7 @@ object UserDao {
 	}
 
 	fun findUserByUsername(username: String): User? {
-		val sql = "SELECT * FROM users WHERE username = ?"
+		val sql = "SELECT * FROM users WHERE `username` = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setString(1, username)
@@ -57,7 +57,7 @@ object UserDao {
 	}
 
 	fun updateUserUsername(userId: Int, newUsername: String): Boolean {
-		val sql = "UPDATE users SET username = ? WHERE id = ?"
+		val sql = "UPDATE users SET `username` = ? WHERE `id` = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setString(1, newUsername)
@@ -71,7 +71,7 @@ object UserDao {
 	}
 
 	fun updateUserPassword(userId: Int, newPassword: String): Boolean {
-		val sql = "UPDATE users SET password = ? WHERE id = ?"
+		val sql = "UPDATE users SET `password` = ? WHERE `id` = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setString(1, newPassword)
@@ -85,7 +85,7 @@ object UserDao {
 	}
 
 	fun findUserBalance(userId: Int): Double? {
-		val sql = "SELECT balance FROM users WHERE id = ?"
+		val sql = "SELECT `balance` FROM users WHERE `id` = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setInt(1, userId)
@@ -103,7 +103,7 @@ object UserDao {
 	}
 
 	fun updateUserBalance(userId: Int, newBalance: Double): Boolean {
-		val sql = "UPDATE users SET balance = ? WHERE id = ?"
+		val sql = "UPDATE users SET `balance` = ? WHERE `id` = ?"
 		return try {
 			val pstmt = connection.prepareStatement(sql)
 			pstmt.setDouble(1, newBalance)

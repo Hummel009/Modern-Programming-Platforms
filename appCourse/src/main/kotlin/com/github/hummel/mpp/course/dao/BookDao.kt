@@ -11,11 +11,12 @@ object BookDao {
 			`id` INT PRIMARY KEY AUTO_INCREMENT,
 			`title` VARCHAR(255) NOT NULL,
 			`description` TEXT NOT NULL,
-			`author` VARCHAR(255) NOT NULL,
+			`author_id` INT NOT NULL,
 			`imgPath` VARCHAR(255) NOT NULL,
 			`price` DECIMAL(24, 2) NOT NULL,
 			`type` VARCHAR(100) NOT NULL,
-			`year` VARCHAR(100) NOT NULL
+			`year` VARCHAR(100) NOT NULL,
+			FOREIGN KEY (`author_id`) REFERENCES authors(`id`)
 		);
 		""".trimIndent()
 
@@ -53,15 +54,15 @@ object BookDao {
 			"Твор Уладзіміра Караткевіча, выдатнага паэта і культуртворца. У гэтай кнізе вы адчуеце эмоцыі і пачуцці беларускай нацыі, якія былі актуальнымі для часоў, у якіх жыў паэт."
 		)
 		val authors = listOf(
-			"Адам Міцкевіч",
-			"Янка Купала",
-			"Якуб Колас",
-			"Максім Багдановіч",
-			"Максім Багдановіч",
-			"Максім Багдановіч",
-			"Максім Багдановіч",
-			"Максім Багдановіч",
-			"Уладзімір Караткевіч"
+			1,
+			2,
+			3,
+			4,
+			4,
+			4,
+			4,
+			4,
+			5
 		)
 		val imgPaths = listOf(
 			"books/am_tadewusz.jpg",
@@ -106,7 +107,7 @@ object BookDao {
 			for (i in names.indices) {
 				pstmt.setString(1, names[i])
 				pstmt.setString(2, descriptions[i])
-				pstmt.setString(3, authors[i])
+				pstmt.setInt(3, authors[i])
 				pstmt.setString(4, imgPaths[i])
 				pstmt.setDouble(5, prices[i])
 				pstmt.setString(6, types[i])
@@ -134,7 +135,7 @@ object BookDao {
 						rs.getInt("id"),
 						rs.getString("title"),
 						rs.getString("description"),
-						rs.getString("author"),
+						rs.getInt("author_id"),
 						rs.getString("imgPath"),
 						rs.getDouble("price"),
 						rs.getString("type"),
@@ -143,25 +144,6 @@ object BookDao {
 				)
 			}
 			return books
-		} catch (e: SQLException) {
-			e.printStackTrace()
-
-			return emptyList()
-		}
-	}
-
-	fun findUniqueAuthors(): List<String> {
-		val sql = "SELECT DISTINCT `author` FROM books"
-
-		try {
-			val stmt = connection.createStatement()
-			val rs = stmt.executeQuery(sql)
-
-			val authors = mutableSetOf<String>()
-			while (rs.next()) {
-				authors.add(rs.getString("author"))
-			}
-			return authors.toList()
 		} catch (e: SQLException) {
 			e.printStackTrace()
 

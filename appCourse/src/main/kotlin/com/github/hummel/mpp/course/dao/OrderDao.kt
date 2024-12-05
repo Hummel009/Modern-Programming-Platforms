@@ -9,20 +9,20 @@ object OrderDao {
 	fun initTable() {
 		val sql1 = """
 		CREATE TABLE IF NOT EXISTS orders (
-			id INT PRIMARY KEY AUTO_INCREMENT,
-			user_id INT NOT NULL,
-			FOREIGN KEY (user_id) REFERENCES users(id)
+			`id` INT PRIMARY KEY AUTO_INCREMENT,
+			`user_id` INT NOT NULL,
+			FOREIGN KEY (`user_id`) REFERENCES users(`id`)
 		);
 		""".trimIndent()
 
 		val sql2 = """
 		CREATE TABLE IF NOT EXISTS order_items (
-			id INT PRIMARY KEY AUTO_INCREMENT,
-			order_id INT NOT NULL,
-			book_id INT NOT NULL,
-			quantity INT NOT NULL,
-			FOREIGN KEY (order_id) REFERENCES orders(id),
-			FOREIGN KEY (book_id) REFERENCES books(id)
+			`id` INT PRIMARY KEY AUTO_INCREMENT,
+			`order_id` INT NOT NULL,
+			`book_id` INT NOT NULL,
+			`quantity` INT NOT NULL,
+			FOREIGN KEY (`order_id`) REFERENCES orders(`id`),
+			FOREIGN KEY (`book_id`) REFERENCES books(`id`)
 		);
 		""".trimIndent()
 
@@ -35,8 +35,8 @@ object OrderDao {
 	}
 
 	fun addOrder(userId: Int, booksIds: List<Int>, quantities: List<Int>): Boolean {
-		val sqlOrder = "INSERT INTO orders (user_id) VALUES (?)"
-		val sqlOrderItem = "INSERT INTO order_items (order_id, book_id, quantity) VALUES (?, ?, ?)"
+		val sqlOrder = "INSERT INTO orders (`user_id`) VALUES (?)"
+		val sqlOrderItem = "INSERT INTO order_items (`order_id`, `book_id`, `quantity`) VALUES (?, ?, ?)"
 
 		return try {
 			connection.autoCommit = false

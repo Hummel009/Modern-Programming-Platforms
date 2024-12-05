@@ -17,14 +17,6 @@ val gson: Gson = Gson()
 
 fun Application.configureRouting() {
 	routing {
-		get("/authors") {
-			val authors = MainService.getUniqueAuthors()
-
-			val jsonResponse = gson.toJson(authors)
-
-			call.respond(jsonResponse)
-		}
-
 		get("/years") {
 			val years = MainService.getUniqueYears()
 
@@ -39,6 +31,24 @@ fun Application.configureRouting() {
 			val jsonResponse = gson.toJson(types)
 
 			call.respond(jsonResponse)
+		}
+
+		route("/authors") {
+			get("/names") {
+				val authors = MainService.getUniqueAuthors()
+
+				val jsonResponse = gson.toJson(authors)
+
+				call.respond(jsonResponse)
+			}
+
+			get("/biographies") {
+				val authorsBiographies = MainService.getAuthorsBiographies()
+
+				val jsonResponse = gson.toJson(authorsBiographies)
+
+				call.respond(jsonResponse)
+			}
 		}
 
 		route("/books") {

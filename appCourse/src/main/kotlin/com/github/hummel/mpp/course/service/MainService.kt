@@ -1,12 +1,13 @@
 package com.github.hummel.mpp.course.service
 
+import com.github.hummel.mpp.course.dao.AuthorDao
 import com.github.hummel.mpp.course.dao.BookDao
 import com.github.hummel.mpp.course.entity.Book
 
 object MainService {
 	fun getAllBooks(): List<Book> = BookDao.findAllBooks().sortedBy { it.year }
 
-	fun getUniqueAuthors(): List<String> = BookDao.findUniqueAuthors().sortedBy { it }
+	fun getUniqueAuthors(): List<String> = AuthorDao.findUniqueAuthors().sortedBy { it }
 
 	fun getUniqueTypes(): List<String> = BookDao.findUniqueTypes().sortedBy { it }
 
@@ -20,10 +21,12 @@ object MainService {
 		return filteredBooks
 	}
 
-	fun getBooksOfAuthor(author: String): List<Book> {
+	fun getBooksOfAuthor(authorName: String): List<Book> {
 		val books = BookDao.findAllBooks()
+		val author = AuthorDao.findAuthorByName(authorName) ?: throw Exception()
+
 		val filteredBooks = books.filter {
-			author == "all" || it.author == author
+			authorName == "all" || it.authorId == author.id
 		}.toList().sortedBy { it.year }
 		return filteredBooks
 	}

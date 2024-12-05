@@ -33,6 +33,11 @@ function App() {
 
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+	const handleFetchAuthorsBiographies = useCallback(async () => {
+		const response = await axios.get('http://localhost:2999/authors');
+		setAuthorsBiographies(response.data);
+	}, []);
+
 	const handleFetchBooks = useCallback(async () => {
 		const response = await axios.get('http://localhost:2999/books');
 		setBooks(response.data);

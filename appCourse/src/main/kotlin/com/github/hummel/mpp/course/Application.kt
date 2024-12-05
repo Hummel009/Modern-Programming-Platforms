@@ -1,6 +1,7 @@
 package com.github.hummel.mpp.course
 
 import com.github.hummel.mpp.course.controller.configureRouting
+import com.github.hummel.mpp.course.dao.AuthorDao
 import com.github.hummel.mpp.course.dao.BookDao
 import com.github.hummel.mpp.course.dao.OrderDao
 import com.github.hummel.mpp.course.dao.UserDao
@@ -41,4 +42,5 @@ fun configureDatabase() {
 	UserDao.initTable()
 	BookDao.initTable()
 	OrderDao.initTable()
+	AuthorDao.initTable()
 }
