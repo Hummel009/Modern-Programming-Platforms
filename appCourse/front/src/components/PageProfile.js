@@ -23,7 +23,6 @@ export const PageProfile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.put(`http://localhost:2999/api/v1/users/${userData.id}/balance`, {
-				userId: userData.id,
 				token: token,
 				rechargeBalance: rechargeBalance
 			});
@@ -43,7 +42,6 @@ export const PageProfile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.put(`http://localhost:2999/api/v1/users/${userData.id}/password`, {
-				userId: userData.id,
 				token: token,
 				newPassword: newPassword
 			});
@@ -64,7 +62,6 @@ export const PageProfile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.put(`http://localhost:2999/api/v1/users/${userData.id}/username`, {
-				userId: userData.id,
 				token: token,
 				newUsername: newUsername
 			});

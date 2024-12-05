@@ -22,12 +22,11 @@ export const PageCart = ({
 		}
 	}
 
-	const handleBuyBooks = async () => {
+	const handleAddOrder = async () => {
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.post(`http://localhost:2999/api/v1/orders/add`, {
-				userId: userData.id,
+			await axios.post(`http://localhost:2999/api/v1/orders/${userData.id}/add`, {
 				token: token,
 				cartData: cartData
 			});
@@ -59,7 +58,7 @@ export const PageCart = ({
 				)}
 			</div>
 			<br />
-			<button className="wds-button prev" onClick={handleBuyBooks} disabled={cartData.length <= 0 || !isLoggedIn}>Купіць</button>
+			<button className="wds-button prev" onClick={handleAddOrder} disabled={cartData.length <= 0 || !isLoggedIn}>Купіць</button>
 			<button className="wds-button next" onClick={handleClearCart} disabled={cartData.length <= 0}>Ачысціць кош</button>
 			<br />
 			<br />

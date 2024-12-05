@@ -88,21 +88,20 @@ function App() {
 		try {
 			const token = Cookies.get('jwt');
 
-			const response = await axios.post(`http://localhost:2999/api/v1/users/${userData.id}`, {
+			const response = await axios.post(`http://localhost:2999/api/v1/users/user`, {
 				token: token
 			});
 
 			setUserData(response.data);
 		} catch (error) {
 		}
-	}, [userData.id]);
+	}, []);
 
 	const handleFetchOrders = useCallback(async () => {
 		try {
 			const token = Cookies.get('jwt');
 
-			const response = await axios.post(`http://localhost:2999/api/v1/orders`, {
-				userId: userData.id,
+			const response = await axios.post(`http://localhost:2999/api/v1/orders/${userData.id}`, {
 				token: token
 			});
 

@@ -18,7 +18,7 @@ fun Application.configureRouting() {
 	routing {
 		route("/api/v1") {
 			route("/users") {
-				post("/{userId}") {
+				post("/user") {
 					val jsonRequest = call.receiveText()
 
 					val request = gson.fromJson(jsonRequest, UserRequest::class.java)
@@ -41,12 +41,13 @@ fun Application.configureRouting() {
 				}
 
 				put("/{userId}/balance") {
+					val userId = call.parameters["userId"]?.toInt() ?: throw Exception()
+
 					val jsonRequest = call.receiveText()
 
 					val request = gson.fromJson(jsonRequest, ProfileBalanceRequest::class.java)
 					val token = AuthService.decomposeToken(request.token)
 
-					val userId = request.userId
 					val username = token?.username
 					val password = token?.password
 					val rechargeBalance = request.rechargeBalance
@@ -63,12 +64,13 @@ fun Application.configureRouting() {
 				}
 
 				put("/{userId}/password") {
+					val userId = call.parameters["userId"]?.toInt() ?: throw Exception()
+
 					val jsonRequest = call.receiveText()
 
 					val request = gson.fromJson(jsonRequest, ProfilePasswordRequest::class.java)
 					val token = AuthService.decomposeToken(request.token)
 
-					val userId = request.userId
 					val username = token?.username
 					val password = token?.password
 					val newPassword = request.newPassword
@@ -85,12 +87,13 @@ fun Application.configureRouting() {
 				}
 
 				put("/{userId}/username") {
+					val userId = call.parameters["userId"]?.toInt() ?: throw Exception()
+
 					val jsonRequest = call.receiveText()
 
 					val request = gson.fromJson(jsonRequest, ProfileUsernameRequest::class.java)
 					val token = AuthService.decomposeToken(request.token)
 
-					val userId = request.userId
 					val username = token?.username
 					val password = token?.password
 					val newUsername = request.newUsername
@@ -201,13 +204,14 @@ fun Application.configureRouting() {
 			}
 
 			route("/orders") {
-				post {
+				post("/{userId}") {
+					val userId = call.parameters["userId"]?.toInt() ?: throw Exception()
+
 					val jsonRequest = call.receiveText()
 
 					val request = gson.fromJson(jsonRequest, UserOrdersRequest::class.java)
 					val token = AuthService.decomposeToken(request.token)
 
-					val userId = request.userId
 					val username = token?.username
 					val password = token?.password
 
@@ -222,13 +226,14 @@ fun Application.configureRouting() {
 					}
 				}
 
-				post("/add") {
+				post("/{userId}/add") {
+					val userId = call.parameters["userId"]?.toInt() ?: throw Exception()
+
 					val jsonRequest = call.receiveText()
 
 					val request = gson.fromJson(jsonRequest, CartBuyRequest::class.java)
 					val token = AuthService.decomposeToken(request.token)
 
-					val userId = request.userId
 					val username = token?.username
 					val password = token?.password
 
