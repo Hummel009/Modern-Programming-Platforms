@@ -168,19 +168,6 @@ fun Application.configureRouting() {
 					call.respond(jsonResponse)
 				}
 
-				post("/ids") {
-					val jsonRequest = call.receiveText()
-
-					val request = gson.fromJson(jsonRequest, GetBooksWithIdsRequest::class.java)
-					val ids = request.bookIds
-
-					val booksWithIds = MainService.getBooksWithIds(ids)
-
-					val jsonResponse = gson.toJson(booksWithIds.map { it.toResponse() })
-
-					call.respond(jsonResponse)
-				}
-
 				get("/years") {
 					val years = MainService.getAllYears()
 

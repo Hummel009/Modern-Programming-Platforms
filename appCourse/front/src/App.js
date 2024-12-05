@@ -67,13 +67,11 @@ function App() {
 			const cartCookie = Cookies.get('cart');
 			let cart = cartCookie ? JSON.parse(cartCookie) : [];
 
+			const response = await axios.get(`http://localhost:2999/api/v1/books`);
+
 			const bookIds = cart.map(item => item.id);
 
-			const response = await axios.post(`http://localhost:2999/api/v1/books/ids`, {
-				bookIds: bookIds
-			});
-
-			const cartDataWithQuantities = response.data.map(book => {
+			const cartDataWithQuantities = response.data.filter(book => bookIds.includes(book.id)).map(book => {
 				const itemInCart = cart.find(item => item.id === book.id);
 				return {
 					...book,
