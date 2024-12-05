@@ -10,10 +10,12 @@ export const PageProfile = ({
 	userData,
 	orders,
 	setIsLoggedIn,
-	handleDeleteToken
+	handleDeleteToken,
+	handleFetchUserData
 }) => {
 	const [newUsername, setNewUsername] = useState('');
 	const [newPassword, setNewPassword] = useState('');
+	const [rechargeBalance, setRechargeBalance] = useState('');
 
 	const handleChangeUsername = async (e) => {
 		e.preventDefault();
@@ -57,6 +59,26 @@ export const PageProfile = ({
 		}
 	};
 
+	const handleRechargeBalance = async (e) => {
+		e.preventDefault();
+		try {
+			const token = Cookies.get('jwt');
+
+			await axios.put('http://localhost:2999/profile/balance', {
+				userId: userData.userId,
+				token: token,
+				rechargeBalance: rechargeBalance
+			});
+
+
+			handleFetchUserData();
+
+			toast.success('Баланс папоўнены!');
+		} catch (error) {
+			toast.error('Памылка!');
+		}
+	};
+
 	return (
 		<div>
 			<h1>
@@ -66,29 +88,44 @@ export const PageProfile = ({
 				<div>
 					<div>Імя ўдзельніка: {userData.username}</div>
 					<div>Баланс: {userData.balance}$</div>
-					<form onSubmit={handleChangeUsername}>
-						<input
-							type="text"
-							name="username"
-							placeholder="Нове імя ўдзельніка"
-							value={newUsername}
-							onChange={(e) => setNewUsername(e.target.value)}
-							required
-						/>
-						<button type="submit" className="wds-button">Змяніць логін</button>
-					</form>
 
-					<form onSubmit={handleChangePassword}>
-						<input
-							type="password"
-							name="password"
-							placeholder="Новы пароль"
-							value={newPassword}
-							onChange={(e) => setNewPassword(e.target.value)}
-							required
-						/>
-						<button type="submit" className="wds-button">Змяніць пароль</button>
-					</form>
+					<div className="change">
+						<form onSubmit={handleChangeUsername}>
+							<input
+								type="text"
+								name="username"
+								placeholder="Нове імя ўдзельніка"
+								value={newUsername}
+								onChange={(e) => setNewUsername(e.target.value)}
+								required
+							/>
+							<button type="submit" className="wds-button">Змяніць логін</button>
+						</form>
+
+						<form onSubmit={handleChangePassword}>
+							<input
+								type="password"
+								name="password"
+								placeholder="Новы пароль"
+								value={newPassword}
+								onChange={(e) => setNewPassword(e.target.value)}
+								required
+							/>
+							<button type="submit" className="wds-button">Змяніць пароль</button>
+						</form>
+
+						<form onSubmit={handleRechargeBalance}>
+							<input
+								type="balance"
+								name="balance"
+								placeholder="Колькасць грошай"
+								value={rechargeBalance}
+								onChange={(e) => setRechargeBalance(e.target.value)}
+								required
+							/>
+							<button type="submit" className="wds-button">Папоўніць баланс</button>
+						</form>
+					</div>
 
 					{orders.map(order => {
 						return (

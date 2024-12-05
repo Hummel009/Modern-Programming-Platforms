@@ -364,3 +364,11 @@ select {
 .page {
 	min-height: 600px;
 }
+
+.change {
+    display: flex;
+}
+
+.change>* {
+    margin-right: 1em;
+}

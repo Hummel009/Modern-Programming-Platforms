@@ -165,6 +165,7 @@ function App() {
 										orders={orders}
 										setIsLoggedIn={setIsLoggedIn}
 										handleDeleteToken={handleDeleteToken}
+										handleFetchUserData={handleFetchUserData}
 									/>
 								} />
 								<Route path="/cart" element={

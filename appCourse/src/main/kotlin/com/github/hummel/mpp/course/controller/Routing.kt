@@ -216,6 +216,28 @@ fun Application.configureRouting() {
 					call.respond(HttpStatusCode.Unauthorized)
 				}
 			}
+
+			put("/balance") {
+				val jsonRequest = call.receiveText()
+
+				val request = gson.fromJson(jsonRequest, ProfileBalanceRequest::class.java)
+				val token = AuthService.decomposeToken(request.token)
+
+				val userId = request.userId
+				val username = token?.username
+				val password = token?.password
+				val rechargeBalance = request.rechargeBalance
+
+				if (AuthService.areCredentialsValid(username, password)) {
+					if (ProfileService.rechargeUserBalance(userId, rechargeBalance)) {
+						call.respond(HttpStatusCode.OK)
+					} else {
+						call.respond(HttpStatusCode.BadRequest)
+					}
+				} else {
+					call.respond(HttpStatusCode.Unauthorized)
+				}
+			}
 		}
 
 		post("/register") {

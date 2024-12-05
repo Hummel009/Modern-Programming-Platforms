@@ -19,4 +19,13 @@ object ProfileService {
 	}
 
 	fun getUserOrders(userId: Int): List<Order> = OrderDao.findAllUserOrders(userId)
+
+
+	fun rechargeUserBalance(userId: Int, rechargeBalance: Double): Boolean {
+		val userBalance = UserDao.findUserBalance(userId) ?: return false
+
+		val newBalance = userBalance + rechargeBalance
+
+		return UserDao.updateUserBalance(userId, newBalance)
+	}
 }
