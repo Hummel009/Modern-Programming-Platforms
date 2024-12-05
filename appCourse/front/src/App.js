@@ -102,7 +102,7 @@ function App() {
 			const token = Cookies.get('jwt');
 
 			const response = await axios.post('http://localhost:2999/user/orders', {
-				userId: userData.userId,
+				userId: userData.id,
 				token: token
 			});
 
