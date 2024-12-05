@@ -42,6 +42,10 @@ export const PageCart = ({
 		}
 	};
 
+	const totalPrice = cartData.reduce((total, book) => {
+		return total + (book.price * book.quantity)
+	}, 0);
+
 	return (
 		<div>
 			<h1>
@@ -49,7 +53,7 @@ export const PageCart = ({
 			</h1>
 			<div className="total-price">
 				{cartData.length > 0 ? (
-					<span>Сумарны кошт: {cartData.reduce((total, book) => total + (book.price * book.quantity), 0).toFixed(2)}$</span>
+					<span>Агульны кошт: {totalPrice.toFixed(2)}$</span>
 				) : (
 					<span>Кош пусты.</span>
 				)}
@@ -73,5 +77,5 @@ export const PageCart = ({
 				))}
 			</div>
 		</div>
-	)
+	);
 }

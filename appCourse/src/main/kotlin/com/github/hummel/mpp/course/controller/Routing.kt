@@ -1,7 +1,6 @@
 package com.github.hummel.mpp.course.controller
 
 import com.github.hummel.mpp.course.dto.request.*
-import com.github.hummel.mpp.course.entity.OrderFull
 import com.github.hummel.mpp.course.service.AuthService
 import com.github.hummel.mpp.course.service.CartService
 import com.github.hummel.mpp.course.service.MainService
@@ -106,33 +105,7 @@ fun Application.configureRouting() {
 				if (AuthService.areCredentialsValid(username, password)) {
 					val orders = ProfileService.getUserOrders(userId)
 
-					val ordersNums = List(orders.size) { it + 1 }
-					val ordersBooks = orders.map {
-						MainService.getBooksWithIds(it.orderItems.map { item ->
-							item.bookId
-						})
-					}
-					val ordersBooksQuantities = orders.map {
-						it.orderItems.map { item ->
-							item.quantity
-						}
-					}
-					val orderPrices = orders.mapIndexed { index, order ->
-						order.orderItems.zip(ordersBooks[index]) { orderItem, book ->
-							orderItem.quantity * book.price
-						}.sum()
-					}
-
-					val ordersFull = ordersNums.indices.map { index ->
-						OrderFull(
-							number = ordersNums[index],
-							totalPrice = orderPrices[index],
-							books = ordersBooks[index],
-							quantities = ordersBooksQuantities[index]
-						)
-					}
-
-					val jsonResponse = gson.toJson(ordersFull)
+					val jsonResponse = gson.toJson(orders.map { it.toResponse() })
 
 					call.respond(jsonResponse)
 				} else {

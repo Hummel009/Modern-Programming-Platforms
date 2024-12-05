@@ -109,7 +109,7 @@ function App() {
 			setOrders(response.data);
 		} catch (error) {
 		}
-	}, [userData.userId]);
+	}, [userData.id]);
 
 	useEffect(() => {
 		handleFetchStorageData();
@@ -191,7 +191,7 @@ function App() {
 											<h1>
 												<span>{author.name}</span>
 											</h1>
-											<img className="author-img" src={author.image} width="100%" height="auto" alt="" />
+											<img className="author-img" src={author.image} width="300px" height="366px" alt="" />
 											<div className="author-desc">
 												{author.desc.split('\n').map((line, index) => (
 													<p key={index}>{line}</p>

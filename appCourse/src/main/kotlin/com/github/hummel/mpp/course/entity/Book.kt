@@ -14,14 +14,19 @@ data class Book(
 	val year: Int,
 	val price: Double
 ) {
-	fun toResponse(): BookResponse = BookResponse(
-		id = id,
-		name = name,
-		desc = desc,
-		image = image,
-		authorName = AuthorDao.findAuthorById(authorId)?.name ?: throw Exception(),
-		typeName = TypeDao.findTypeById(typeId)?.name ?: throw Exception(),
-		year = year,
-		price = price
-	)
+	fun toResponse(): BookResponse {
+		val authorName = AuthorDao.findAuthorById(authorId)?.name ?: throw Exception()
+		val typeName = TypeDao.findTypeById(typeId)?.name ?: throw Exception()
+
+		return BookResponse(
+			id = id,
+			name = name,
+			desc = desc,
+			image = image,
+			authorName = authorName,
+			typeName = typeName,
+			year = year,
+			price = price
+		)
+	}
 }
