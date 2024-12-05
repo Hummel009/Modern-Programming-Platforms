@@ -99,7 +99,7 @@ function App() {
 		}
 	}, []);
 
-	const handleFetchOrders = useCallback(async () => {
+	const handleFetchUserOrders = useCallback(async () => {
 		try {
 			const token = Cookies.get('jwt');
 
@@ -119,8 +119,8 @@ function App() {
 		handleUseToken()
 		handleFetchCartData();
 		handleFetchUserData();
-		handleFetchOrders();
-	}, [handleFetchStorageData, handleUseToken, handleFetchCartData, handleFetchUserData, handleFetchOrders]);
+		handleFetchUserOrders();
+	}, [handleFetchStorageData, handleUseToken, handleFetchCartData, handleFetchUserData, handleFetchUserOrders]);
 
 	const handleDeleteToken = () => {
 		try {

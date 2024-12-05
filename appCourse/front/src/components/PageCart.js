@@ -22,7 +22,7 @@ export const PageCart = ({
 		}
 	}
 
-	const handleAddOrder = async () => {
+	const handleAddUserOrder = async () => {
 		try {
 			const token = Cookies.get('jwt');
 
@@ -61,7 +61,7 @@ export const PageCart = ({
 				)}
 			</div>
 			<br />
-			<button className="wds-button prev" onClick={handleAddOrder} disabled={cartData.length <= 0 || !isLoggedIn}>Купіць</button>
+			<button className="wds-button prev" onClick={handleAddUserOrder} disabled={cartData.length <= 0 || !isLoggedIn}>Купіць</button>
 			<button className="wds-button next" onClick={handleClearCart} disabled={cartData.length <= 0}>Ачысціць кош</button>
 			<br />
 			<br />

@@ -56,7 +56,7 @@ export const PageMain = ({
 		setCurrentPage(1);
 	};
 
-	const handleAddToCart = async (book) => {
+	const handleAddBookToCart = async (book) => {
 		try {
 			let cart = Cookies.get('cart') ? JSON.parse(Cookies.get('cart')) : [];
 			const existingBook = cart.find(item => item.id === book.id);
@@ -64,7 +64,7 @@ export const PageMain = ({
 			if (existingBook) {
 				existingBook.quantity += 1;
 			} else {
-				cart.push({ id: book.id, quantity: 1 });
+				cart.push({ bookId: book.id, quantity: 1 });
 			}
 
 			Cookies.set('cart', JSON.stringify(cart), { expires: 7 });
@@ -121,7 +121,7 @@ export const PageMain = ({
 							<div className="other">{book.typeName}, {book.year}</div>
 							<div className="description">{book.desc}</div>
 						</div>
-						<button className="wds-button price" onClick={(e) => handleAddToCart(book)}>Дадаць у кош ({book.price}$)</button>
+						<button className="wds-button price" onClick={(e) => handleAddBookToCart(book)}>Дадаць у кош ({book.price}$)</button>
 						<img src={book.image} width="100%" height="auto" alt="" />
 					</div>
 				))}
