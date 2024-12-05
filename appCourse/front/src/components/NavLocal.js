@@ -6,19 +6,19 @@ export const NavLocal = (
 		<div className="page-header">
 			<nav className="local-navigation">
 				<Link to="/">
-					<span id="lang-main">Галоўная</span>
+					<span>Галоўная</span>
 				</Link>
 				<Link to="/register">
-					<span id="lang-register">Рэгістрацыя</span>
+					<span>Рэгістрацыя</span>
 				</Link>
 				<Link to="/login">
-					<span id="lang-enter">Уваход</span>
+					<span>Уваход</span>
 				</Link>
 				<Link to="/profile">
-					<span id="lang-profile">Профіль</span>
+					<span>Профіль</span>
 				</Link>
 				<Link to="/cart">
-					<span id="lang-cart">Кош</span>
+					<span>Кош</span>
 				</Link>
 			</nav>
 		</div>

@@ -178,6 +178,13 @@ function App() {
 										handleFetchUserData={handleFetchUserData}
 									/>
 								} />
+								{authors.map(author => (
+									<Route path={author} element={
+										<h1>
+											<span>{author}</span>
+										</h1>
+									} />
+								))}
 							</Routes>
 						</main>
 						<RightRail

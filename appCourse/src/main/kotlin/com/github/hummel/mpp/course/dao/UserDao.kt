@@ -11,7 +11,7 @@ object UserDao {
 			`id` INT PRIMARY KEY AUTO_INCREMENT,
 			`username` VARCHAR(255) UNIQUE NOT NULL,
 			`password` VARCHAR(1024) NOT NULL,
-			`balance` DECIMAL(24, 2) NOT NULL
+			`balance` DECIMAL(24, 2) NOT NULL DEFAULT 0
 		);
 		""".trimIndent()
 

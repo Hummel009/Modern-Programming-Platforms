@@ -38,7 +38,7 @@ export const PageRegister = ({
 	return (
 		<div>
 			<h1>
-				<span id="lang-enter">Рэгістрацыя</span>
+				<span>Рэгістрацыя</span>
 			</h1>
 			<form onSubmit={handleRegisterSubmit} className="main-fieldset">
 				<input

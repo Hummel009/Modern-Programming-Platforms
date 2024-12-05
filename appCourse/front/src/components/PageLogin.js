@@ -38,7 +38,7 @@ export const PageLogin = ({
 	return (
 		<div>
 			<h1>
-				<span id="lang-enter">Уваход</span>
+				<span>Уваход</span>
 			</h1>
 			<form onSubmit={handleLoginSubmit} className="main-fieldset">
 				<input

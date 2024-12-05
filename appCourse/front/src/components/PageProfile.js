@@ -82,7 +82,7 @@ export const PageProfile = ({
 	return (
 		<div>
 			<h1>
-				<span id="lang-enter">Профіль</span>
+				<span>Профіль</span>
 			</h1>
 			{isLoggedIn ? (
 				<div>

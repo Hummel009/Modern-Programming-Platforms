@@ -45,7 +45,7 @@ export const PageCart = ({
 	return (
 		<div>
 			<h1>
-				<span id="lang-enter">Кош</span>
+				<span>Кош</span>
 			</h1>
 			<div className="total-price">
 				{cartData.length > 0 ? (

@@ -3,6 +3,7 @@ import React, {
 	useState
 } from 'react';
 import Cookies from 'js-cookie';
+import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -65,7 +66,7 @@ export const PageMain = ({
 	return (
 		<div>
 			<h1>
-				<span id="lang-enter">Галоўная</span>
+				<span>Галоўная</span>
 			</h1>
 
 			<div>
@@ -85,7 +86,9 @@ export const PageMain = ({
 					<div key={book.id}>
 						<div className="preamble">
 							<div className="title">«{book.title}»</div>
-							<div className="author">{book.author}</div>
+							<div className="author">
+								<Link to={book.author}>{book.author}</Link>
+							</div>
 							<div className="description">{book.description}</div>
 						</div>
 						<button className="wds-button price" onClick={(e) => handleAddToCart(book)}>Дадаць у кош ({book.price}$)</button>
