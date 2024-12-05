@@ -1,5 +1,5 @@
 package com.github.hummel.mpp.course.dto.request
 
-data class ProfilePasswordRequest(
+data class ChangeUserPasswordRequest(
 	val token: String?, val newPassword: String
 )

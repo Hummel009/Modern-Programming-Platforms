@@ -88,7 +88,7 @@ function App() {
 		try {
 			const token = Cookies.get('jwt');
 
-			const response = await axios.post(`http://localhost:2999/api/v1/users/user`, {
+			const response = await axios.post(`http://localhost:2999/api/v1/users/info`, {
 				token: token
 			});
 

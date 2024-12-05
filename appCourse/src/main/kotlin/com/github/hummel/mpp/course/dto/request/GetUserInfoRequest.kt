@@ -1,5 +1,5 @@
 package com.github.hummel.mpp.course.dto.request
 
-data class UserOrdersRequest(
+data class GetUserInfoRequest(
 	val token: String?
 )
