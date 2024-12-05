@@ -51,7 +51,7 @@ function App() {
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.options(`http://localhost:2999/api/v1/token`, {
+			await axios.post(`http://localhost:2999/api/v1/token`, {
 				headers: {
 					Authorization: `Bearer ${token}`
 				}

@@ -276,7 +276,7 @@ fun Application.configureRouting() {
 				}
 			}
 
-			options("/token") {
+			post("/token") {
 				val token = call.request.headers["Authorization"]?.removePrefix("Bearer ")
 				val decomposedToken = AuthService.decomposeToken(token)
 
