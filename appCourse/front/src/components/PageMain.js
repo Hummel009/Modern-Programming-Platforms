@@ -10,6 +10,8 @@ import 'react-toastify/dist/ReactToastify.css';
 export const PageMain = ({
 	books,
 	authors,
+	types,
+	years,
 	setBooks,
 	handleFetchCartData
 }) => {
@@ -33,9 +35,27 @@ export const PageMain = ({
 		}
 	};
 
-	const handleFilterBooks = async (author) => {
-		const response = await axios.post('http://localhost:2999/books/filter', {
-			author: author
+	const handleFilterBooksAuthors = async (author) => {
+		const response = await axios.post('http://localhost:2999/books/filter/authors', {
+			filterValue: author
+		});
+
+		setBooks(response.data);
+		setCurrentPage(1);
+	};
+
+	const handleFilterBooksTypes = async (type) => {
+		const response = await axios.post('http://localhost:2999/books/filter/types', {
+			filterValue: type
+		});
+
+		setBooks(response.data);
+		setCurrentPage(1);
+	};
+
+	const handleFilterBooksYears = async (year) => {
+		const response = await axios.post('http://localhost:2999/books/filter/years', {
+			filterValue: year
 		});
 
 		setBooks(response.data);
@@ -75,11 +95,26 @@ export const PageMain = ({
 
 			<br />
 
-			<select onChange={(e) => handleFilterBooks(e.target.value)}>
-				{authors.map(author => (
-					<option key={author} value={author}>{author}</option>
-				))}
-			</select>
+			<div className="change">
+				<select onChange={(e) => handleFilterBooksAuthors(e.target.value)}>
+					<option value="all">Усе аўтары</option>
+					{authors.map(author => (
+						<option key={author} value={author}>{author}</option>
+					))}
+				</select>
+				<select onChange={(e) => handleFilterBooksTypes(e.target.value)}>
+					<option value="all">Усе тыпы</option>
+					{types.map(type => (
+						<option key={type} value={type}>{type}</option>
+					))}
+				</select>
+				<select onChange={(e) => handleFilterBooksYears(e.target.value)}>
+					<option value="all">Усе годы</option>
+					{years.map(year => (
+						<option key={year} value={year}>Пасля {year}</option>
+					))}
+				</select>
+			</div>
 
 			<div className="navi">
 				{currentBooks.map(book => (
@@ -89,6 +124,7 @@ export const PageMain = ({
 							<div className="author">
 								<Link to={book.author}>{book.author}</Link>
 							</div>
+							<div className="other">{book.type}, {book.year}</div>
 							<div className="description">{book.description}</div>
 						</div>
 						<button className="wds-button price" onClick={(e) => handleAddToCart(book)}>Дадаць у кош ({book.price}$)</button>

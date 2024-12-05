@@ -8,12 +8,14 @@ object BookDao {
 	fun initTable() {
 		val sql = """
 		CREATE TABLE IF NOT EXISTS books (
-			id INT PRIMARY KEY AUTO_INCREMENT,
-			title VARCHAR(255) NOT NULL,
-			description TEXT NOT NULL,
-			author VARCHAR(255) NOT NULL,
-			imgPath VARCHAR(255) NOT NULL,
-			price DECIMAL(24, 2) NOT NULL
+			`id` INT PRIMARY KEY AUTO_INCREMENT,
+			`title` VARCHAR(255) NOT NULL,
+			`description` TEXT NOT NULL,
+			`author` VARCHAR(255) NOT NULL,
+			`imgPath` VARCHAR(255) NOT NULL,
+			`price` DECIMAL(24, 2) NOT NULL,
+			`type` VARCHAR(100) NOT NULL,
+			`year` VARCHAR(100) NOT NULL
 		);
 		""".trimIndent()
 
@@ -23,7 +25,11 @@ object BookDao {
 			e.printStackTrace()
 		}
 
-		val sqlFill = "INSERT INTO books (title, description, author, imgPath, price) VALUES (?, ?, ?, ?, ?)"
+		val sqlFill = """INSERT
+			INTO books (`title`, `description`, `author`, `imgPath`, `price`, `type`, `year`)
+			VALUES (?, ?, ?, ?, ?, ?, ?)
+		""".trimIndent()
+
 		val names = listOf(
 			"Пан Тадэвуш",
 			"Паўлінка",
@@ -71,6 +77,28 @@ object BookDao {
 		val prices = listOf(
 			1.19, 1.29, 1.39, 1.49, 1.59, 1.69, 1.79, 1.89, 1.99
 		)
+		val types = listOf(
+			"Паэзія", // Пан Тадэвуш
+			"Паэзія", // Паўлінка
+			"Проза", // Новая зямля
+			"Паэзія", // Пярсцёнак
+			"Проза", // У школе
+			"Паэзія", // Шыпшына
+			"Паэзія", // Вянок
+			"Проза", // Зорка Венера
+			"Проза"  // Каласы пад сярпом тваім
+		)
+		val years = listOf(
+			"1834", // Пан Тадэвуш
+			"1913", // Паўлінка
+			"1948", // Новая зямля
+			"1913", // Пярсцёнак
+			"1924", // У школе
+			"1924", // Шыпшына
+			"1930", // Вянок
+			"1967", // Зорка Венера
+			"1967"  // Каласы пад сярпом тваім
+		)
 
 		try {
 			val pstmt = connection.prepareStatement(sqlFill)
@@ -81,6 +109,8 @@ object BookDao {
 				pstmt.setString(3, authors[i])
 				pstmt.setString(4, imgPaths[i])
 				pstmt.setDouble(5, prices[i])
+				pstmt.setString(6, types[i])
+				pstmt.setString(7, years[i])
 				pstmt.addBatch()
 			}
 
@@ -106,7 +136,9 @@ object BookDao {
 						rs.getString("description"),
 						rs.getString("author"),
 						rs.getString("imgPath"),
-						rs.getDouble("price")
+						rs.getDouble("price"),
+						rs.getString("type"),
+						rs.getString("year")
 					)
 				)
 			}
@@ -119,7 +151,7 @@ object BookDao {
 	}
 
 	fun findUniqueAuthors(): List<String> {
-		val sql = "SELECT DISTINCT author FROM books"
+		val sql = "SELECT DISTINCT `author` FROM books"
 
 		try {
 			val stmt = connection.createStatement()
@@ -130,6 +162,44 @@ object BookDao {
 				authors.add(rs.getString("author"))
 			}
 			return authors.toList()
+		} catch (e: SQLException) {
+			e.printStackTrace()
+
+			return emptyList()
+		}
+	}
+
+	fun findUniqueTypes(): List<String> {
+		val sql = "SELECT DISTINCT `type` FROM books"
+
+		try {
+			val stmt = connection.createStatement()
+			val rs = stmt.executeQuery(sql)
+
+			val types = mutableSetOf<String>()
+			while (rs.next()) {
+				types.add(rs.getString("type"))
+			}
+			return types.toList()
+		} catch (e: SQLException) {
+			e.printStackTrace()
+
+			return emptyList()
+		}
+	}
+
+	fun findUniqueYears(): List<String> {
+		val sql = "SELECT DISTINCT `year` FROM books"
+
+		try {
+			val stmt = connection.createStatement()
+			val rs = stmt.executeQuery(sql)
+
+			val years = mutableSetOf<String>()
+			while (rs.next()) {
+				years.add(rs.getString("year"))
+			}
+			return years.toList()
 		} catch (e: SQLException) {
 			e.printStackTrace()
 

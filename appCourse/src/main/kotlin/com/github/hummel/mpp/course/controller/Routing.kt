@@ -18,9 +18,25 @@ val gson: Gson = Gson()
 fun Application.configureRouting() {
 	routing {
 		get("/authors") {
-			val authors = listOf("all") + MainService.getUniqueAuthors()
+			val authors = MainService.getUniqueAuthors()
 
 			val jsonResponse = gson.toJson(authors)
+
+			call.respond(jsonResponse)
+		}
+
+		get("/years") {
+			val years = MainService.getUniqueYears()
+
+			val jsonResponse = gson.toJson(years)
+
+			call.respond(jsonResponse)
+		}
+
+		get("/types") {
+			val types = MainService.getUniqueTypes()
+
+			val jsonResponse = gson.toJson(types)
 
 			call.respond(jsonResponse)
 		}
@@ -30,19 +46,6 @@ fun Application.configureRouting() {
 				val books = MainService.getAllBooks()
 
 				val jsonResponse = gson.toJson(books)
-
-				call.respond(jsonResponse)
-			}
-
-			post("/filter") {
-				val jsonRequest = call.receiveText()
-
-				val request = gson.fromJson(jsonRequest, BooksFilterRequest::class.java)
-				val author = request.author
-
-				val booksToShow = MainService.getBooksOfAuthor(author)
-
-				val jsonResponse = gson.toJson(booksToShow)
 
 				call.respond(jsonResponse)
 			}
@@ -58,6 +61,45 @@ fun Application.configureRouting() {
 				val jsonResponse = gson.toJson(booksByIds)
 
 				call.respond(jsonResponse)
+			}
+
+			route("/filter") {
+				post("/authors") {
+					val jsonRequest = call.receiveText()
+
+					val request = gson.fromJson(jsonRequest, BooksFilterRequest::class.java)
+					val filterValue = request.filterValue
+
+					val booksToShow = MainService.getBooksOfAuthor(filterValue)
+
+					val jsonResponse = gson.toJson(booksToShow)
+
+					call.respond(jsonResponse)
+				}
+				post("/types") {
+					val jsonRequest = call.receiveText()
+
+					val request = gson.fromJson(jsonRequest, BooksFilterRequest::class.java)
+					val filterValue = request.filterValue
+
+					val booksToShow = MainService.getBooksOfType(filterValue)
+
+					val jsonResponse = gson.toJson(booksToShow)
+
+					call.respond(jsonResponse)
+				}
+				post("/years") {
+					val jsonRequest = call.receiveText()
+
+					val request = gson.fromJson(jsonRequest, BooksFilterRequest::class.java)
+					val filterValue = request.filterValue
+
+					val booksToShow = MainService.getBooksSinceYear(filterValue)
+
+					val jsonResponse = gson.toJson(booksToShow)
+
+					call.respond(jsonResponse)
+				}
 			}
 		}
 

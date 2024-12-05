@@ -28,6 +28,8 @@ function App() {
 
 	const [books, setBooks] = useState([]);
 	const [authors, setAuthors] = useState([]);
+	const [years, setYears] = useState([]);
+	const [types, setTypes] = useState([]);
 
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -39,6 +41,16 @@ function App() {
 	const handleFetchAuthors = useCallback(async () => {
 		const response = await axios.get('http://localhost:2999/authors');
 		setAuthors(response.data);
+	}, []);
+
+	const handleFetchTypes = useCallback(async () => {
+		const response = await axios.get('http://localhost:2999/types');
+		setTypes(response.data);
+	}, []);
+
+	const handleFetchYears = useCallback(async () => {
+		const response = await axios.get('http://localhost:2999/years');
+		setYears(response.data);
 	}, []);
 
 	const handleUseToken = useCallback(async () => {
@@ -108,11 +120,13 @@ function App() {
 	useEffect(() => {
 		handleFetchBooks();
 		handleFetchAuthors();
+		handleFetchTypes();
+		handleFetchYears();
 		handleUseToken()
 		handleFetchCartData();
 		handleFetchUserData();
 		handleFetchOrders();
-	}, [handleFetchBooks, handleFetchAuthors, handleUseToken, handleFetchCartData, handleFetchUserData, handleFetchOrders]);
+	}, [handleFetchBooks, handleFetchAuthors, handleFetchTypes, handleFetchYears, handleUseToken, handleFetchCartData, handleFetchUserData, handleFetchOrders]);
 
 	const handleDeleteToken = () => {
 		try {
@@ -140,6 +154,8 @@ function App() {
 									<PageMain
 										books={books}
 										authors={authors}
+										types={types}
+										years={years}
 										setBooks={setBooks}
 										handleFetchCartData={handleFetchCartData}
 									/>
