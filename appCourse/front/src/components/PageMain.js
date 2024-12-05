@@ -36,27 +36,21 @@ export const PageMain = ({
 	};
 
 	const handleFilterBooksAuthors = async (authorName) => {
-		const response = await axios.post('http://localhost:2999/main/authors', {
-			filterValue: authorName
-		});
+		const response = await axios.get(`http://localhost:2999/api/v1/authors/${authorName}/books`);
 
 		setBooks(response.data);
 		setCurrentPage(1);
 	};
 
 	const handleFilterBooksTypes = async (typeName) => {
-		const response = await axios.post('http://localhost:2999/main/types', {
-			filterValue: typeName
-		});
+		const response = await axios.get(`http://localhost:2999/api/v1/types/${typeName}/books`);
 
 		setBooks(response.data);
 		setCurrentPage(1);
 	};
 
 	const handleFilterBooksYears = async (year) => {
-		const response = await axios.post('http://localhost:2999/main/years', {
-			filterValue: year
-		});
+		const response = await axios.get(`http://localhost:2999/api/v1/books/years/${year}`);
 
 		setBooks(response.data);
 		setCurrentPage(1);

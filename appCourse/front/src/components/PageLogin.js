@@ -18,7 +18,7 @@ export const PageLogin = ({
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post('http://localhost:2999/login', {
+			const response = await axios.post(`http://localhost:2999/api/v1/login`, {
 				username: loginData.username,
 				password: loginData.password
 			});

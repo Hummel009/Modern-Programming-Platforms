@@ -34,24 +34,24 @@ function App() {
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 	const handleFetchStorageData = useCallback(async () => {
-		const responseBooks = await axios.get('http://localhost:2999/books');
+		const responseBooks = await axios.get(`http://localhost:2999/api/v1/books`);
 		setBooks(responseBooks.data);
 
-		const responseAuthors = await axios.get('http://localhost:2999/authors');
+		const responseYears = await axios.get(`http://localhost:2999/api/v1/books/years`);
+		setYears(responseYears.data);
+
+		const responseAuthors = await axios.get(`http://localhost:2999/api/v1/authors`);
 		setAuthors(responseAuthors.data);
 
-		const responseTypes = await axios.get('http://localhost:2999/types');
+		const responseTypes = await axios.get(`http://localhost:2999/api/v1/types`);
 		setTypes(responseTypes.data);
-
-		const responseYears = await axios.get('http://localhost:2999/years');
-		setYears(responseYears.data);
 	}, []);
 
 	const handleUseToken = useCallback(async () => {
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.post('http://localhost:2999/token', {
+			await axios.post(`http://localhost:2999/api/v1/token`, {
 				token: token
 			});
 
@@ -67,7 +67,7 @@ function App() {
 
 			const bookIds = cart.map(item => item.id);
 
-			const response = await axios.post('http://localhost:2999/books/ids', {
+			const response = await axios.post(`http://localhost:2999/api/v1/books/ids`, {
 				bookIds: bookIds
 			});
 
@@ -88,20 +88,20 @@ function App() {
 		try {
 			const token = Cookies.get('jwt');
 
-			const response = await axios.post('http://localhost:2999/user', {
+			const response = await axios.post(`http://localhost:2999/api/v1/users/${userData.id}`, {
 				token: token
 			});
 
 			setUserData(response.data);
 		} catch (error) {
 		}
-	}, []);
+	}, [userData.id]);
 
 	const handleFetchOrders = useCallback(async () => {
 		try {
 			const token = Cookies.get('jwt');
 
-			const response = await axios.post('http://localhost:2999/user/orders', {
+			const response = await axios.post(`http://localhost:2999/api/v1/orders`, {
 				userId: userData.id,
 				token: token
 			});

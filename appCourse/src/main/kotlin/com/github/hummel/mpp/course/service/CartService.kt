@@ -5,7 +5,7 @@ import com.github.hummel.mpp.course.dao.UserDao
 import com.github.hummel.mpp.course.entity.Book
 
 object CartService {
-	fun buyBooks(userId: Int, booksToBuy: List<Book>, quantities: List<Int>): Boolean {
+	fun addUserOrder(userId: Int, booksToBuy: List<Book>, quantities: List<Int>): Boolean {
 		val price = booksToBuy.zip(quantities) { book, quantity -> book.price * quantity }.sum()
 
 		val userBalance = UserDao.findUserById(userId)?.balance ?: return false

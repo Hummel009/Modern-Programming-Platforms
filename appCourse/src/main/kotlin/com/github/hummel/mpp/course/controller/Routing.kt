@@ -16,254 +16,239 @@ val gson: Gson = Gson()
 
 fun Application.configureRouting() {
 	routing {
-		route("/authors") {
-			get {
-				val authors = MainService.getAllAuthors()
+		route("/api/v1") {
+			route("/users") {
+				post("/{userId}") {
+					val jsonRequest = call.receiveText()
 
-				val jsonResponse = gson.toJson(authors)
+					val request = gson.fromJson(jsonRequest, UserRequest::class.java)
+					val token = AuthService.decomposeToken(request.token)
 
-				call.respond(jsonResponse)
+					val username = token?.username
+					val password = token?.password
+
+					if (AuthService.areCredentialsValid(username, password)) {
+						username ?: throw Exception()
+
+						val user = ProfileService.getUserData(username)
+
+						val jsonResponse = gson.toJson(user.toResponse())
+
+						call.respond(jsonResponse)
+					} else {
+						call.respond(HttpStatusCode.Unauthorized)
+					}
+				}
+
+				put("/{userId}/balance") {
+					val jsonRequest = call.receiveText()
+
+					val request = gson.fromJson(jsonRequest, ProfileBalanceRequest::class.java)
+					val token = AuthService.decomposeToken(request.token)
+
+					val userId = request.userId
+					val username = token?.username
+					val password = token?.password
+					val rechargeBalance = request.rechargeBalance
+
+					if (AuthService.areCredentialsValid(username, password)) {
+						if (ProfileService.rechargeUserBalance(userId, rechargeBalance)) {
+							call.respond(HttpStatusCode.OK)
+						} else {
+							call.respond(HttpStatusCode.BadRequest)
+						}
+					} else {
+						call.respond(HttpStatusCode.Unauthorized)
+					}
+				}
+
+				put("/{userId}/password") {
+					val jsonRequest = call.receiveText()
+
+					val request = gson.fromJson(jsonRequest, ProfilePasswordRequest::class.java)
+					val token = AuthService.decomposeToken(request.token)
+
+					val userId = request.userId
+					val username = token?.username
+					val password = token?.password
+					val newPassword = request.newPassword
+
+					if (AuthService.areCredentialsValid(username, password)) {
+						if (ProfileService.changeUserPassword(userId, newPassword)) {
+							call.respond(HttpStatusCode.OK)
+						} else {
+							call.respond(HttpStatusCode.BadRequest)
+						}
+					} else {
+						call.respond(HttpStatusCode.Unauthorized)
+					}
+				}
+
+				put("/{userId}/username") {
+					val jsonRequest = call.receiveText()
+
+					val request = gson.fromJson(jsonRequest, ProfileUsernameRequest::class.java)
+					val token = AuthService.decomposeToken(request.token)
+
+					val userId = request.userId
+					val username = token?.username
+					val password = token?.password
+					val newUsername = request.newUsername
+
+					if (AuthService.areCredentialsValid(username, password)) {
+						if (ProfileService.changeUserUsername(userId, newUsername)) {
+							call.respond(HttpStatusCode.OK)
+						} else {
+							call.respond(HttpStatusCode.BadRequest)
+						}
+					} else {
+						call.respond(HttpStatusCode.Unauthorized)
+					}
+				}
 			}
-		}
 
-		route("/types") {
-			get {
-				val types = MainService.getAllTypes()
+			route("/authors") {
+				get {
+					val authors = MainService.getAllAuthors()
 
-				val jsonResponse = gson.toJson(types)
-
-				call.respond(jsonResponse)
-			}
-		}
-
-		route("/years") {
-			get {
-				val years = MainService.getAllYears()
-
-				val jsonResponse = gson.toJson(years)
-
-				call.respond(jsonResponse)
-			}
-		}
-
-		route("/books") {
-			get {
-				val books = MainService.getAllBooks()
-
-				val jsonResponse = gson.toJson(books.map { it.toResponse() })
-
-				call.respond(jsonResponse)
-			}
-
-			post("/ids") {
-				val jsonRequest = call.receiveText()
-
-				val request = gson.fromJson(jsonRequest, BooksIdsRequest::class.java)
-				val ids = request.bookIds
-
-				val booksWithIds = MainService.getBooksWithIds(ids)
-
-				val jsonResponse = gson.toJson(booksWithIds.map { it.toResponse() })
-
-				call.respond(jsonResponse)
-			}
-		}
-
-		route("/user") {
-			post {
-				val jsonRequest = call.receiveText()
-
-				val request = gson.fromJson(jsonRequest, UserRequest::class.java)
-				val token = AuthService.decomposeToken(request.token)
-
-				val username = token?.username
-				val password = token?.password
-
-				if (AuthService.areCredentialsValid(username, password)) {
-					username ?: throw Exception()
-
-					val user = ProfileService.getUserData(username)
-
-					val jsonResponse = gson.toJson(user.toResponse())
+					val jsonResponse = gson.toJson(authors)
 
 					call.respond(jsonResponse)
-				} else {
-					call.respond(HttpStatusCode.Unauthorized)
 				}
-			}
 
-			post("/orders") {
-				val jsonRequest = call.receiveText()
+				get("/{authorName}/books") {
+					val filterValue = call.parameters["authorName"] ?: throw Exception()
 
-				val request = gson.fromJson(jsonRequest, UserOrdersRequest::class.java)
-				val token = AuthService.decomposeToken(request.token)
+					val booksToShow = if (filterValue == "all") {
+						MainService.getAllBooks()
+					} else {
+						MainService.getBooksOfAuthor(filterValue.toInt())
+					}
 
-				val userId = request.userId
-				val username = token?.username
-				val password = token?.password
-
-				if (AuthService.areCredentialsValid(username, password)) {
-					val orders = ProfileService.getUserOrders(userId)
-
-					val jsonResponse = gson.toJson(orders.map { it.toResponse() })
+					val jsonResponse = gson.toJson(booksToShow.map { it.toResponse() })
 
 					call.respond(jsonResponse)
-				} else {
-					call.respond(HttpStatusCode.Unauthorized)
 				}
 			}
-		}
 
-		route("/main") {
-			post("/authors") {
-				val jsonRequest = call.receiveText()
+			route("/types") {
+				get {
+					val types = MainService.getAllTypes()
 
-				val request = gson.fromJson(jsonRequest, MainRequest::class.java)
-				val filterValue = request.filterValue
+					val jsonResponse = gson.toJson(types)
 
-				val booksToShow = if (filterValue == "all") {
-					MainService.getAllBooks()
-				} else {
-					MainService.getBooksOfAuthor(filterValue.toInt())
+					call.respond(jsonResponse)
 				}
 
-				val jsonResponse = gson.toJson(booksToShow.map { it.toResponse() })
+				get("/{typeName}/books") {
+					val filterValue = call.parameters["typeName"] ?: throw Exception()
 
-				call.respond(jsonResponse)
-			}
-
-			post("/types") {
-				val jsonRequest = call.receiveText()
-
-				val request = gson.fromJson(jsonRequest, MainRequest::class.java)
-				val filterValue = request.filterValue
-
-				val booksToShow = if (filterValue == "all") {
-					MainService.getAllBooks()
-				} else {
-					MainService.getBooksOfType(filterValue.toInt())
-				}
-
-				val jsonResponse = gson.toJson(booksToShow.map { it.toResponse() })
-
-				call.respond(jsonResponse)
-			}
-
-			post("/years") {
-				val jsonRequest = call.receiveText()
-
-				val request = gson.fromJson(jsonRequest, MainRequest::class.java)
-				val filterValue = request.filterValue
-
-				val booksToShow = if (filterValue == "all") {
-					MainService.getAllBooks()
-				} else {
-					MainService.getBooksSinceYear(filterValue.toInt())
-				}
-
-				val jsonResponse = gson.toJson(booksToShow.map { it.toResponse() })
-
-				call.respond(jsonResponse)
-			}
-		}
-
-		route("/cart") {
-			post("/buy") {
-				val jsonRequest = call.receiveText()
-
-				val request = gson.fromJson(jsonRequest, CartBuyRequest::class.java)
-				val token = AuthService.decomposeToken(request.token)
-
-				val userId = request.userId
-				val username = token?.username
-				val password = token?.password
-
-				if (AuthService.areCredentialsValid(username, password)) {
-					val ids = request.cartData.map { it.id }
-					val quantities = request.cartData.map { it.quantity }
-					val booksToBuy = MainService.getBooksWithIds(ids)
-
-					if (CartService.buyBooks(userId, booksToBuy, quantities)) {
-						call.respond(HttpStatusCode.OK)
+					val booksToShow = if (filterValue == "all") {
+						MainService.getAllBooks()
 					} else {
-						call.respond(HttpStatusCode.BadRequest)
+						MainService.getBooksOfType(filterValue.toInt())
 					}
-				} else {
-					call.respond(HttpStatusCode.Unauthorized)
+
+					val jsonResponse = gson.toJson(booksToShow.map { it.toResponse() })
+
+					call.respond(jsonResponse)
 				}
 			}
-		}
 
-		route("/profile") {
-			put("/balance") {
-				val jsonRequest = call.receiveText()
+			route("/books") {
+				get {
+					val books = MainService.getAllBooks()
 
-				val request = gson.fromJson(jsonRequest, ProfileBalanceRequest::class.java)
-				val token = AuthService.decomposeToken(request.token)
+					val jsonResponse = gson.toJson(books.map { it.toResponse() })
 
-				val userId = request.userId
-				val username = token?.username
-				val password = token?.password
-				val rechargeBalance = request.rechargeBalance
+					call.respond(jsonResponse)
+				}
 
-				if (AuthService.areCredentialsValid(username, password)) {
-					if (ProfileService.rechargeUserBalance(userId, rechargeBalance)) {
-						call.respond(HttpStatusCode.OK)
+				post("/ids") {
+					val jsonRequest = call.receiveText()
+
+					val request = gson.fromJson(jsonRequest, BooksIdsRequest::class.java)
+					val ids = request.bookIds
+
+					val booksWithIds = MainService.getBooksWithIds(ids)
+
+					val jsonResponse = gson.toJson(booksWithIds.map { it.toResponse() })
+
+					call.respond(jsonResponse)
+				}
+
+				get("/years") {
+					val years = MainService.getAllYears()
+
+					val jsonResponse = gson.toJson(years)
+
+					call.respond(jsonResponse)
+				}
+
+				get("/years/{year}") {
+					val filterValue = call.parameters["year"] ?: throw Exception()
+
+					val booksToShow = if (filterValue == "all") {
+						MainService.getAllBooks()
 					} else {
-						call.respond(HttpStatusCode.BadRequest)
+						MainService.getBooksSinceYear(filterValue.toInt())
 					}
-				} else {
-					call.respond(HttpStatusCode.Unauthorized)
+
+					val jsonResponse = gson.toJson(booksToShow.map { it.toResponse() })
+
+					call.respond(jsonResponse)
 				}
 			}
 
-			put("/password") {
-				val jsonRequest = call.receiveText()
+			route("/orders") {
+				post {
+					val jsonRequest = call.receiveText()
 
-				val request = gson.fromJson(jsonRequest, ProfilePasswordRequest::class.java)
-				val token = AuthService.decomposeToken(request.token)
+					val request = gson.fromJson(jsonRequest, UserOrdersRequest::class.java)
+					val token = AuthService.decomposeToken(request.token)
 
-				val userId = request.userId
-				val username = token?.username
-				val password = token?.password
-				val newPassword = request.newPassword
+					val userId = request.userId
+					val username = token?.username
+					val password = token?.password
 
-				if (AuthService.areCredentialsValid(username, password)) {
-					if (ProfileService.changeUserPassword(userId, newPassword)) {
-						call.respond(HttpStatusCode.OK)
+					if (AuthService.areCredentialsValid(username, password)) {
+						val orders = ProfileService.getUserOrders(userId)
+
+						val jsonResponse = gson.toJson(orders.map { it.toResponse() })
+
+						call.respond(jsonResponse)
 					} else {
-						call.respond(HttpStatusCode.BadRequest)
+						call.respond(HttpStatusCode.Unauthorized)
 					}
-				} else {
-					call.respond(HttpStatusCode.Unauthorized)
 				}
-			}
 
-			put("/username") {
-				val jsonRequest = call.receiveText()
+				post("/add") {
+					val jsonRequest = call.receiveText()
 
-				val request = gson.fromJson(jsonRequest, ProfileUsernameRequest::class.java)
-				val token = AuthService.decomposeToken(request.token)
+					val request = gson.fromJson(jsonRequest, CartBuyRequest::class.java)
+					val token = AuthService.decomposeToken(request.token)
 
-				val userId = request.userId
-				val username = token?.username
-				val password = token?.password
-				val newUsername = request.newUsername
+					val userId = request.userId
+					val username = token?.username
+					val password = token?.password
 
-				if (AuthService.areCredentialsValid(username, password)) {
-					if (ProfileService.changeUserUsername(userId, newUsername)) {
-						call.respond(HttpStatusCode.OK)
+					if (AuthService.areCredentialsValid(username, password)) {
+						val ids = request.cartData.map { it.id }
+						val quantities = request.cartData.map { it.quantity }
+						val booksToBuy = MainService.getBooksWithIds(ids)
+
+						if (CartService.addUserOrder(userId, booksToBuy, quantities)) {
+							call.respond(HttpStatusCode.OK)
+						} else {
+							call.respond(HttpStatusCode.BadRequest)
+						}
 					} else {
-						call.respond(HttpStatusCode.BadRequest)
+						call.respond(HttpStatusCode.Unauthorized)
 					}
-				} else {
-					call.respond(HttpStatusCode.Unauthorized)
 				}
 			}
-		}
 
-		route("/login") {
-			post {
+			post("/login") {
 				val jsonRequest = call.receiveText()
 
 				val request = gson.fromJson(jsonRequest, LoginRequest::class.java)
@@ -279,10 +264,8 @@ fun Application.configureRouting() {
 					call.respond(HttpStatusCode.Unauthorized)
 				}
 			}
-		}
 
-		route("/register") {
-			post {
+			post("/register") {
 				val jsonRequest = call.receiveText()
 
 				val request = gson.fromJson(jsonRequest, RegisterRequest::class.java)
@@ -300,26 +283,22 @@ fun Application.configureRouting() {
 					call.respond(HttpStatusCode.Unauthorized)
 				}
 			}
-		}
 
-		post("/token") {
-			val jsonRequest = call.receiveText()
+			post("/token") {
+				val jsonRequest = call.receiveText()
 
-			val request = gson.fromJson(jsonRequest, TokenRequest::class.java)
-			val token = AuthService.decomposeToken(request.token)
+				val request = gson.fromJson(jsonRequest, TokenRequest::class.java)
+				val token = AuthService.decomposeToken(request.token)
 
-			val username = token?.username
-			val password = token?.password
+				val username = token?.username
+				val password = token?.password
 
-			if (AuthService.areCredentialsValid(username, password)) {
-				call.respond(HttpStatusCode.OK)
-			} else {
-				call.respond(HttpStatusCode.Unauthorized)
+				if (AuthService.areCredentialsValid(username, password)) {
+					call.respond(HttpStatusCode.OK)
+				} else {
+					call.respond(HttpStatusCode.Unauthorized)
+				}
 			}
-		}
-
-		get("{...}") {
-			call.respond(HttpStatusCode.NotFound)
 		}
 	}
 }

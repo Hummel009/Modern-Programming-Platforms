@@ -18,7 +18,7 @@ export const PageRegister = ({
 	const handleRegisterSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post('http://localhost:2999/register', {
+			const response = await axios.post(`http://localhost:2999/api/v1/register`, {
 				username: registerData.username,
 				password: registerData.password
 			});
