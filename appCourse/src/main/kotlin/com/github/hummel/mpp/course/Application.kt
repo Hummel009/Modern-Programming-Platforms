@@ -1,11 +1,7 @@
 package com.github.hummel.mpp.course
 
 import com.github.hummel.mpp.course.controller.configureRouting
-import com.github.hummel.mpp.course.dao.AuthorDao
-import com.github.hummel.mpp.course.dao.BookDao
-import com.github.hummel.mpp.course.dao.OrderDao
-import com.github.hummel.mpp.course.dao.TypeDao
-import com.github.hummel.mpp.course.dao.UserDao
+import com.github.hummel.mpp.course.dao.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -24,11 +20,12 @@ fun Application.module() {
 	install(CORS) {
 		anyHost()
 		allowCredentials = true
-		allowMethod(HttpMethod.Delete)
 		allowMethod(HttpMethod.Post)
 		allowMethod(HttpMethod.Put)
 		allowMethod(HttpMethod.Get)
+		allowMethod(HttpMethod.Options)
 		allowHeader(HttpHeaders.ContentType)
+		allowHeader(HttpHeaders.AccessControlAllowOrigin)
 	}
 
 	configureDatabase()

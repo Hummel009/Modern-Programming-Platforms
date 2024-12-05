@@ -27,8 +27,11 @@ export const PageCart = ({
 			const token = Cookies.get('jwt');
 
 			await axios.post(`http://localhost:2999/api/v1/orders/${userData.id}/add`, {
-				token: token,
 				cartData: cartData
+			}, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
 			});
 
 			handleClearCart();

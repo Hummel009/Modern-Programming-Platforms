@@ -1,5 +1,5 @@
 package com.github.hummel.mpp.course.dto.request
 
-data class GetBooksIdsRequest(
+data class GetBooksWithIdsRequest(
 	val bookIds: List<Int>
 )

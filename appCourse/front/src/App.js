@@ -51,8 +51,10 @@ function App() {
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.post(`http://localhost:2999/api/v1/token`, {
-				token: token
+			await axios.options(`http://localhost:2999/api/v1/token`, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
 			});
 
 			setIsLoggedIn(true);
@@ -88,8 +90,10 @@ function App() {
 		try {
 			const token = Cookies.get('jwt');
 
-			const response = await axios.post(`http://localhost:2999/api/v1/users/info`, {
-				token: token
+			const response = await axios.get(`http://localhost:2999/api/v1/users/info`, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
 			});
 
 			setUserData(response.data);
@@ -101,8 +105,10 @@ function App() {
 		try {
 			const token = Cookies.get('jwt');
 
-			const response = await axios.post(`http://localhost:2999/api/v1/orders/${userData.id}`, {
-				token: token
+			const response = await axios.get(`http://localhost:2999/api/v1/orders/${userData.id}`, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
 			});
 
 			setOrders(response.data);

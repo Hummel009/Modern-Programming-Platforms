@@ -23,8 +23,11 @@ export const PageProfile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.put(`http://localhost:2999/api/v1/users/${userData.id}/balance`, {
-				token: token,
 				rechargeBalance: rechargeBalance
+			}, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
 			});
 
 
@@ -42,8 +45,11 @@ export const PageProfile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.put(`http://localhost:2999/api/v1/users/${userData.id}/password`, {
-				token: token,
 				newPassword: newPassword
+			}, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
 			});
 
 			handleDeleteToken();
@@ -62,8 +68,11 @@ export const PageProfile = ({
 			const token = Cookies.get('jwt');
 
 			await axios.put(`http://localhost:2999/api/v1/users/${userData.id}/username`, {
-				token: token,
 				newUsername: newUsername
+			}, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
 			});
 
 			handleDeleteToken();

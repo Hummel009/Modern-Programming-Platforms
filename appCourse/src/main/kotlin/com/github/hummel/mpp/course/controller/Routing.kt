@@ -18,14 +18,12 @@ fun Application.configureRouting() {
 	routing {
 		route("/api/v1") {
 			route("/users") {
-				post("/info") {
-					val jsonRequest = call.receiveText()
+				get("/info") {
+					val token = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+					val decomposedToken = AuthService.decomposeToken(token)
 
-					val request = gson.fromJson(jsonRequest, GetUserInfoRequest::class.java)
-					val token = AuthService.decomposeToken(request.token)
-
-					val username = token?.username
-					val password = token?.password
+					val username = decomposedToken?.username
+					val password = decomposedToken?.password
 
 					if (AuthService.areCredentialsValid(username, password)) {
 						username ?: throw Exception()
@@ -43,13 +41,14 @@ fun Application.configureRouting() {
 				put("/{userId}/balance") {
 					val userId = call.parameters["userId"]?.toInt() ?: throw Exception()
 
+					val token = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+					val decomposedToken = AuthService.decomposeToken(token)
+
 					val jsonRequest = call.receiveText()
-
 					val request = gson.fromJson(jsonRequest, ChangeUserBalanceRequest::class.java)
-					val token = AuthService.decomposeToken(request.token)
 
-					val username = token?.username
-					val password = token?.password
+					val username = decomposedToken?.username
+					val password = decomposedToken?.password
 					val rechargeBalance = request.rechargeBalance
 
 					if (AuthService.areCredentialsValid(username, password)) {
@@ -66,13 +65,14 @@ fun Application.configureRouting() {
 				put("/{userId}/password") {
 					val userId = call.parameters["userId"]?.toInt() ?: throw Exception()
 
+					val token = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+					val decomposedToken = AuthService.decomposeToken(token)
+
 					val jsonRequest = call.receiveText()
-
 					val request = gson.fromJson(jsonRequest, ChangeUserPasswordRequest::class.java)
-					val token = AuthService.decomposeToken(request.token)
 
-					val username = token?.username
-					val password = token?.password
+					val username = decomposedToken?.username
+					val password = decomposedToken?.password
 					val newPassword = request.newPassword
 
 					if (AuthService.areCredentialsValid(username, password)) {
@@ -89,13 +89,14 @@ fun Application.configureRouting() {
 				put("/{userId}/username") {
 					val userId = call.parameters["userId"]?.toInt() ?: throw Exception()
 
+					val token = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+					val decomposedToken = AuthService.decomposeToken(token)
+
 					val jsonRequest = call.receiveText()
-
 					val request = gson.fromJson(jsonRequest, ChangeUserUsernameRequest::class.java)
-					val token = AuthService.decomposeToken(request.token)
 
-					val username = token?.username
-					val password = token?.password
+					val username = decomposedToken?.username
+					val password = decomposedToken?.password
 					val newUsername = request.newUsername
 
 					if (AuthService.areCredentialsValid(username, password)) {
@@ -170,7 +171,7 @@ fun Application.configureRouting() {
 				post("/ids") {
 					val jsonRequest = call.receiveText()
 
-					val request = gson.fromJson(jsonRequest, GetBooksIdsRequest::class.java)
+					val request = gson.fromJson(jsonRequest, GetBooksWithIdsRequest::class.java)
 					val ids = request.bookIds
 
 					val booksWithIds = MainService.getBooksWithIds(ids)
@@ -204,16 +205,14 @@ fun Application.configureRouting() {
 			}
 
 			route("/orders") {
-				post("/{userId}") {
+				get("/{userId}") {
 					val userId = call.parameters["userId"]?.toInt() ?: throw Exception()
 
-					val jsonRequest = call.receiveText()
+					val token = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+					val decomposedToken = AuthService.decomposeToken(token)
 
-					val request = gson.fromJson(jsonRequest, GetUserOrdersRequest::class.java)
-					val token = AuthService.decomposeToken(request.token)
-
-					val username = token?.username
-					val password = token?.password
+					val username = decomposedToken?.username
+					val password = decomposedToken?.password
 
 					if (AuthService.areCredentialsValid(username, password)) {
 						val orders = ProfileService.getUserOrders(userId)
@@ -229,13 +228,14 @@ fun Application.configureRouting() {
 				post("/{userId}/add") {
 					val userId = call.parameters["userId"]?.toInt() ?: throw Exception()
 
+					val token = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+					val decomposedToken = AuthService.decomposeToken(token)
+
 					val jsonRequest = call.receiveText()
-
 					val request = gson.fromJson(jsonRequest, AddUserOrderRequest::class.java)
-					val token = AuthService.decomposeToken(request.token)
 
-					val username = token?.username
-					val password = token?.password
+					val username = decomposedToken?.username
+					val password = decomposedToken?.password
 
 					if (AuthService.areCredentialsValid(username, password)) {
 						val ids = request.cartData.map { it.id }
@@ -289,14 +289,12 @@ fun Application.configureRouting() {
 				}
 			}
 
-			post("/token") {
-				val jsonRequest = call.receiveText()
+			options("/token") {
+				val token = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+				val decomposedToken = AuthService.decomposeToken(token)
 
-				val request = gson.fromJson(jsonRequest, TokenRequest::class.java)
-				val token = AuthService.decomposeToken(request.token)
-
-				val username = token?.username
-				val password = token?.password
+				val username = decomposedToken?.username
+				val password = decomposedToken?.password
 
 				if (AuthService.areCredentialsValid(username, password)) {
 					call.respond(HttpStatusCode.OK)
