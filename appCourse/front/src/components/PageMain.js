@@ -56,7 +56,7 @@ export const PageMain = ({
 
 			handleFetchCartData();
 
-			toast.success('Кніга дадана ў кош!');
+			toast.success('Дадана ў кош!');
 		} catch (error) {
 			toast.error('Памылка!');
 		}
