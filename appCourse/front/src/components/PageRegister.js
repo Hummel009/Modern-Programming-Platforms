@@ -3,6 +3,7 @@ import React, {
 	useState
 } from 'react';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 
 export const PageRegister = ({
 	isLoggedIn,
@@ -25,10 +26,12 @@ export const PageRegister = ({
 			Cookies.set('jwt', response.data, { path: '/', secure: false, sameSite: 'Lax' });
 
 			setIsLoggedIn(true);
-			
+
 			handleFetchUserData();
+
+			toast.success('Рэгістрацыя прайшла паспяхова!');
 		} catch (error) {
-			alert('Register failed. Please check your credentials.');
+			toast.error('Памылка!');
 		}
 	};
 

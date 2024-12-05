@@ -3,7 +3,7 @@ import React, {
 	useState
 } from 'react';
 import Cookies from 'js-cookie';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const PageMain = ({
@@ -56,9 +56,9 @@ export const PageMain = ({
 
 			handleFetchCartData();
 
-            toast.success('Книга добавлена в корзину!');
+			toast.success('Кніга дадана ў кош!');
 		} catch (error) {
-            toast.error('Ошибка при добавлении книги в корзину.');
+			toast.error('Памылка!');
 		}
 	};
 
@@ -71,8 +71,6 @@ export const PageMain = ({
 			<div>
 				Тут вы можаце знайсці вельмі многа розных кніг.
 			</div>
-			
-            <ToastContainer />
 
 			<br />
 

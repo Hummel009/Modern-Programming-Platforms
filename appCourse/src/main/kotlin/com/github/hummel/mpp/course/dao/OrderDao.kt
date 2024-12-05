@@ -62,11 +62,9 @@ object OrderDao {
 
 			val results = pstmtOrderItem.executeBatch()
 
-			if (results.any { it > 0 }) throw Exception()
-
 			connection.commit()
 
-			true
+			results.any { it > 0 }
 		} catch (e: SQLException) {
 			e.printStackTrace()
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 
 export const PageCart = ({
 	isLoggedIn,
@@ -14,7 +15,10 @@ export const PageCart = ({
 			Cookies.remove('cart');
 
 			setCartData([]);
+
+			toast.success('Кош ачышчаны!');
 		} catch (error) {
+			toast.error('Памылка!');
 		}
 	}
 
@@ -31,8 +35,10 @@ export const PageCart = ({
 			handleClearCart();
 			handleFetchUserData();
 			handleFetchOrders();
+
+			toast.success('Заказ аформлены!');
 		} catch (error) {
-			alert('Buy failed. Please check your credentials.');
+			toast.error('Памылка!');
 		}
 	};
 

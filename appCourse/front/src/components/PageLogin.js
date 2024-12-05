@@ -3,6 +3,7 @@ import React, {
 	useState
 } from 'react';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 
 export const PageLogin = ({
 	isLoggedIn,
@@ -25,10 +26,12 @@ export const PageLogin = ({
 			Cookies.set('jwt', response.data, { path: '/', secure: false, sameSite: 'Lax' });
 
 			setIsLoggedIn(true);
-			
+
 			handleFetchUserData();
+
+			toast.success('Аўтарызацыя прайшла паспяхова!');
 		} catch (error) {
-			alert('Login failed. Please check your credentials.');
+			toast.error('Памылка!');
 		}
 	};
 

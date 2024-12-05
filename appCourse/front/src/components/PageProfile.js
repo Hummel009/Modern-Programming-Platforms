@@ -3,6 +3,7 @@ import React, {
 	useState
 } from 'react';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
 
 export const PageProfile = ({
 	isLoggedIn,
@@ -28,8 +29,10 @@ export const PageProfile = ({
 			handleDeleteToken();
 
 			setIsLoggedIn(false);
+
+			toast.success('Логін зменены!');
 		} catch (error) {
-			alert('Change username failed. Please check your credentials.');
+			toast.error('Памылка!');
 		}
 	};
 
@@ -47,8 +50,10 @@ export const PageProfile = ({
 			handleDeleteToken();
 
 			setIsLoggedIn(false);
+
+			toast.success('Пароль зменены!');
 		} catch (error) {
-			alert('Change password failed. Please check your credentials.');
+			toast.error('Памылка!');
 		}
 	};
 
@@ -94,13 +99,13 @@ export const PageProfile = ({
 								<div className="navi">
 									{order.books.map((book, index) => (
 										<div key={book.id}>
-										<div className="preamble">
-											<div className="title">«{book.title}»</div>
-											<div className="author">{book.author}</div>
-											<div className="description">{book.description}</div>
-										</div>
-										<div className="quantity">Колькасць: {order.quantities[index]}</div>
-										<img src={book.imgPath} width="100%" height="auto" alt="" />
+											<div className="preamble">
+												<div className="title">«{book.title}»</div>
+												<div className="author">{book.author}</div>
+												<div className="description">{book.description}</div>
+											</div>
+											<div className="quantity">Колькасць: {order.quantities[index]}</div>
+											<img src={book.imgPath} width="100%" height="auto" alt="" />
 										</div>
 									))}
 								</div>
