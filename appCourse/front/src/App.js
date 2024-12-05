@@ -191,7 +191,7 @@ function App() {
 											<h1>
 												<span>{author.name}</span>
 											</h1>
-											<img className="author-img" src={author.image} width="300px" height="366px" alt="" />
+											<img className="author-img" src={author.image} width="300px" height="auto" alt="" />
 											<div className="author-desc">
 												{author.desc.split('\n').map((line, index) => (
 													<p key={index}>{line}</p>
