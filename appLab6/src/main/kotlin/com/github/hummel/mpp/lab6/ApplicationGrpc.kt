@@ -97,7 +97,7 @@ class ServerImpl : ServerImplBase() {
 
 	override fun filterTasks(jsonRequest: StringRequest, responseObserver: StreamObserver<StringReply>) {
 		val filterRequest = gson.fromJson(jsonRequest.getValue(), FilterRequest::class.java)
-		val filter = filterRequest.filter
+		val filter = filterRequest.status
 
 		val filteredTasks = tasks.asSequence().filter {
 			it.value.status == filter || filter == "all"
@@ -111,8 +111,8 @@ class ServerImpl : ServerImplBase() {
 
 	override fun editTask(jsonRequest: StringRequest, responseObserver: StreamObserver<StringReply>) {
 		val editTaskRequest = gson.fromJson(jsonRequest.getValue(), EditTaskRequest::class.java)
-		val index = editTaskRequest.index
-		val title = editTaskRequest.title
+		val index = editTaskRequest.taskId
+		val title = editTaskRequest.newTitle
 
 		tasks.getValue(index).title = title
 

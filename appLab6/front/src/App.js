@@ -36,21 +36,21 @@ function App() {
 		setTasks(tasksMap);
 	};
 
-	const filterTasks = async (filter) => {
+	const filterTasks = async (status) => {
 		const response = await axios.post('http://localhost:2999/api/v1/tasks/filter', {
-			filter: filter
+			status: status
 		});
 		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
 	};
 
-	const editTask = async (index) => {
-		const taskToEdit = tasks.get(index);
-		const title = prompt("Введите новое название задачи:", taskToEdit.title);
+	const editTask = async (taskId) => {
+		const taskToEdit = tasks.get(taskId);
+		const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
-		if (title) {
+		if (newTitle) {
 			const response = await axios.put('http://localhost:2999/api/v1/tasks/edit', {
-				index: index, title: title
+				taskId: taskId, newTitle: newTitle
 			});
 			const tasksMap = new Map(Object.entries(response.data));
 			setTasks(tasksMap);
