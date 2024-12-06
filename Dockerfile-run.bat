@@ -1,1 +1,1 @@
-docker run --name course-backend -p 2999:2999 course-backend
+docker run --name course-backend -p 2999:2999 hummel009/course-backend

@@ -1,1 +1,1 @@
-docker build -t course-frontend .
+docker build -t hummel009/course-frontend .

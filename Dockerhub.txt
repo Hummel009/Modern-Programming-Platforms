@@ -1,8 +1,0 @@
-docker tag course-frontend hummel009/course-frontend:latest
-docker tag course-backend hummel009/course-backend:latest
-
-docker push hummel009/course-frontend:latest
-docker push hummel009/course-backend:latest
-
-docker run --name course-frontend -p 3000:3000 hummel009/course-frontend:latest
-docker run --name course-backend -p 2999:2999 hummel009/course-backend:latest

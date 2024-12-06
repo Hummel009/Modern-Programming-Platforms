@@ -1,1 +1,1 @@
-docker build -t course-backend .
+docker build -t hummel009/course-backend .
