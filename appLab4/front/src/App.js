@@ -135,8 +135,7 @@ function App() {
 
 	const tryUseCookieToken = async () => {
 		if (tokenWsRef.current) {
-			const tokenCookie = document.cookie.split('; ').find(row => row.startsWith('jwt='));
-			const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+			const token = Cookies.get('jwt');
 
 			tokenWsRef.current.send(JSON.stringify({
 				token: token

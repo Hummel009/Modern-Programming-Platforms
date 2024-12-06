@@ -124,9 +124,7 @@ function App() {
 	};
 
 	const tryUseCookieToken = async () => {
-		const cookies = document.cookie.split('; ');
-		const tokenCookie = cookies.find(row => row.startsWith('jwt='));
-		const token = tokenCookie ? tokenCookie.split('=')[1] : null;
+		const token = Cookies.get('jwt');
 
 		const query = `
 			mutation {
