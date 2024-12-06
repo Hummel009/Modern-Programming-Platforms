@@ -12,8 +12,6 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.utils.io.jvm.javaio.*
-import java.io.File
 
 val tasks: MutableMap<Int, Task> = mutableMapOf()
 
@@ -80,7 +78,6 @@ fun Application.configureRouting() {
 			var title = ""
 			var status = ""
 			var dueDate = ""
-			var fileName: String? = null
 
 			multipart.forEachPart { part ->
 				when (part) {
@@ -92,23 +89,14 @@ fun Application.configureRouting() {
 						}
 					}
 
-					is PartData.FileItem -> {
-						fileName = part.originalFileName
-						val file = File("uploads/${System.currentTimeMillis()}-$fileName")
-						part.provider().toInputStream().use { input ->
-							file.outputStream().buffered().use { output ->
-								input.copyTo(output)
-							}
-						}
-					}
-
+					is PartData.FileItem -> {}
 					is PartData.BinaryChannelItem -> {}
 					is PartData.BinaryItem -> {}
 				}
 				part.dispose()
 			}
 
-			tasks[getNextAvailableId()] = Task(title, status, dueDate, fileName)
+			tasks[getNextAvailableId()] = Task(title, status, dueDate)
 
 			call.respond(HttpStatusCode.OK)
 		}

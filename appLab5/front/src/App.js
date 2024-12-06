@@ -2,8 +2,9 @@ import React, {
 	useState,
 	useEffect
 } from 'react';
-import axios from 'axios';
 import './App.css'
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 function App() {
 	const [tasks, setTasks] = useState(new Map());
@@ -115,7 +116,7 @@ function App() {
 
 		const auth = response.data.data.login;
 		if (auth !== "Unauthorized") {
-			document.cookie = `jwt=${auth}; path=/; secure=false; SameSite=Lax`;
+			Cookies.set('jwt', auth, { path: '/', secure: false, sameSite: 'Lax'});
 			setIsLoggedIn(true);
 			fetchTasks();
 		} else {
