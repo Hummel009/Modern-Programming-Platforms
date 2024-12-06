@@ -226,10 +226,10 @@ fun Application.configureRouting() {
 
 					if (AuthService.areCredentialsValid(username, password)) {
 						val ids = request.cartData.map { it.bookId }
+						val books = MainService.getAllBooks().filter { ids.contains(it.id) }
 						val quantities = request.cartData.map { it.quantity }
-						val booksToBuy = MainService.getBooksWithIds(ids)
 
-						if (CartService.addUserOrder(userId, booksToBuy, quantities)) {
+						if (CartService.addUserOrder(userId, books, quantities)) {
 							call.respond(HttpStatusCode.OK)
 						} else {
 							call.respond(HttpStatusCode.BadRequest)

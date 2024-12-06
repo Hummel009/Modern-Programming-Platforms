@@ -16,16 +16,6 @@ object MainService {
 
 	fun getAllYears(): List<Int> = BookDao.findUniqueYears().sortedBy { it }
 
-	fun getBooksWithIds(ids: List<Int>): List<Book> {
-		val books = BookDao.findAllBooks()
-		val filteredBooks = books.filter { (id, _, _, _, _, _, _, _) ->
-			ids.contains(id)
-		}.toList().sortedBy {
-			it.year
-		}
-		return filteredBooks
-	}
-
 	fun getBooksOfAuthor(authorId: Int): List<Book> {
 		val books = BookDao.findAllBooks()
 
