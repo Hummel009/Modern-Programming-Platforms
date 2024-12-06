@@ -7,13 +7,13 @@ option java_outer_classname = "EntryPoint";
 package helloworld;
 
 service Server {
-  rpc Login (StringRequest) returns (StringReply) {}
-  rpc Token (StringRequest) returns (StringReply) {}
   rpc GetTasks (StringRequest) returns (StringReply) {}
   rpc ClearTasks (StringRequest) returns (StringReply) {}
-  rpc FilterTasks (StringRequest) returns (StringReply) {}
-  rpc EditTask (StringRequest) returns (StringReply) {}
   rpc AddTask (AddRequest) returns (StringReply) {}
+  rpc EditTask (StringRequest) returns (StringReply) {}
+  rpc FilterTasks (StringRequest) returns (StringReply) {}
+  rpc Login (StringRequest) returns (StringReply) {}
+  rpc Token (StringRequest) returns (StringReply) {}
 }
 
 message StringRequest {

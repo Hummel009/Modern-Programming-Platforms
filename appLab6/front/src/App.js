@@ -2,8 +2,9 @@ import React, {
 	useState,
 	useEffect
 } from 'react';
-import axios from 'axios';
 import './App.css'
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 function App() {
 	const [tasks, setTasks] = useState(new Map());
@@ -24,19 +25,19 @@ function App() {
 	}, []);
 
 	const fetchTasks = async () => {
-		const response = await axios.get('http://localhost:2999/get-tasks');
+		const response = await axios.get('http://localhost:2999/api/v1/tasks');
 		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
 	};
 
 	const clearTasks = async () => {
-		const response = await axios.delete('http://localhost:2999/clear-tasks');
+		const response = await axios.delete('http://localhost:2999/api/v1/tasks');
 		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
 	};
 
 	const filterTasks = async (filter) => {
-		const response = await axios.post('http://localhost:2999/filter-tasks', {
+		const response = await axios.post('http://localhost:2999/api/v1/tasks/filter', {
 			filter: filter
 		});
 		const tasksMap = new Map(Object.entries(response.data));
@@ -48,7 +49,7 @@ function App() {
 		const title = prompt("Введите новое название задачи:", taskToEdit.title);
 
 		if (title) {
-			const response = await axios.put('http://localhost:2999/edit-task', {
+			const response = await axios.put('http://localhost:2999/api/v1/tasks/edit', {
 				index: index, title: title
 			});
 			const tasksMap = new Map(Object.entries(response.data));
@@ -58,7 +59,7 @@ function App() {
 
 	const makeError = async () => {
 		try {
-			await axios.get('http://localhost:2999/jojoreference');
+			await axios.get('http://localhost:2999/api/v1/jojoreference');
 		} catch (e) {
 			setErrorCode(e.response.status);
 		}
@@ -72,12 +73,13 @@ function App() {
 	const handleLoginSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post('http://localhost:2999/login', {
+			const response = await axios.post('http://localhost:2999/api/v1/login', {
 				username: loginData.username,
 				password: loginData.password
 			});
 
-			document.cookie = `jwt=${response.data}; path=/; secure=false; SameSite=Lax`;
+			Cookies.set('jwt', response.data, { path: '/', secure: false, sameSite: 'Lax' });
+
 			setIsLoggedIn(true);
 
 			fetchTasks();
@@ -90,7 +92,7 @@ function App() {
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.post('http://localhost:2999/token', {
+			await axios.post('http://localhost:2999/api/v1/token', {
 				token: token
 			});
 
@@ -108,7 +110,7 @@ function App() {
 		for (const key in formData) {
 			form.append(key, formData[key]);
 		}
-		await axios.post('http://localhost:2999/add-task', form, {
+		await axios.post('http://localhost:2999/api/v1/tasks/add', form, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},
