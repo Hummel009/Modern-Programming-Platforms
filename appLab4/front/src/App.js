@@ -3,8 +3,9 @@ import React, {
 	useEffect,
 	useRef
 } from 'react';
-import axios from 'axios';
 import './App.css'
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 function App() {
 	const [tasks, setTasks] = useState(new Map());
@@ -33,7 +34,7 @@ function App() {
 		loginWsRef.current.onmessage = function (event) {
 			const response = event.data;
 			if (response !== "Unauthorized") {
-				document.cookie = `jwt=${response}; path=/; secure=false; SameSite=Lax`;
+				Cookies.set('jwt', response, { path: '/', secure: false, sameSite: 'Lax'});
 				setIsLoggedIn(true);
 				fetchTasks();
 			} else {
@@ -89,22 +90,22 @@ function App() {
 		}
 	};
 
-	const filterTasks = async (filter) => {
+	const filterTasks = async (status) => {
 		if (filterTasksWsRef.current) {
 			filterTasksWsRef.current.send(JSON.stringify({
-				filter: filter
+				filter: status
 			}));
 		}
 	};
 
-	const editTask = async (index) => {
+	const editTask = async (taskId) => {
 		if (editTaskWsRef.current) {
-			const taskToEdit = tasks.get(index);
-			const title = prompt("Введите новое название задачи:", taskToEdit.title);
+			const taskToEdit = tasks.get(taskId);
+			const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
-			if (title) {
+			if (newTitle) {
 				editTaskWsRef.current.send(JSON.stringify({
-					index: index, title: title
+					taskId: taskId, newTitle: newTitle
 				}));
 			}
 		}
@@ -149,7 +150,7 @@ function App() {
 		for (const key in formData) {
 			form.append(key, formData[key]);
 		}
-		await axios.post('http://localhost:2999/add-task', form, {
+		await axios.post('http://localhost:2999/tasks/add', form, {
 			headers: {
 				'Content-Type': 'multipart/form-data',
 			},

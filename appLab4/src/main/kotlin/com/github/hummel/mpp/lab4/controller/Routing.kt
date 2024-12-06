@@ -16,10 +16,8 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
-import io.ktor.utils.io.jvm.javaio.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.consumeEach
-import java.io.File
 
 val tasks: MutableMap<Int, Task> = mutableMapOf()
 
@@ -130,7 +128,7 @@ fun Application.configureWebSocket() {
 						val jsonRequest = frame.readText()
 
 						val filterRequest = gson.fromJson(jsonRequest, FilterRequest::class.java)
-						val filterStatus = filterRequest.filter
+						val filterStatus = filterRequest.status
 
 						val filteredTasks = tasks.asSequence().filter {
 							it.value.status == filterStatus || filterStatus == "all"
@@ -158,8 +156,8 @@ fun Application.configureWebSocket() {
 						val jsonRequest = frame.readText()
 
 						val editTaskRequest = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
-						val index = editTaskRequest.index
-						val title = editTaskRequest.title
+						val index = editTaskRequest.taskId
+						val title = editTaskRequest.newTitle
 
 						tasks.getValue(index).title = title
 
@@ -179,12 +177,11 @@ fun Application.configureWebSocket() {
 
 fun Application.configureRouting() {
 	routing {
-		post("/add-task") {
+		post("/tasks/add") {
 			val multipart = call.receiveMultipart()
 			var title = ""
 			var status = ""
 			var dueDate = ""
-			var fileName: String? = null
 
 			multipart.forEachPart { part ->
 				when (part) {
@@ -196,23 +193,14 @@ fun Application.configureRouting() {
 						}
 					}
 
-					is PartData.FileItem -> {
-						fileName = part.originalFileName
-						val file = File("uploads/${System.currentTimeMillis()}-$fileName")
-						part.provider().toInputStream().use { input ->
-							file.outputStream().buffered().use { output ->
-								input.copyTo(output)
-							}
-						}
-					}
-
+					is PartData.FileItem -> {}
 					is PartData.BinaryChannelItem -> {}
 					is PartData.BinaryItem -> {}
 				}
 				part.dispose()
 			}
 
-			tasks[getNextAvailableId()] = Task(title, status, dueDate, fileName)
+			tasks[getNextAvailableId()] = Task(title, status, dueDate)
 
 			call.respond(HttpStatusCode.OK)
 		}
