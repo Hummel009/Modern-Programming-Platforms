@@ -71,7 +71,7 @@ fun Application.configureRouting() {
 					call.respond(response.getValue())
 				}
 
-				get("/filter") {
+				post("/filter") {
 					val jsonRequest = call.receiveText()
 
 					val request = StringRequest.newBuilder().setValue(jsonRequest).build()
