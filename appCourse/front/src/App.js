@@ -51,7 +51,7 @@ function App() {
 		try {
 			const token = Cookies.get('jwt');
 
-			await axios.post(`http://localhost:2999/api/v1/token`, {
+			await axios.post(`http://localhost:2999/api/v1/token`, {}, {
 				headers: {
 					Authorization: `Bearer ${token}`
 				}
@@ -184,8 +184,8 @@ function App() {
 										cartData={cartData}
 										userData={userData}
 										setCartData={setCartData}
-										handleFetchOrders={handleFetchOrders}
 										handleFetchUserData={handleFetchUserData}
+										handleFetchUserOrders={handleFetchUserOrders}
 									/>
 								} />
 								{authors.map((author, index) => (

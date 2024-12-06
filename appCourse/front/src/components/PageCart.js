@@ -7,8 +7,8 @@ export const PageCart = ({
 	cartData,
 	userData,
 	setCartData,
-	handleFetchOrders,
-	handleFetchUserData
+	handleFetchUserData,
+	handleFetchUserOrders
 }) => {
 	const handleClearCart = () => {
 		try {
@@ -36,7 +36,7 @@ export const PageCart = ({
 
 			handleClearCart();
 			handleFetchUserData();
-			handleFetchOrders();
+			handleFetchUserOrders();
 
 			toast.success('Заказ аформлены!');
 		} catch (error) {

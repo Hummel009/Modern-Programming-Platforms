@@ -20,32 +20,30 @@ function App() {
 	}, []);
 
 	const fetchTasks = async () => {
-		const response = await axios.get('http://localhost:2999/get-tasks');
+		const response = await axios.get(`http://localhost:2999/api/v1/tasks`);
 		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
 	};
 
 	const clearTasks = async () => {
-		const response = await axios.delete('http://localhost:2999/clear-tasks');
+		const response = await axios.delete(`http://localhost:2999/api/v1/tasks`);
 		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
 	};
 
-	const filterTasks = async (filter) => {
-		const response = await axios.post('http://localhost:2999/filter-tasks', {
-			filter: filter
-		});
+	const filterTasks = async (status) => {
+		const response = await axios.get(`http://localhost:2999/api/v1/tasks/statuses/${status}`);
 		const tasksMap = new Map(Object.entries(response.data));
 		setTasks(tasksMap);
 	};
 
-	const editTask = async (index) => {
-		const taskToEdit = tasks.get(index);
-		const title = prompt("Введите новое название задачи:", taskToEdit.title);
+	const editTask = async (taskId) => {
+		const taskToEdit = tasks.get(taskId);
+		const newTitle = prompt("Введите новое название задачи:", taskToEdit.title);
 
-		if (title) {
-			const response = await axios.put('http://localhost:2999/edit-task', {
-				index: index, title: title
+		if (newTitle) {
+			const response = await axios.put(`http://localhost:2999/api/v1/tasks/${taskId}`, {
+				newTitle: newTitle
 			});
 			const tasksMap = new Map(Object.entries(response.data));
 			setTasks(tasksMap);
@@ -54,7 +52,7 @@ function App() {
 
 	const makeError = async () => {
 		try {
-			await axios.get('http://localhost:2999/jojoreference');
+			await axios.get(`http://localhost:2999/api/v1/jojoreference`);
 		} catch (e) {
 			setErrorCode(e.response.status);
 		}
@@ -67,15 +65,13 @@ function App() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+
 		const form = new FormData();
 		for (const key in formData) {
 			form.append(key, formData[key]);
 		}
-		await axios.post('http://localhost:2999/add-task', form, {
-			headers: {
-				'Content-Type': 'multipart/form-data',
-			},
-		});
+		await axios.post(`http://localhost:2999/api/v1/tasks/add`, form);
+
 		fetchTasks();
 	};
 

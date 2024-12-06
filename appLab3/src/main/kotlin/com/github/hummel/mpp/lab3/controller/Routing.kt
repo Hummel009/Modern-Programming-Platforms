@@ -1,8 +1,6 @@
 package com.github.hummel.mpp.lab3.controller
 
 import com.github.hummel.mpp.lab3.dto.EditTaskRequest
-import com.github.hummel.mpp.lab3.dto.FilterRequest
-import com.github.hummel.mpp.lab3.dto.TokenRequest
 import com.github.hummel.mpp.lab3.dto.UserRequest
 import com.github.hummel.mpp.lab3.entity.Task
 import com.github.hummel.mpp.lab3.generateToken
@@ -15,8 +13,6 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.utils.io.jvm.javaio.*
-import java.io.File
 
 val tasks: MutableMap<Int, Task> = mutableMapOf()
 
@@ -24,117 +20,103 @@ private val gson: Gson = Gson()
 
 fun Application.configureRouting() {
 	routing {
-		post("/login") {
-			val jsonRequest = call.receiveText()
+		route("/api/v1") {
+			route("/tasks") {
+				get {
+					val jsonResponse = gson.toJson(tasks)
 
-			val userRequest = gson.fromJson(jsonRequest, UserRequest::class.java)
-			val user = userRequest.toEntity()
-
-			if (isValidUser(user)) {
-				val textResponse = generateToken(user)
-
-				call.respond(textResponse)
-			} else {
-				call.respond(HttpStatusCode.Unauthorized)
-			}
-		}
-
-		post("/token") {
-			val jsonRequest = call.receiveText()
-
-			val tokenRequest = gson.fromJson(jsonRequest, TokenRequest::class.java)
-			val token = tokenRequest.token
-
-			if (isValidToken(token)) {
-				call.respond(HttpStatusCode.OK)
-			} else {
-				call.respond(HttpStatusCode.Unauthorized)
-			}
-		}
-
-		get("/get-tasks") {
-			val jsonResponse = gson.toJson(tasks)
-
-			call.respond(jsonResponse)
-		}
-
-		delete("/clear-tasks") {
-			tasks.clear()
-
-			val jsonResponse = gson.toJson(tasks)
-
-			call.respond(jsonResponse)
-		}
-
-		post("/filter-tasks") {
-			val jsonRequest = call.receiveText()
-
-			val filterRequest = gson.fromJson(jsonRequest, FilterRequest::class.java)
-			val filter = filterRequest.filter
-
-			val filteredTasks = tasks.asSequence().filter {
-				it.value.status == filter || filter == "all"
-			}.associate { it.key to it.value }
-
-			val jsonResponse = gson.toJson(filteredTasks)
-
-			call.respond(jsonResponse)
-		}
-
-		put("/edit-task") {
-			val jsonRequest = call.receiveText()
-
-			val editTaskRequest = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
-			val index = editTaskRequest.index
-			val title = editTaskRequest.title
-
-			tasks.getValue(index).title = title
-
-			val jsonResponse = gson.toJson(tasks)
-
-			call.respond(jsonResponse)
-		}
-
-		post("/add-task") {
-			val multipart = call.receiveMultipart()
-			var title = ""
-			var status = ""
-			var dueDate = ""
-			var fileName: String? = null
-
-			multipart.forEachPart { part ->
-				when (part) {
-					is PartData.FormItem -> {
-						when (part.name) {
-							"title" -> title = part.value
-							"status" -> status = part.value
-							"dueDate" -> dueDate = part.value
-						}
-					}
-
-					is PartData.FileItem -> {
-						fileName = part.originalFileName
-						val file = File("uploads/${System.currentTimeMillis()}-$fileName")
-						part.provider().toInputStream().use { input ->
-							file.outputStream().buffered().use { output ->
-								input.copyTo(output)
-							}
-						}
-					}
-
-					is PartData.BinaryChannelItem -> {}
-					is PartData.BinaryItem -> {}
+					call.respond(jsonResponse)
 				}
-				part.dispose()
+
+				delete {
+					tasks.clear()
+
+					val jsonResponse = gson.toJson(tasks)
+
+					call.respond(jsonResponse)
+				}
+
+				post("/add") {
+					val multipart = call.receiveMultipart()
+
+					var title = ""
+					var status = ""
+					var dueDate = ""
+
+					multipart.forEachPart { part ->
+						when (part) {
+							is PartData.FormItem -> {
+								when (part.name) {
+									"title" -> title = part.value
+									"status" -> status = part.value
+									"dueDate" -> dueDate = part.value
+								}
+							}
+
+							is PartData.FileItem -> {}
+							is PartData.BinaryChannelItem -> {}
+							is PartData.BinaryItem -> {}
+						}
+						part.dispose()
+					}
+
+					tasks[getNextAvailableId()] = Task(title, status, dueDate)
+
+					call.respond(HttpStatusCode.OK)
+				}
+
+				put("/{taskId}") {
+					val taskId = call.parameters["taskId"]?.toInt() ?: throw Exception()
+
+					val jsonRequest = call.receiveText()
+					val editTaskRequest = gson.fromJson(jsonRequest, EditTaskRequest::class.java)
+
+					val title = editTaskRequest.newTitle
+
+					tasks.getValue(taskId).title = title
+
+					val jsonResponse = gson.toJson(tasks)
+
+					call.respond(jsonResponse)
+				}
+
+				get("/statuses/{status}") {
+					val status = call.parameters["status"] ?: throw Exception()
+
+					val filteredTasks = tasks.asSequence().filter {
+						status == "all" || it.value.status == status
+					}.associate { it.key to it.value }
+
+					val jsonResponse = gson.toJson(filteredTasks)
+
+					call.respond(jsonResponse)
+				}
 			}
 
-			tasks[getNextAvailableId()] = Task(title, status, dueDate, fileName)
+			post("/login") {
+				val jsonRequest = call.receiveText()
 
-			call.respond(HttpStatusCode.OK)
-		}
+				val userRequest = gson.fromJson(jsonRequest, UserRequest::class.java)
+				val user = userRequest.toEntity()
 
-		get("{...}") {
-			call.respond(HttpStatusCode.NotFound)
+				if (isValidUser(user)) {
+					val textResponse = generateToken(user)
+
+					call.respond(textResponse)
+				} else {
+					call.respond(HttpStatusCode.Unauthorized)
+				}
+			}
+
+			post("/token") {
+				val token = call.request.headers["Authorization"]?.removePrefix("Bearer ")
+
+				if (isValidToken(token)) {
+					call.respond(HttpStatusCode.OK)
+				} else {
+					call.respond(HttpStatusCode.Unauthorized)
+				}
+			}
 		}
 	}
 }
