@@ -1,8 +1,8 @@
-FROM openjdk:11-jre-slim
-
-VOLUME /tmp
+FROM eclipse-temurin:11-alpine
 
 EXPOSE 2999
+
+VOLUME /tmp
 
 ARG JAR_FILE=appCourse/build/libs/appCourse-all.jar
 
