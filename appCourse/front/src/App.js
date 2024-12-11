@@ -18,7 +18,7 @@ import Cookies from 'js-cookie';
 
 function App() {
 	const [userData, setUserData] = useState({
-		userId: null,
+		id: null,
 		username: '',
 		balance: 0
 	});
@@ -69,13 +69,13 @@ function App() {
 
 			const response = await axios.get(`http://localhost:2999/api/v1/books`);
 
-			const bookIds = cart.map(item => item.id);
+			const bookIds = cart.map(item => item.bookId);
 
 			const cartDataWithQuantities = response.data.filter(book => bookIds.includes(book.id)).map(book => {
 				const itemInCart = cart.find(item => item.id === book.id);
 				return {
 					...book,
-					quantity: itemInCart ? itemInCart.quantity : 0
+					quantity: itemInCart.quantity
 				};
 			});
 
@@ -116,11 +116,17 @@ function App() {
 
 	useEffect(() => {
 		handleFetchStorageData();
-		handleUseToken()
 		handleFetchCartData();
-		handleFetchUserData();
-		handleFetchUserOrders();
-	}, [handleFetchStorageData, handleUseToken, handleFetchCartData, handleFetchUserData, handleFetchUserOrders]);
+
+		if (!isLoggedIn) {
+			handleUseToken()
+		} else {
+			handleFetchUserData();
+			if (userData.id) {
+				handleFetchUserOrders();
+			}
+		}
+	}, [isLoggedIn, userData.id, handleFetchStorageData, handleUseToken, handleFetchCartData, handleFetchUserData, handleFetchUserOrders]);
 
 	const handleDeleteToken = () => {
 		try {
