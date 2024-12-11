@@ -69,15 +69,15 @@ function App() {
 
 			const response = await axios.get(`http://localhost:2999/api/v1/books`);
 
-			const bookIds = cart.map(item => item.bookId);
-
-			const cartDataWithQuantities = response.data.filter(book => bookIds.includes(book.id)).map(book => {
-				const itemInCart = cart.find(item => item.id === book.id);
-				return {
-					...book,
-					quantity: itemInCart.quantity
-				};
-			});
+			const cartDataWithQuantities = response.data
+				.filter(book => cart.some(item => item.bookId === book.id))
+				.map(book => {
+					const itemInCart = cart.find(item => item.bookId === book.id);
+					return {
+						...book,
+						quantity: itemInCart ? itemInCart.quantity : 0
+					};
+				});
 
 			setCartData(cartDataWithQuantities);
 		} catch (error) {
