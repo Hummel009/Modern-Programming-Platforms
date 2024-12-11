@@ -4,7 +4,7 @@ import java.time.format.DateTimeFormatter
 plugins {
 	id("org.jetbrains.kotlin.jvm")
 	id("org.jetbrains.kotlin.plugin.serialization")
-	id("io.ktor.plugin")
+	id("io.ktor.plugin") version "latest.release"
 }
 
 group = "com.github.hummel"
