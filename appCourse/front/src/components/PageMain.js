@@ -59,7 +59,7 @@ export const PageMain = ({
 	const handleAddBookToCart = async (book) => {
 		try {
 			let cart = Cookies.get('cart') ? JSON.parse(Cookies.get('cart')) : [];
-			const existingBook = cart.find(item => item.id === book.id);
+			const existingBook = cart.find(item => item.bookId === book.id);
 
 			if (existingBook) {
 				existingBook.quantity += 1;
