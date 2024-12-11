@@ -7,8 +7,8 @@ data class Order(val id: Int, val userId: Int, val orderItems: MutableList<Order
 	data class OrderItem(val id: Int, val orderId: Int, val bookId: Int, val quantity: Int)
 
 	fun toResponse(): OrderResponse {
-		val ids = orderItems.map { it.bookId }
-		val books = MainService.getAllBooks().filter { ids.contains(it.id) }
+		val bookIds = orderItems.map { it.bookId }
+		val books = MainService.getAllBooks().filter { bookIds.contains(it.id) }
 		val quantities = orderItems.map { it.quantity }
 
 		return OrderResponse(

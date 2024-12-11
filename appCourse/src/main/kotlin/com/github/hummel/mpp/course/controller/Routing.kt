@@ -225,8 +225,8 @@ fun Application.configureRouting() {
 					val password = decomposedToken?.password
 
 					if (AuthService.areCredentialsValid(username, password)) {
-						val ids = request.cart.map { it.bookId }
-						val books = MainService.getAllBooks().filter { ids.contains(it.id) }
+						val bookIds = request.cart.map { it.bookId }
+						val books = MainService.getAllBooks().filter { bookIds.contains(it.id) }
 						val quantities = request.cart.map { it.quantity }
 
 						if (CartService.addUserOrder(userId, books, quantities)) {
