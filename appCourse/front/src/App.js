@@ -64,8 +64,7 @@ function App() {
 
 	const handleFetchCartData = useCallback(async () => {
 		try {
-			const cartCookie = Cookies.get('cart');
-			let cart = cartCookie ? JSON.parse(cartCookie) : [];
+			let cart = Cookies.get('cart') ? JSON.parse(Cookies.get('cart')) : [];
 
 			const response = await axios.get(`http://localhost:2999/api/v1/books`);
 

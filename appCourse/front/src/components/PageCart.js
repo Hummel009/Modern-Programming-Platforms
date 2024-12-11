@@ -25,9 +25,10 @@ export const PageCart = ({
 	const handleAddUserOrder = async () => {
 		try {
 			const token = Cookies.get('jwt');
+			let cart = Cookies.get('cart') ? JSON.parse(Cookies.get('cart')) : [];
 
 			await axios.post(`http://localhost:2999/api/v1/orders/${userData.id}/add`, {
-				cartData: cartData
+				cart: cart
 			}, {
 				headers: {
 					Authorization: `Bearer ${token}`
