@@ -89,7 +89,7 @@ export const PageMain = ({
 
 			<div className="change">
 				<select onChange={(e) => handleFilterBooksAuthors(e.target.value)}>
-					<option value="all">Все авторы</option>
+					<option value="all">Все вендоры</option>
 					{authors.map(author => (
 						<option key={author.id} value={author.id}>{author.name}</option>
 					))}
