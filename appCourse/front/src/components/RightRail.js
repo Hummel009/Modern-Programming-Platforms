@@ -1,5 +1,5 @@
-
 import { ToastContainer } from 'react-toastify';
+
 export const RightRail = ({
 	isLoggedIn
 }) => {

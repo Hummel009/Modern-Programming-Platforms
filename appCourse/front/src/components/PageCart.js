@@ -16,9 +16,9 @@ export const PageCart = ({
 
 			setCartData([]);
 
-			toast.success('Кош ачышчаны!');
+			toast.success('Корзина очищена!');
 		} catch (error) {
-			toast.error('Памылка!');
+			toast.error('Ошибка!');
 		}
 	}
 
@@ -39,9 +39,9 @@ export const PageCart = ({
 			handleFetchUserData();
 			handleFetchUserOrders();
 
-			toast.success('Заказ аформлены!');
+			toast.success('Заказ оформлен!');
 		} catch (error) {
-			toast.error('Памылка!');
+			toast.error('Ошибка!');
 		}
 	};
 
@@ -52,18 +52,18 @@ export const PageCart = ({
 	return (
 		<div>
 			<h1>
-				<span>Кош</span>
+				<span>Корзина</span>
 			</h1>
 			<div className="total-price">
 				{cartData.length > 0 ? (
-					<span>Агульны кошт: {totalPrice.toFixed(2)}$</span>
+					<span>Общая стоимость: {totalPrice.toFixed(2)}$</span>
 				) : (
-					<span>Кош пусты.</span>
+					<span>Корзина пуста.</span>
 				)}
 			</div>
 			<br />
-			<button className="wds-button prev" onClick={handleAddUserOrder} disabled={cartData.length <= 0 || !isLoggedIn}>Купіць</button>
-			<button className="wds-button next" onClick={handleClearCart} disabled={cartData.length <= 0}>Ачысціць кош</button>
+			<button className="wds-button prev" onClick={handleAddUserOrder} disabled={cartData.length <= 0 || !isLoggedIn}>Купить</button>
+			<button className="wds-button next" onClick={handleClearCart} disabled={cartData.length <= 0}>Очистить корзину</button>
 			<br />
 			<br />
 			<div className="navi">
@@ -74,7 +74,7 @@ export const PageCart = ({
 							<div className="author">{book.authorName}</div>
 							<div className="description">{book.desc}</div>
 						</div>
-						<div className="title">Колькасць: {book.quantity}</div>
+						<div className="title">Количество: {book.quantity}</div>
 						<img src={book.image} width="100%" height="auto" alt="" />
 					</div>
 				))}

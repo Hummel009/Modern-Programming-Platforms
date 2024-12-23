@@ -1,7 +1,5 @@
 import axios from 'axios';
-import React, {
-	useState
-} from 'react';
+import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 
@@ -29,22 +27,22 @@ export const PageLogin = ({
 
 			handleFetchUserData();
 
-			toast.success('Аўтарызацыя прайшла паспяхова!');
+			toast.success('Авторизация прошла успешно!');
 		} catch (error) {
-			toast.error('Памылка!');
+			toast.error('Ошибка!');
 		}
 	};
 
 	return (
 		<div>
 			<h1>
-				<span>Уваход</span>
+				<span>Вход</span>
 			</h1>
 			<form onSubmit={handleLoginSubmit} className="main-fieldset">
 				<input
 					type="text"
 					name="username"
-					placeholder="Імя ўдзельніка"
+					placeholder="Имя пользователя"
 					onChange={(e) => setLoginData({
 						...loginData,
 						[e.target.name]: e.target.value
@@ -62,9 +60,9 @@ export const PageLogin = ({
 					required
 				/>
 				{isLoggedIn ? (
-					<button disabled type="submit" className="wds-button">Увайсці</button>
+					<button disabled type="submit" className="wds-button">Войти</button>
 				) : (
-					<button type="submit" className="wds-button">Увайсці</button>
+					<button type="submit" className="wds-button">Войти</button>
 				)}
 			</form>
 		</div>

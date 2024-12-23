@@ -1,7 +1,5 @@
 import axios from 'axios';
-import React, {
-	useState
-} from 'react';
+import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
 
@@ -29,22 +27,22 @@ export const PageRegister = ({
 
 			handleFetchUserData();
 
-			toast.success('Рэгістрацыя прайшла паспяхова!');
+			toast.success('Регистрация прошла успешно!');
 		} catch (error) {
-			toast.error('Памылка!');
+			toast.error('Ошибка!');
 		}
 	};
 
 	return (
 		<div>
 			<h1>
-				<span>Рэгістрацыя</span>
+				<span>Регистрация</span>
 			</h1>
 			<form onSubmit={handleRegisterSubmit} className="main-fieldset">
 				<input
 					type="text"
 					name="username"
-					placeholder="Імя ўдзельніка"
+					placeholder="Имя пользователя"
 					onChange={(e) => setRegisterData({
 						...registerData,
 						[e.target.name]: e.target.value
@@ -62,9 +60,9 @@ export const PageRegister = ({
 					required
 				/>
 				{isLoggedIn ? (
-					<button disabled type="submit" className="wds-button">Зарэгістравацца</button>
+					<button disabled type="submit" className="wds-button">Зарегистрироваться</button>
 				) : (
-					<button type="submit" className="wds-button">Зарэгістравацца</button>
+					<button type="submit" className="wds-button">Зарегистрироваться</button>
 				)}
 			</form>
 		</div>

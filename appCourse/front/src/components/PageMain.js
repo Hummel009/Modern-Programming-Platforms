@@ -1,7 +1,5 @@
 import axios from 'axios';
-import React, {
-	useState
-} from 'react';
+import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -71,9 +69,9 @@ export const PageMain = ({
 
 			handleFetchCartData();
 
-			toast.success('Дадана ў кош!');
+			toast.success('Добавлено в корзину!');
 		} catch (error) {
-			toast.error('Памылка!');
+			toast.error('Ошибка!');
 		}
 	};
 
@@ -84,14 +82,14 @@ export const PageMain = ({
 			</h1>
 
 			<div>
-				Тут вы можете купить разные ноутбуки.
+				Здесь вы можете купить разные книги.
 			</div>
 
 			<br />
 
 			<div className="change">
 				<select onChange={(e) => handleFilterBooksAuthors(e.target.value)}>
-					<option value="all">Все вендоры</option>
+					<option value="all">Все авторы</option>
 					{authors.map(author => (
 						<option key={author.id} value={author.id}>{author.name}</option>
 					))}
@@ -103,9 +101,9 @@ export const PageMain = ({
 					))}
 				</select>
 				<select onChange={(e) => handleFilterBooksYears(e.target.value)}>
-					<option value="all">Все года</option>
+					<option value="all">Все годы</option>
 					{years.map(year => (
-						<option key={year} value={year}>Пасля {year}</option>
+						<option key={year} value={year}>После {year}</option>
 					))}
 				</select>
 			</div>
@@ -121,14 +119,14 @@ export const PageMain = ({
 							<div className="other">{book.typeName}, {book.year}</div>
 							<div className="description">{book.desc}</div>
 						</div>
-						<button className="wds-button price" onClick={(e) => handleAddBookToCart(book)}>Дадаць у кош ({book.price}$)</button>
+						<button className="wds-button price" onClick={(e) => handleAddBookToCart(book)}>Добавить в корзину ({book.price}$)</button>
 						<img src={book.image} width="100%" height="auto" alt="" />
 					</div>
-				))}
-			</div>
+			 ))}
+		 </div>
 
-			<button className="wds-button prev" onClick={handlePrevPage} disabled={currentPage === 1}>Прошлая</button>
-			<button className="wds-button next" onClick={handleNextPage} disabled={currentPage === totalPages}>Следующая</button>
-		</div>
-	)
+		 <button className="wds-button prev" onClick={handlePrevPage} disabled={currentPage === 1}>Предыдущая</button>
+		 <button className="wds-button next" onClick={handleNextPage} disabled={currentPage === totalPages}>Следующая</button>
+	  </div>
+   )
 }
