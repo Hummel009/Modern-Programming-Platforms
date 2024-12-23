@@ -92,6 +92,10 @@ export const PageProfile = ({
 			</h1>
 			{isLoggedIn ? (
 				<div>
+					<button onClick={handleDeleteToken} className="wds-button">Выйсці</button>
+
+					<br/><br/>
+
 					<div>Імя ўдзельніка: {userData.username}</div>
 					<div>Баланс: {userData.balance}$</div>
 

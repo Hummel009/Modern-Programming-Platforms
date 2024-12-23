@@ -147,6 +147,10 @@ function App() {
 				<div className="page-container">
 					<NavLocal />
 					<div className="page has-right-rail">
+						<RightRail
+							isLoggedIn={isLoggedIn}
+							handleDeleteToken={handleDeleteToken}
+						/>
 						<main className="page-main">
 							<Routes>
 								<Route path="/" element={
@@ -210,10 +214,6 @@ function App() {
 								))}
 							</Routes>
 						</main>
-						<RightRail
-							isLoggedIn={isLoggedIn}
-							handleDeleteToken={handleDeleteToken}
-						/>
 					</div>
 				</div>
 			</div>

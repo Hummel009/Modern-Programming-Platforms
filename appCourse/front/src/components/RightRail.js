@@ -1,8 +1,7 @@
 
 import { ToastContainer } from 'react-toastify';
 export const RightRail = ({
-	isLoggedIn,
-	handleDeleteToken
+	isLoggedIn
 }) => {
 	return (
 		<aside className='right-rail search'>
@@ -11,16 +10,13 @@ export const RightRail = ({
 
 				{isLoggedIn ? (
 					<div>
-						<h1>
-							<span className="status" style={{ color: 'green' }}>Уваход здзейснены</span>
-						</h1>
-						<button onClick={handleDeleteToken} className="wds-button">Выйсці</button>
+						<span className="status" style={{ color: 'green' }}>Уваход здзейснены</span>
+						<div>
+						</div>
 					</div>
 				) : (
 					<div>
-						<h1>
-							<span className="status" style={{ color: 'red' }}>Уваход не здзейснены</span>
-						</h1>
+						<span className="status" style={{ color: 'red' }}>Уваход не здзейснены</span>
 					</div>
 				)}
 			</div>

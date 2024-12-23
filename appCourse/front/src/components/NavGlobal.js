@@ -1,19 +1,26 @@
+import { Link } from 'react-router-dom';
+
 export const NavGlobal = (
 ) => {
 	return(
 		<div className="global-navigation">
-			<div className="dev">
-				<img src="avatars/github.jpg" width="100%" height="auto" alt="" />
-				<a href="https://github.com/Hummel009">GitHub</a>
-			</div>
-			<div className="dev">
-				<img src="avatars/discord.jpg" width="100%" height="auto" alt="" />
-				<a href="https://discord.gg/Hx5CksdyvE">Discord</a>
-			</div>
-			<div className="dev">
-				<img src="avatars/youtube.jpg" width="100%" height="auto" alt="" />
-				<a href="https://www.youtube.com/@Hummel009">YouTube</a>
-			</div>
+			<nav className="local-navigation">
+                <Link to="/">
+                    <span>Галоўная</span>
+                </Link>
+                <Link to="/register">
+                    <span>Рэгістрацыя</span>
+                </Link>
+                <Link to="/login">
+                    <span>Уваход</span>
+                </Link>
+                <Link to="/profile">
+                    <span>Профіль</span>
+                </Link>
+                <Link to="/cart">
+                    <span>Кош</span>
+                </Link>
+            </nav>
 		</div>
 	)
 }
