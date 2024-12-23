@@ -6,19 +6,19 @@ export const NavGlobal = (
 		<div className="global-navigation">
 			<nav className="local-navigation">
                 <Link to="/">
-                    <span>Галоўная</span>
+                    <span>Главная</span>
                 </Link>
                 <Link to="/register">
-                    <span>Рэгістрацыя</span>
+                    <span>Регистрация</span>
                 </Link>
                 <Link to="/login">
-                    <span>Уваход</span>
+                    <span>Вход</span>
                 </Link>
                 <Link to="/profile">
-                    <span>Профіль</span>
+                    <span>Профиль</span>
                 </Link>
                 <Link to="/cart">
-                    <span>Кош</span>
+                    <span>Корзина</span>
                 </Link>
             </nav>
 		</div>

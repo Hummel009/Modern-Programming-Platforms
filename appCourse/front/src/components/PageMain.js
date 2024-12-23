@@ -80,30 +80,30 @@ export const PageMain = ({
 	return (
 		<div>
 			<h1>
-				<span>Галоўная</span>
+				<span>Главная</span>
 			</h1>
 
 			<div>
-				Тут вы можаце знайсці вельмі многа розных кніг.
+				Тут вы можете купить разные ноутбуки.
 			</div>
 
 			<br />
 
 			<div className="change">
 				<select onChange={(e) => handleFilterBooksAuthors(e.target.value)}>
-					<option value="all">Усе аўтары</option>
+					<option value="all">Все вендоры</option>
 					{authors.map(author => (
 						<option key={author.id} value={author.id}>{author.name}</option>
 					))}
 				</select>
 				<select onChange={(e) => handleFilterBooksTypes(e.target.value)}>
-					<option value="all">Усе тыпы</option>
+					<option value="all">Все типы</option>
 					{types.map(type => (
 						<option key={type.id} value={type.id}>{type.name}</option>
 					))}
 				</select>
 				<select onChange={(e) => handleFilterBooksYears(e.target.value)}>
-					<option value="all">Усе годы</option>
+					<option value="all">Все года</option>
 					{years.map(year => (
 						<option key={year} value={year}>Пасля {year}</option>
 					))}
@@ -127,8 +127,8 @@ export const PageMain = ({
 				))}
 			</div>
 
-			<button className="wds-button prev" onClick={handlePrevPage} disabled={currentPage === 1}>Папярэдняя</button>
-			<button className="wds-button next" onClick={handleNextPage} disabled={currentPage === totalPages}>Наступная</button>
+			<button className="wds-button prev" onClick={handlePrevPage} disabled={currentPage === 1}>Прошлая</button>
+			<button className="wds-button next" onClick={handleNextPage} disabled={currentPage === totalPages}>Следующая</button>
 		</div>
 	)
 }

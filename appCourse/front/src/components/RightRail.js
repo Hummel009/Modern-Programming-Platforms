@@ -10,13 +10,13 @@ export const RightRail = ({
 
 				{isLoggedIn ? (
 					<div>
-						<span className="status" style={{ color: 'green' }}>Уваход здзейснены</span>
+						<span className="status" style={{ color: 'green' }}>Вход осуществлён</span>
 						<div>
 						</div>
 					</div>
 				) : (
 					<div>
-						<span className="status" style={{ color: 'red' }}>Уваход не здзейснены</span>
+						<span className="status" style={{ color: 'red' }}>Вход не осуществлён</span>
 					</div>
 				)}
 			</div>

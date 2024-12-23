@@ -244,14 +244,14 @@ body {
 }
 
 .wds-button:disabled {
-	background-color: #a9a9a9;
+	background-color: #898FA5;
 	color: Black;
 	cursor: not-allowed;
 	opacity: 0.6;
 }
 
 .wds-button:disabled:hover {
-	background-color: #a9a9a9;
+	background-color: #898FA5;
 	color: Black;
 }
 

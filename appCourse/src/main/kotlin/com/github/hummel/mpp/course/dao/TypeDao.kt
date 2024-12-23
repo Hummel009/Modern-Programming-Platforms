@@ -25,7 +25,7 @@ object TypeDao {
 		""".trimIndent()
 
 		val names = listOf(
-			"Паэзія", "Проза", "П'еса",
+			"Ультрабук", "Ноутбук",
 		)
 
 		try {
