@@ -64,6 +64,10 @@ jsonwebtoken и bcrypt . Логику аутентификации нужно о
 
 Как лабораторная работа №3, но сервера теперь два, и один с другим общается посредством GRPC.
 
+## Приложения
+
+В папке docs лежит пояснительная записка к курсовой работе.
+
 <!----------------------------------------------------------------------------->
 
 [code_smells_badge]: https://sonarcloud.io/api/project_badges/measure?project=Hummel009_Modern-Programming-Platforms&metric=code_smells
